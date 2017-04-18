@@ -17,12 +17,10 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
 
+#include "xtensor-blas/xblas_config.hpp"
 #include "xtensor-blas/xblas_utils.hpp"
 
-#ifndef USE_CXXLAPACK
-#define USE_CXXLAPACK
-#endif
-#include "thirdparty/FLENS/flens/flens.cxx"
+#include "flens/cxxblas/cxxblas.cxx"
 
 
 namespace xt
@@ -46,10 +44,14 @@ namespace blas
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
 
-        cxxblas::dot(ad.size(),
-                     ad.raw_data() + ad.raw_data_offset(), ad.strides().front(),
-                     bd.raw_data() + bd.raw_data_offset(), bd.strides().front(),
-                     res(0));
+        cxxblas::dot<BLAS_IDX>(
+            (BLAS_IDX) ad.size(),
+            ad.raw_data() + ad.raw_data_offset(),
+            (BLAS_IDX) ad.strides().front(),
+            bd.raw_data() + bd.raw_data_offset(),
+            (BLAS_IDX) bd.strides().front(),
+            res(0)
+        );
         return res;
     }
 
@@ -69,10 +71,14 @@ namespace blas
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
 
-        cxxblas::dotu(ad.size(),
-                      ad.raw_data() + ad.raw_data_offset(), ad.strides().front(),
-                      bd.raw_data() + bd.raw_data_offset(), bd.strides().front(),
-                      res(0));
+        cxxblas::dotu<BLAS_IDX>(
+            (BLAS_IDX) ad.size(),
+            ad.raw_data() + ad.raw_data_offset(),
+            (BLAS_IDX) ad.strides().front(),
+            bd.raw_data() + bd.raw_data_offset(),
+            (BLAS_IDX) bd.strides().front(),
+            res(0)
+        );
         return res;
     }
 
@@ -87,9 +93,12 @@ namespace blas
     {
         typename E1::value_type res;
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
-        cxxblas::asum(ad.size(),
-                      ad.raw_data() + ad.raw_data_offset(), ad.strides().front(), 
-                      res);
+        cxxblas::asum<BLAS_IDX>(
+            (BLAS_IDX) ad.size(),
+            ad.raw_data() + ad.raw_data_offset(),
+            (BLAS_IDX) ad.strides().front(), 
+            res
+        );
         return res;
     }
 
@@ -105,9 +114,12 @@ namespace blas
         typename E1::value_type res;
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
 
-        cxxblas::nrm2(ad.size(),
-                      ad.raw_data() + ad.raw_data_offset(), ad.strides().front(), 
-                      res);
+        cxxblas::nrm2<BLAS_IDX>(
+            (BLAS_IDX) ad.size(),
+            ad.raw_data() + ad.raw_data_offset(),
+            (BLAS_IDX) ad.strides().front(), 
+            res
+        );
         return res;
     }
 
@@ -137,17 +149,21 @@ namespace blas
             std::reverse(result_shape.begin(), result_shape.end());
         }
 
-        result_type res(result_shape);
+        result_type res(result_shape);  // TODO make double 
 
-        cxxblas::gemv(
+        cxxblas::gemv<BLAS_IDX>(
             get_blas_storage_order(dA), 
             transpose ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
-            dA.shape()[0], dA.shape()[1],
+            (BLAS_IDX) dA.shape()[0],
+            (BLAS_IDX) dA.shape()[1],
             alpha(), // alpha
-            dA.raw_data(), dA.strides().front(),
-            dx.raw_data(), dx.strides().front(), 
-            0.f, // beta 
-            res.raw_data(), 1ul
+            dA.raw_data(),
+            (BLAS_IDX) dA.strides().front(),
+            dx.raw_data(),
+            (BLAS_IDX) dx.strides().front(), 
+            value_type(0), // beta 
+            res.raw_data(),
+            (BLAS_IDX) 1
         );
 
         return res;
@@ -180,16 +196,21 @@ namespace blas
 
         return_type res(s);
 
-        cxxblas::gemm(
+        cxxblas::gemm<BLAS_IDX>(
             get_blas_storage_order(da), 
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
             transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
-            da.shape()[0], da.shape()[1], db.shape()[0],
+            (BLAS_IDX) da.shape()[0],
+            (BLAS_IDX) da.shape()[1],
+            (BLAS_IDX) db.shape()[0],
             alpha(),
-            da.raw_data(), da.strides().front(),
-            db.raw_data(), db.strides().front(), 
+            da.raw_data(),
+            (BLAS_IDX) da.strides().front(),
+            db.raw_data(),
+            (BLAS_IDX) db.strides().front(), 
             beta(),
-            res.raw_data(), res.strides().front()
+            res.raw_data(),
+            (BLAS_IDX) res.strides().front()
         );
 
         return res;
@@ -220,14 +241,14 @@ namespace blas
         typename return_type::shape_type s = {dx.shape()[0], dy.shape()[0]};
         return_type res(s, 0);
 
-        cxxblas::ger(
+        cxxblas::ger<BLAS_IDX>(
             get_blas_storage_order(res), 
-            dx.shape()[0],
-            dy.shape()[0],
+            (BLAS_IDX) dx.shape()[0],
+            (BLAS_IDX) dy.shape()[0],
             alpha(),
-            dx.raw_data(), dx.strides().front(),
-            dy.raw_data(), dy.strides().front(), 
-            res.raw_data(), res.strides().front()
+            dx.raw_data(),  (BLAS_IDX) dx.strides().front(),
+            dy.raw_data(),  (BLAS_IDX) dy.strides().front(), 
+            res.raw_data(), (BLAS_IDX) res.strides().front()
         );
 
         return res;

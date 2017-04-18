@@ -36,6 +36,17 @@ set(XTENSOR_BLAS_HEADERS
     ${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xlinalg.hpp
 )
 
+OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
+OPTION(HAVE_CBLAS "use cblas" ON)
+
+if(HAVE_CBLAS)
+  add_definitions(-DHAVE_CBLAS=1)
+endif()
+
+if (CXXBLAS_DEBUG)
+  add_definitions(-DCXXBLAS_DEBUG=1)
+endif()
+
 OPTION(BUILD_TESTS "xtensor-blas test suite" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
 
@@ -47,7 +58,7 @@ if(BUILD_TESTS)
     find_package(xtensor REQUIRED)
     include_directories(${XTENSOR_BLAS_INCLUDE_DIR})
     include_directories(${xtensor_INCLUDE_DIR})
-    include_directories(${XTENSOR_BLAS_INCLUDE_DIR}/thirdparty/FLENS)
+    include_directories(${XTENSOR_BLAS_INCLUDE_DIR}/flens/)
     add_subdirectory(test)
 endif()
 

@@ -1,3 +1,0 @@
-[submodule "include/thirdparty/FLENS"]
-	path = include/thirdparty/FLENS
-	url = https://github.com/michael-lehn/FLENS

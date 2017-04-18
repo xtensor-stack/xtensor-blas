@@ -13,6 +13,14 @@
 #define XTENSOR_BLAS_VERSION_MINOR 8
 #define XTENSOR_BLAS_VERSION_PATCH 0
 
+#ifndef USE_CXXLAPACK
+#define USE_CXXLAPACK
+#endif
+
+#ifndef BLAS_IDX
+#define BLAS_IDX int
+#endif
+
 namespace xt
 {
 	using XBLAS_INDEX = int;

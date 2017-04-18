@@ -103,15 +103,12 @@ namespace xt
 
         auto t = linalg::inv(a);
 
-        xarray<double> expected = 
+        xarray<double, layout_type::column_major> expected = 
               {{ 0.55555556, -0.11111111, -0.22222222},
                { 0.22222222,  0.55555556,  0.11111111},
                {-0.33333333, -0.33333333,  0.33333333}};
 
-        EXPECT_NEAR(expected(0, 0), t(0, 0), 1e-5);
-        EXPECT_NEAR(expected(1, 0), t(1, 0), 1e-5);
-        EXPECT_NEAR(expected(2, 0), t(2, 0), 1e-5);
-        EXPECT_NEAR(expected(2, 1), t(2, 1), 1e-5);
+        EXPECT_TRUE(allclose(expected, t));
 
         auto br = linalg::inv(b);
         EXPECT_EQ(b, br);

@@ -17,13 +17,11 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
 
-#include "xtensor-blas/xblas_utils.hpp"
 #include "xtensor-blas/xblas_config.hpp"
+#include "xtensor-blas/xblas_utils.hpp"
 
-#ifndef USE_CXXLAPACK
-#define USE_CXXLAPACK
-#endif
-#include "thirdparty/FLENS/flens/flens.cxx"
+#include "flens/cxxblas/cxxblas.cxx"
+#include "flens/cxxlapack/cxxlapack.cxx"
 
 namespace xt
 {

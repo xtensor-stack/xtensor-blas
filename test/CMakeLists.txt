@@ -81,6 +81,7 @@ find_package(Threads)
 
 find_package(xtensor REQUIRED)
 find_package(LAPACK REQUIRED)
+find_package(BLAS REQUIRED)
 
 include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${XBLAS_INCLUDE_DIR})
@@ -98,5 +99,5 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(${XBLAS_TARGET} gtest_main)
 endif()
 
-target_link_libraries(${XBLAS_TARGET} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${XBLAS_TARGET} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 add_custom_target(xtest COMMAND test_xblas DEPENDS ${XBLAS_TARGET})

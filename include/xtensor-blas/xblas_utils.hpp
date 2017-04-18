@@ -9,7 +9,7 @@
 #ifndef XBLAS_UTILS_HPP
 #define XBLAS_UTILS_HPP
 
-#include "thirdparty/FLENS/cxxblas/typedefs.h"
+#include "flens/cxxblas/typedefs.h"
 
 namespace xt
 {

@@ -254,9 +254,8 @@ namespace linalg
             return res;
         }
 
-        int i = 0;
-
-        int bits, var = n;
+        // if n > 3, do a binary decomposition (copied from NumPy)
+        int bits, var = n, i = 0;
         for(bits = 0; var != 0; ++bits)
         {
             var >>= 1;
