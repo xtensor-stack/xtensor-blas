@@ -101,7 +101,7 @@ namespace xt
                             { 0, 1, 0},
                             { 0, 0, 1}};
 
-        auto t = linalg::inverse(a);
+        auto t = linalg::inv(a);
 
         xarray<double> expected = 
               {{ 0.55555556, -0.11111111, -0.22222222},
@@ -113,7 +113,7 @@ namespace xt
         EXPECT_NEAR(expected(2, 0), t(2, 0), 1e-5);
         EXPECT_NEAR(expected(2, 1), t(2, 1), 1e-5);
 
-        auto br = linalg::inverse(b);
+        auto br = linalg::inv(b);
         EXPECT_EQ(b, br);
         xarray<double> t_r_major(std::vector<std::size_t>{3, 3});
         assign_data(t_r_major, t, true);

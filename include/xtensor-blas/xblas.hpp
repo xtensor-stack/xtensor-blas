@@ -31,15 +31,17 @@ namespace xt
 namespace blas
 {
     /**
-     * Calculate the dot product between two vectors
+     * Calculate the dot product between two vectors, conjugating 
+     * the first argument \em a in the case of complex vectors.
+     * 
      * @param a vector of n elements
      * @param b vector of n elements
      * @returns scalar result
      */
     template <class E1, class E2>
-    xtensor<typename E1::value_type, 1> dot(const xexpression<E1>& a, const xexpression<E2>& b)
+    xarray<typename E1::value_type> dot(const xexpression<E1>& a, const xexpression<E2>& b)
     {
-        xtensor<typename E1::value_type, 1> res({0});
+        xarray<typename E1::value_type> res({0});
 
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
@@ -52,7 +54,31 @@ namespace blas
     }
 
     /**
+     * Calculate the dot product between two complex vectors, not conjugating the 
+     * first argument \em a.
+     * 
+     * @param a vector of n elements
+     * @param b vector of n elements
+     * @returns scalar result
+     */
+    template <class E1, class E2>
+    xarray<typename E1::value_type> dotu(const xexpression<E1>& a, const xexpression<E2>& b)
+    {
+        xarray<typename E1::value_type> res({0});
+
+        auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
+        auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
+
+        cxxblas::dotu(ad.size(),
+                      ad.raw_data() + ad.raw_data_offset(), ad.strides().front(),
+                      bd.raw_data() + bd.raw_data_offset(), bd.strides().front(),
+                      res(0));
+        return res;
+    }
+
+    /**
      * Calculate the 1-norm of a vector
+     * 
      * @param a vector of n elements
      * @returns scalar result
      */
@@ -69,6 +95,7 @@ namespace blas
 
     /**
      * Calculate the 2-norm of a vector
+     * 
      * @param a vector of n elements
      * @returns scalar result
      */
@@ -84,14 +111,21 @@ namespace blas
         return res;
     }
 
-    template <class E1, class E2>
-    xt::xarray<typename E1::value_type> gemv(const xexpression<E1>& A, const xexpression<E2>& x, 
-                                             bool transpose = false,
-                                             const xscalar<typename E1::value_type> alpha = 1)
+    /**
+     * Calculate the general matrix times vector product according to 
+     * ``y := alpha * A * x + beta * y``.
+     *
+     * @param A matrix of n x m elements
+     * @param x vector of n elements
+     * @param transpose select if A should be transposed
+     * @param alpha scalar scale factor
+     * @returns the resulting vector
+     */
+    template <class E1, class E2, class value_type = typename E1::value_type>
+    xt::xarray<value_type> gemv(const xexpression<E1>& A, const xexpression<E2>& x, 
+                                bool transpose = false,
+                                const xscalar<value_type> alpha = value_type(1))
     {
-        // General Matrix times vector calculatess
-        // y := alpha * A * x + beta * y
-
         auto&& dA = view_eval<E1::static_layout>(A.derived_cast());
         auto&& dx = view_eval<E2::static_layout>(x.derived_cast());
 
@@ -104,7 +138,6 @@ namespace blas
         }
 
         result_type res(result_shape);
-
 
         cxxblas::gemv(
             get_blas_storage_order(dA), 
@@ -126,16 +159,18 @@ namespace blas
      * @param B matrix of n-by-k elements
      * @returns matrix of m-by-k elements
      */
-    template <class E1, class E2>
-    xarray<typename E1::value_type> gemm(const xexpression<E1>& A, const xexpression<E2>& B,
-                                         const xscalar<typename E1::value_type> alpha = 1,
-                                         const xscalar<typename E1::value_type> beta = 0,
-                                         bool transpose_A = false, bool transpose_B = false)
+    template <class E1, class E2, class value_type = typename E1::value_type>
+    xarray<value_type> gemm(const xexpression<E1>& A, const xexpression<E2>& B,
+                            const xscalar<value_type> alpha = value_type(1),
+                            const xscalar<value_type> beta = value_type(0),
+                            bool transpose_A = false, bool transpose_B = false)
     {
         auto&& da = view_eval(A.derived_cast());
         auto&& db = view_eval(B.derived_cast());
 
         XTENSOR_ASSERT(da.layout() == db.layout());
+        XTENSOR_ASSERT(da.dimension() == 2);
+        XTENSOR_ASSERT(db.dimension() == 2);
 
         using return_type = typename select_xtype<E1, E2>::type;
         typename return_type::shape_type s = {
@@ -160,9 +195,18 @@ namespace blas
         return res;
     }
 
-    template <class E1, class E2>
-    xarray<typename E1::value_type> ger(const xexpression<E1>& x, const xexpression<E2>& y,
-                                        const xscalar<typename E1::value_type> alpha = 1)
+    /**
+     * Calculate the outer product of vector x and y.
+     * According to A:= alpha * x * y' + A
+     *
+     * @param x vector of n elements
+     * @param y vector of m elements
+     * @param alpha scalar scale factor
+     * @returns matrix of n-by-m elements
+     */
+    template <class E1, class E2, class value_type = typename E1::value_type>
+    xarray<value_type> ger(const xexpression<E1>& x, const xexpression<E2>& y,
+                           const xscalar<value_type> alpha = 1)
     {
         // outer product
         // A := alpha * x * y' + A
@@ -174,7 +218,7 @@ namespace blas
 
         using return_type = typename select_xtype<E1, E2>::type;
         typename return_type::shape_type s = {dx.shape()[0], dy.shape()[0]};
-        return_type res(s);
+        return_type res(s, 0);
 
         cxxblas::ger(
             get_blas_storage_order(res), 

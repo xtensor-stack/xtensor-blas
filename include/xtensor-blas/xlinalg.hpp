@@ -26,36 +26,70 @@ namespace xt
 namespace linalg
 {
 
+    /**
+     * Calculate 1- and 2-norm of vector.
+     *
+     * @param vec input vector
+     * @param ord order of norm (1 or 2)
+     * @return scalar result
+     *
+     * @tparam type of xexpression
+     */
     template <class E1>
-    typename E1::value_type norm(const xexpression<E1>& a, int ord = 2)
+    typename E1::value_type norm(const xexpression<E1>& vec, int ord = 2)
     {
         if (ord == 1)
         {
-            return blas::asum(a);
+            return blas::asum(vec);
         }
         else if (ord == 2)
         {
-            return blas::nrm2(a);
+            return blas::nrm2(vec);
         }
         std::stringstream ss;
         ss << "Norm " << ord << " not implemented!" << std::endl;
         throw std::runtime_error(ss.str());
     }
 
+    /**
+     * Solve a linear matrix equation, or system of linear scalar equations.
+     * Computes the “exact” solution, x, of the well-determined, i.e., full rank, 
+     * linear matrix equation ax = b.
+     * 
+     * @param a Coefficient matrix
+     * @param b Ordinate or “dependent variable” values.
+     * @return Solution to the system a x = b. Returned shape is identical to b.
+     */
     template <class E1, class E2>
     auto solve(const xexpression<E1>& a, const xexpression<E2>& b)
     {
         return lapack::gesv(a, b);
     }
 
+    /**
+     * Compute the (multiplicative) inverse of a matrix.
+     *
+     * @param a Matrix to be inverted
+     * @return (Multiplicative) inverse of the matrix a.
+     */
     template <class E1>
-    auto inverse(const xexpression<E1>& a)
+    auto inv(const xexpression<E1>& a)
     {
         // copy otherwise A gets overwritten
         auto a_c = copy_to_layout<layout_type::column_major>(a.derived_cast());
         return lapack::getri(a_c);
     }
 
+    /**
+     * Compute the eigenvalues and right eigenvectors of a square array.
+     *
+     * @param Matrix for which the eigenvalues and right eigenvectors will be computed
+     * @return std::tuple(w, v). The first element corresponds to the eigenvalues, 
+     *                    each repeated according to its multiplicity. The eigenvalues 
+     *                    are not necessarily ordered.
+     *                    The second (1) element are the normalized (unit “length”) eigenvectors,
+     *                    such that the column v[:, i] corresponds to the eigenvalue w[i].
+     */
     template <class E1>
     auto eig(const xexpression<E1>& A)
     {
@@ -91,15 +125,35 @@ namespace linalg
                 }
             }
         }
-
+        return std::make_tuple(VR, eig_vecs);
     }
 
+    /**
+     * Non-broadcasting dot function.
+     * In the case of two 1D vectors, computes the vector dot 
+     * product. In the case of complex vectors, computes the dot 
+     * product without conjugating the first argument.
+     * If \em t or \em o is a 2D matrix, computes the matrix-times-vector
+     * product. If both \em t and \em o ar 2D matrices, computes
+     * the matrix-product.
+     * 
+     * @param t input array
+     * @param o input array
+     *
+     * @return resulting array
+     */
     template <class T, class O>
-    typename select_xtype<T, O>::type
-    dot(const T& t, const O& o) {
+    auto dot(const T& t, const O& o) {
         if (t.dimension() == 1 && o.dimension() == 1)
         {
-            return blas::dot(t, o);
+            if (is_complex<typename T::value_type>::value)
+            {
+                return blas::dotu(t, o);
+            }
+            else
+            {
+                return blas::dot(t, o);
+            }
         }
         else
         {
@@ -119,6 +173,122 @@ namespace linalg
         throw std::exception();
     }
 
+    /**
+     * Computes the dot product for two vectors. 
+     * Behaves different from \ref dot in the case of complex
+     * vectors. If vectors are complex, vdot conjugates the first
+     * argument \em t.
+     * Note: Unlike NumPy, xtensor-blas currently doesn't flatten 
+     * the input arguments.
+     * 
+     * @param t input vector (1D)
+     * @param o input vector (1D)
+     *
+     * @return resulting array
+     */
+    template <class T, class O>
+    auto vdot(const T& t, const O& o) {
+        XTENSOR_ASSERT(t.dimension() == 1);
+        XTENSOR_ASSERT(o.dimension() == 1);
+
+        if (is_complex<typename T::value_type>::value)
+        {
+            return blas::dot(t, o);
+        }
+        else
+        {
+            return blas::dotu(t, o);
+        }
+    }
+
+    /**
+     * Compute the outer product of two vectors.
+     * 
+     * @param t input vector (1D)
+     * @param o input vector (1D)
+     *
+     * @return resulting array
+     */
+    template <class T, class O>
+    auto outer(const T& t, const O& o) {
+        XTENSOR_ASSERT(t.dimension() == 1);
+        XTENSOR_ASSERT(o.dimension() == 1);
+        return blas::ger(t, o);
+    }
+
+    /**
+     * Calculate matrix power A**n
+     *
+     * @param mat  The matrix
+     * @param n    The exponent
+     *
+     * @return resulting array
+     */
+    template <class E>
+    E matrix_power(E mat, int n)
+    {
+        XTENSOR_ASSERT(mat.dimension() == 2);
+        XTENSOR_ASSERT(mat.shape()[0] == mat.shape()[1]);
+
+        using xtype = E;
+        xtype res(mat.shape());
+        if (n == 0)
+        {
+            res = eye(mat.shape());
+            return res;
+        }
+        else if (n < 0)
+        {
+            mat = inv(mat);
+            n = -n;
+        }
+
+        res = mat;
+
+        if (n <= 3)
+        {
+            for (int i = 0; i < n - 1; ++i)
+            {
+                res = blas::gemm(res, mat);
+            }
+            return res;
+        }
+
+        int i = 0;
+
+        int bits, var = n;
+        for(bits = 0; var != 0; ++bits)
+        {
+            var >>= 1;
+        }
+
+        while (~n & (1 << i))
+        {
+            mat = blas::gemm(mat, mat);
+            ++i;
+        }
+        res = mat;
+        ++i;
+        for (; i < bits; ++i)
+        {
+            mat = blas::gemm(mat, mat);
+            if (n & (1 << i))
+            {
+                res = blas::gemm(res, mat);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * Non-broadcasting cross product between two vectors
+     * Calculate cross product between two 1D vectors with 2- or 3 entries.
+     * If only two entries are available, the third entry is assumed to be 0.
+     * 
+     * @param a input vector
+     * @param b input vector
+     * @return resulting array
+     */
     template <class E1, class E2>
     auto cross(const xexpression<E1>& a, const xexpression<E2>& b)
     {
@@ -153,7 +323,7 @@ namespace linalg
         }
         else
         {
-            throw std::exception();
+            throw std::runtime_error("a or b did not have appropriate size 2 or 3.");
         }
         return res;
     }

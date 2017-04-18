@@ -33,28 +33,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     else()
         message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
     endif()
-
-    # Enable link time optimization and set the default symbol
-    # visibility to hidden (very important to obtain small binaries)
-    if (NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG)
-        # Default symbol visibility
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-
-        # Check for Link Time Optimization support
-        # (GCC/Clang)
-        CHECK_CXX_COMPILER_FLAG("-flto" HAS_LTO_FLAG)
-        if (HAS_LTO_FLAG)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
-        endif()
-
-        # Intel equivalent to LTO is called IPO
-        if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-            CHECK_CXX_COMPILER_FLAG("-ipo" HAS_IPO_FLAG)
-            if (HAS_IPO_FLAG)
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-            endif()
-        endif()
-    endif()
 endif()
 
 if(MSVC)
@@ -67,9 +45,14 @@ if(MSVC)
     endforeach()
 endif()
 
-if (DOWNLOAD_GTEST)
-    # Download and unpack googletest at configure time
-    configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
+    if(DOWNLOAD_GTEST)
+        # Download and unpack googletest at configure time
+        configure_file(downloadGTest.cmake.in googletest-download/CMakeLists.txt)
+    else()
+        # Copy local source of googletest at configure time
+        configure_file(copyGTest.cmake.in googletest-download/CMakeLists.txt)
+    endif()
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
                     RESULT_VARIABLE result
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
@@ -89,10 +72,7 @@ if (DOWNLOAD_GTEST)
                      ${CMAKE_CURRENT_BINARY_DIR}/googletest-build)
 
     set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-    set(GTEST_LIBRARY_DIRS "${gtest_BINARY_DIR}")
-    set(GTEST_LIBRARIES "${GTEST_LIBRARY_DIRS}/gtest.lib")
-    set(GTEST_MAIN_LIBRARIES "${GTEST_LIBRARY_DIRS}/gtest_main.lib")
-    set(GTEST_BOTH_LIBRARIES ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
+    set(GTEST_BOTH_LIBRARIES  gtest_main gtest)
 else()
     find_package(GTest REQUIRED)
 endif()
@@ -106,16 +86,17 @@ include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${XBLAS_INCLUDE_DIR})
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(XTENSOR_TESTS
+set(XTENSOR_BLAS_TESTS
     main.cpp
     test_blas.cpp
 )
-set(XBLAS_TARGET test_blas)
-add_executable(${XBLAS_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
-target_link_libraries(${XBLAS_TARGET} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-if(DOWNLOAD_GTEST)
-    add_custom_target(xtest COMMAND test_blas DEPENDS gtest_main ${XBLAS_TARGET})
-else()
-    add_custom_target(xtest COMMAND test_blas DEPENDS ${XBLAS_TARGET})
+set(XBLAS_TARGET test_xblas)
+
+add_executable(${XBLAS_TARGET} ${XTENSOR_BLAS_TESTS} ${XTENSOR_BLAS_HEADERS} ${XTENSOR_HEADERS})
+if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
+    add_dependencies(${XBLAS_TARGET} gtest_main)
 endif()
+
+target_link_libraries(${XBLAS_TARGET} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_custom_target(xtest COMMAND test_xblas DEPENDS ${XBLAS_TARGET})

@@ -30,11 +30,19 @@ namespace xt
 
 namespace lapack
 {
+    /**
+     * Interface to LAPACK gesv.
+     * 
+     * @param A matrix in
+     * @param b vector (right hand side)
+     *
+     * @return solution to ``Ax = b``
+     */
     template <class E1, class E2>
-    xarray<typename E1::value_type> gesv(const xexpression<E1>& A, const xexpression<E2>& B)
+    xarray<typename E1::value_type> gesv(const xexpression<E1>& A, const xexpression<E2>& b)
     {
         auto&& da = view_eval<layout_type::column_major>(A.derived_cast());
-        auto&& db = view_eval<layout_type::column_major>(B.derived_cast());
+        auto&& db = view_eval<layout_type::column_major>(b.derived_cast());
 
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(da.layout() == layout_type::column_major);
@@ -57,6 +65,12 @@ namespace lapack
         return db;
     }
 
+    /**
+     * Interface to LAPACK getri.
+     * 
+     * @param A matrix to invert
+     * @return inverse of A
+     */
     template <class E1>
     auto getri(const xexpression<E1>& A)
     {
@@ -102,11 +116,19 @@ namespace lapack
         return dA;
     }
 
+    /**
+     * Interface to LAPACK geev.
+     * 
+     * @param A matrix for which eigenvalues are to be calculated
+     * @return tuple of (wr, wi, VR, VL) where wr and wi are the real and imaginary
+     *         part of the eigenvalue, VR are the right eigenvectors (the only ones computed)
+     *         and VL is currently meaningless. Please consult a LAPACK documentation
+     *         to find out how VR is structured.
+     */
     template <class E1>
     auto geev(const xexpression<E1>& A)
     {
         // TODO implement for complex numbers
-
         auto&& dA = view_eval<layout_type::column_major>(A.derived_cast());
         XTENSOR_ASSERT(dA.dimension() == 2);
         XTENSOR_ASSERT(dA.layout() == layout_type::column_major);
