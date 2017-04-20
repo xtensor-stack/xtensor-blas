@@ -14,6 +14,7 @@
 #include "xtensor-blas/xlapack.hpp"
 #include "xtensor-blas/xlinalg.hpp"
 
+
 namespace xt
 {
     TEST(xblas, matrix_times_vector)
@@ -52,33 +53,6 @@ namespace xt
         EXPECT_EQ(expected2, res2);
     }
 
-    TEST(xblas, solve)
-    {
-        xarray<double> a = {{ 2, 1, 1},
-                            {-1, 1,-1},
-                            { 1, 2, 3}};
-
-        xarray<double> vec = {2, 3, -10};
-        xarray<double> expected = {3, 1, -5};
-
-        auto res = linalg::solve(a, vec);
-        EXPECT_EQ(expected, res);
-
-        vec.reshape({3, 1});
-        expected.reshape({3, 1});
-        auto res2 = linalg::solve(a, vec);
-        EXPECT_EQ(expected, res2);
-
-        xarray<double> vec2 = {6, 2, -10};
-        vec2.reshape({3, 1});
-
-        auto res3 = linalg::solve(a, concatenate(xtuple(vec, vec2 * 3), 1));
-        xarray<double> expected3 = {{ 3, 16},
-                                    { 1,  4},
-                                    {-5,-18}};
-        EXPECT_EQ(expected3, res3);
-    }
-
     TEST(xblas, norm)
     {
         auto a = linalg::norm(xt::arange<double>(15), 1);
@@ -91,33 +65,22 @@ namespace xt
         EXPECT_NEAR(res, 7.5498344352707498, 1e-6);
     }
 
-    TEST(xblas, inverse)
+    TEST(xblas, outer)
     {
-        xarray<double> a = {{ 2, 1, 1},
-                            {-1, 1,-1},
-                            { 1, 2, 3}};
+        xarray<double> a = {1, 1, 1};
 
-        xarray<double> b = {{ 1, 0, 0},
-                            { 0, 1, 0},
-                            { 0, 0, 1}};
+        xarray<double> b = arange(0, 3);
 
-        auto t = linalg::inv(a);
+        xarray<long> expected = {{0,1,2},
+                                 {0,1,2},
+                                 {0,1,2}};
 
-        xarray<double, layout_type::column_major> expected = 
-              {{ 0.55555556, -0.11111111, -0.22222222},
-               { 0.22222222,  0.55555556,  0.11111111},
-               {-0.33333333, -0.33333333,  0.33333333}};
+        auto t = linalg::outer(a, b);
+        auto t2 = linalg::outer(a, xt::arange(0, 3));
+        auto t3 = linalg::outer(xt::ones<double>({3}), xt::arange(0, 3));
 
-        EXPECT_TRUE(allclose(expected, t));
-
-        auto br = linalg::inv(b);
-        EXPECT_EQ(b, br);
-        xarray<double> t_r_major(std::vector<std::size_t>{3, 3});
-        assign_data(t_r_major, t, true);
-        auto almost_eye = linalg::dot(t_r_major, a);
-        auto e = xt::eye(3);
-        auto d = almost_eye - e;
-        auto min = xt::amin(d);
-        EXPECT_NEAR(min(), 0.0, 1e-6);
+        EXPECT_TRUE(all(equal(expected, t)));
+        EXPECT_TRUE(all(equal(expected, t2)));
+        EXPECT_TRUE(all(equal(expected, t3)));
     }
 }

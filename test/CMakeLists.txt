@@ -90,6 +90,8 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(XTENSOR_BLAS_TESTS
     main.cpp
     test_blas.cpp
+    test_lapack.cpp
+    test_linalg.cpp
 )
 
 set(XBLAS_TARGET test_xblas)

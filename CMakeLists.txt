@@ -9,12 +9,14 @@
 cmake_minimum_required(VERSION 3.1)
 project(xtensor-blas)
 
-set(XTENSOR_BLAS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(FLENS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/xtensor-blas/flens)
+set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR} ${FLENS_INCLUDE_DIR})
 
 # Versionning
 # ===========
 
-file(STRINGS "${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xblas_config.hpp" xtensor_blas_version_defines
+file(STRINGS "${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp" xtensor_blas_version_defines
      REGEX "#define XTENSOR_BLAS_VERSION_(MAJOR|MINOR|PATCH)")
 foreach(ver ${xtensor_blas_version_defines})
     if(ver MATCHES "#define XTENSOR_BLAS_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
@@ -29,11 +31,11 @@ message(STATUS "xtensor-blas v${${PROJECT_NAME}_VERSION}")
 # =====
 
 set(XTENSOR_BLAS_HEADERS
-    ${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xblas.hpp
-    ${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xblas_utils.hpp
-    ${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xblas_config.hpp
-    ${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xlapack.hpp
-    ${XTENSOR_BLAS_INCLUDE_DIR}/xtensor-blas/xlinalg.hpp
+    ${INCLUDE_DIR}/xtensor-blas/xblas.hpp
+    ${INCLUDE_DIR}/xtensor-blas/xblas_utils.hpp
+    ${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp
+    ${INCLUDE_DIR}/xtensor-blas/xlapack.hpp
+    ${INCLUDE_DIR}/xtensor-blas/xlinalg.hpp
 )
 
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
@@ -58,7 +60,6 @@ if(BUILD_TESTS)
     find_package(xtensor REQUIRED)
     include_directories(${XTENSOR_BLAS_INCLUDE_DIR})
     include_directories(${xtensor_INCLUDE_DIR})
-    include_directories(${XTENSOR_BLAS_INCLUDE_DIR}/flens/)
     add_subdirectory(test)
 endif()
 
@@ -69,10 +70,13 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 install(FILES ${XTENSOR_BLAS_HEADERS}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas)
+
+install(DIRECTORY ${INCLUDE_DIR}/xtensor-blas/flens/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas/flens)
 
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}" CACHE STRING "install path for xblasConfig.cmake")
+set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}" CACHE STRING "install path for xtensor-blasConfig.cmake")
 
 configure_package_config_file(${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"

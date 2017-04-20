@@ -109,25 +109,26 @@ namespace xt
 
     namespace detail
     {
-        template <class A, class B, class T>
+        template <class A, class B, class T, std::size_t NEW_DIM>
         struct get_type_impl {
             using type = xarray<T>;
         };
 
-        template <class A, std::size_t N, class B, std::size_t M, class T>
-        struct get_type_impl<std::array<A, N>, std::array<B, M>, T> {
-            using type = xtensor<T, M>;
+        template <class A, std::size_t N, class B, std::size_t M, class T, std::size_t NEW_DIM>
+        struct get_type_impl<std::array<A, N>, std::array<B, M>, T, NEW_DIM> {
+            using type = xtensor<T, NEW_DIM>;
         };
 
     }
 
-    template <class A, class B>
+    template <class A, class B, std::size_t NEW_DIM>
     struct select_xtype
     {
-        using type = typename std::remove_const_t<
-                                typename detail::get_type_impl<typename A::shape_type, typename B::shape_type, 
-                                                               typename std::common_type_t<typename A::value_type, 
-                                typename B::value_type>>::type>;
+        using type = std::remove_const_t<
+                        typename detail::get_type_impl<
+                            typename A::shape_type, typename B::shape_type, 
+                            std::common_type_t<typename A::value_type, typename B::value_type>,
+                            NEW_DIM>::type>;
     };
 }
 

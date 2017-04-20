@@ -20,8 +20,7 @@
 #include "xtensor-blas/xblas_config.hpp"
 #include "xtensor-blas/xblas_utils.hpp"
 
-#include "flens/cxxblas/cxxblas.cxx"
-
+#include "cxxblas/cxxblas.cxx"
 
 namespace xt
 {
@@ -141,7 +140,7 @@ namespace blas
         auto&& dA = view_eval<E1::static_layout>(A.derived_cast());
         auto&& dx = view_eval<E2::static_layout>(x.derived_cast());
 
-        using result_type = typename select_xtype<E1, E2>::type;
+        using result_type = typename select_xtype<E1, E2, 1>::type;
         typename result_type::shape_type result_shape({dA.shape()[0]});
 
         if (transpose)
@@ -188,7 +187,7 @@ namespace blas
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
-        using return_type = typename select_xtype<E1, E2>::type;
+        using return_type = typename select_xtype<E1, E2, 2>::type;
         typename return_type::shape_type s = {
           transpose_A ? da.shape()[1] : da.shape()[0],
           transpose_B ? db.shape()[0] : db.shape()[1],
@@ -237,7 +236,7 @@ namespace blas
         XTENSOR_ASSERT(dx.dimension() == 1);
         XTENSOR_ASSERT(dy.dimension() == 1);
 
-        using return_type = typename select_xtype<E1, E2>::type;
+        using return_type = typename select_xtype<E1, E2, 2>::type;
         typename return_type::shape_type s = {dx.shape()[0], dy.shape()[0]};
         return_type res(s, 0);
 

@@ -17,11 +17,10 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
 
+#include "flens/cxxlapack/cxxlapack.cxx"
+
 #include "xtensor-blas/xblas_config.hpp"
 #include "xtensor-blas/xblas_utils.hpp"
-
-#include "flens/cxxblas/cxxblas.cxx"
-#include "flens/cxxlapack/cxxlapack.cxx"
 
 namespace xt
 {
@@ -50,7 +49,7 @@ namespace lapack
 
         std::vector<XBLAS_INDEX> piv(da.shape()[0]);
 
-        cxxlapack::gesv<XBLAS_INDEX>(
+        int info = cxxlapack::gesv<XBLAS_INDEX>(
             (XBLAS_INDEX) da.shape()[0], 
             db.dimension() > 1 ? (XBLAS_INDEX) db.shape().back() : 1,
             da.raw_data(),
@@ -59,6 +58,11 @@ namespace lapack
             db.raw_data(), 
             !db.strides().back() < db.shape().front() ? (XBLAS_INDEX) db.shape().front() : (XBLAS_INDEX) db.strides().back()
         );
+
+        if (info > 0)
+        {
+            throw std::runtime_error("The solution could not be computed.");
+        }
 
         return db;
     }
@@ -102,7 +106,7 @@ namespace lapack
 
         work.resize(std::size_t(work[0]));
 
-        cxxlapack::getri<XBLAS_INDEX>(
+        int info = cxxlapack::getri<XBLAS_INDEX>(
             (XBLAS_INDEX) dA.shape()[0],
             dA.raw_data(),
             (XBLAS_INDEX) dA.strides().back(),
@@ -110,6 +114,11 @@ namespace lapack
             work.data(),
             (XBLAS_INDEX) work.size()
         );
+
+        if (info > 0)
+        {
+            throw std::runtime_error("Singular matrix not invertible.");
+        }
 
         return dA;
     }
@@ -136,16 +145,16 @@ namespace lapack
 
         const auto N = dA.shape()[0];
         std::vector<value_type> work(1);
+    
+        std::vector<std::size_t> vN = {N};
+        xarray<value_type, layout_type::column_major> wr(vN);
+        xarray<value_type, layout_type::column_major> wi(vN);
 
-        xtensor<value_type, 1> wr;
-        wr.reshape({N});
-        xtensor<value_type, 1> wi;
-        wi.reshape({N});
+        typename xtype::shape_type shp({dA.shape()[0], dA.shape()[1]});
+        xtensor<value_type, 2, layout_type::column_major> VL(shp);
+        xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
-        xtensor<value_type, 2, layout_type::column_major> VL(dA.shape());
-        xtensor<value_type, 2, layout_type::column_major> VR(dA.shape());
-
-        cxxlapack::geev<int>(
+        cxxlapack::geev<XBLAS_INDEX>(
             'N',
             'V',
             (XBLAS_INDEX) N,
@@ -157,15 +166,16 @@ namespace lapack
             (XBLAS_INDEX) VL.strides().back(),
             VR.raw_data(), 
             (XBLAS_INDEX) VR.strides().back(),
-            work.data(), -1
+            work.data(), 
+            -1
         );
 
         work.resize(std::size_t(work[0]));
 
-        cxxlapack::geev<int>(
+        int info = cxxlapack::geev<XBLAS_INDEX>(
             'N', // don't compute left eig vectors
             'V', // compute right eigenvectors
-            N,
+            (XBLAS_INDEX) N,
             dA.raw_data(), 
             (XBLAS_INDEX) dA.strides().back(),
             wr.raw_data(),
@@ -177,6 +187,11 @@ namespace lapack
             work.data(),
             (XBLAS_INDEX) work.size()
         );
+
+        if (info > 0)
+        {
+            throw std::runtime_error("The eigenvalue problem did not converge.");
+        }
 
         return std::make_tuple(wr, wi, VL, VR);
     }

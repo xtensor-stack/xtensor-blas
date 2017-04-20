@@ -17,9 +17,11 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
+#include "xtensor/xeval.hpp"
 
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlapack.hpp"
+#include "xtensor-blas/xblas_utils.hpp"
 
 namespace xt
 {
@@ -96,24 +98,24 @@ namespace linalg
         auto geev_res = lapack::geev(A);
 
         using value_type = typename E1::value_type;
-        const auto N = A.shape()[0];
+        const auto& dA = A.derived_cast();
+        const auto N = dA.shape()[0];
 
         xtensor<std::complex<value_type>, 1> eig_vals;
         eig_vals.reshape({N});
         xtensor<std::complex<value_type>, 2> eig_vecs;
         eig_vecs.reshape({N, N});
 
-        xt::real(eig_vals) = std::get<geev_res>(0);
-        xt::imag(eig_vals) = std::get<geev_res>(1);
+        xt::real(eig_vals) = std::get<0>(geev_res);
+        xt::imag(eig_vals) = std::get<1>(geev_res);
 
-        auto& VR = std::get<geev_res>(3);
-        auto& wi = std::get<geev_res>(1);
+        auto& VR = std::get<3>(geev_res);
 
         for (std::size_t i = 0; i < N; ++i)
         {
-            for (std::size_t j = 0; j < N - 1; ++j)
+            for (std::size_t j = 0; j < N; ++j)
             {
-                if (wi[j] != 0)
+                if (std::imag(eig_vals(j)) != 0)
                 {
                     eig_vecs(i, j)     = std::complex<value_type>(VR(i, j),  VR(i, j + 1));
                     eig_vecs(i, j + 1) = std::complex<value_type>(VR(i, j), -VR(i, j + 1));
@@ -125,7 +127,7 @@ namespace linalg
                 }
             }
         }
-        return std::make_tuple(VR, eig_vecs);
+        return std::make_tuple(eig_vals, eig_vecs);
     }
 
     /**
@@ -225,13 +227,15 @@ namespace linalg
      * @return resulting array
      */
     template <class E>
-    E matrix_power(E mat, int n)
+    auto matrix_power(E&& mat_inp, int n)
     {
         XTENSOR_ASSERT(mat.dimension() == 2);
         XTENSOR_ASSERT(mat.shape()[0] == mat.shape()[1]);
 
-        using xtype = E;
+        using xtype = typename select_xtype<E, E, 2>::type;
+        auto&& mat = eval(mat_inp);
         xtype res(mat.shape());
+
         if (n == 0)
         {
             res = eye(mat.shape());
@@ -244,7 +248,6 @@ namespace linalg
         }
 
         res = mat;
-
         if (n <= 3)
         {
             for (int i = 0; i < n - 1; ++i)
@@ -260,14 +263,13 @@ namespace linalg
         {
             var >>= 1;
         }
-
         while (~n & (1 << i))
         {
             mat = blas::gemm(mat, mat);
             ++i;
         }
-        res = mat;
         ++i;
+        res = mat;
         for (; i < bits; ++i)
         {
             mat = blas::gemm(mat, mat);
