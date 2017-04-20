@@ -59,7 +59,7 @@ endif()
 if(BUILD_TESTS)
     find_package(xtensor REQUIRED)
     include_directories(${XTENSOR_BLAS_INCLUDE_DIR})
-    include_directories(${xtensor_INCLUDE_DIR})
+    include_directories(${xtensor_INCLUDE_DIRS})
     add_subdirectory(test)
 endif()
 

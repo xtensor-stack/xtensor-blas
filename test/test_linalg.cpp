@@ -41,7 +41,6 @@ namespace xt
         xarray<double> t3expected = {{  1.06199622e+45,  1.36986674e+45,  1.67773727e+45},
                                      {  3.26000325e+45,  4.20507151e+45,  5.15013977e+45},
                                      {  5.45801029e+45,  7.04027628e+45,  8.62254226e+45}};
-
         EXPECT_TRUE(allclose(t3res, t3expected));
 
         xarray<double> t4arg_0 = {{-2., 1., 3.},

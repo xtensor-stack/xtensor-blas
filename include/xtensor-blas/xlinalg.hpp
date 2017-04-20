@@ -229,16 +229,22 @@ namespace linalg
     template <class E>
     auto matrix_power(E&& mat_inp, int n)
     {
-        XTENSOR_ASSERT(mat.dimension() == 2);
-        XTENSOR_ASSERT(mat.shape()[0] == mat.shape()[1]);
+        XTENSOR_ASSERT(mat_inp.dimension() == 2);
+        XTENSOR_ASSERT(mat_inp.shape()[0] == mat_inp.shape()[1]);
 
-        using xtype = typename select_xtype<E, E, 2>::type;
-        auto&& mat = eval(mat_inp);
-        xtype res(mat.shape());
+        using input_type = std::decay_t<E>;
+        using value_type = typename input_type::value_type;
+        using xtype = xtensor<value_type, 2>;
+        using shape_type = typename xtype::shape_type;
+
+        // copy input matrix
+        xtype mat = mat_inp;
+        shape_type shp = forward_sequence<shape_type>(mat_inp.shape());
+        xtype res(shp);
 
         if (n == 0)
         {
-            res = eye(mat.shape());
+            res = eye(mat.shape()[0]);
             return res;
         }
         else if (n < 0)

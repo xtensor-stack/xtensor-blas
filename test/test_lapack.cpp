@@ -15,6 +15,8 @@
 #include "xtensor-blas/xlapack.hpp"
 #include "xtensor-blas/xlinalg.hpp"
 
+#include "xtensor/xio.hpp"
+
 using namespace std::complex_literals;
 
 namespace xt
@@ -30,6 +32,7 @@ namespace xt
 
         xtensor<std::complex<double>, 1> eig_expected_0 = { 2.24745601+0.i        , 0.24898158+0.51158566i, 0.24898158-0.51158566i,
                                                             0.66252212+0.i        , 0.28854321+0.i        };
+
         xtensor<std::complex<double>, 2> eig_expected_1 = {{-0.67843725+0.i        ,-0.00104977+0.50731553i,-0.00104977-0.50731553i,
                                                             -0.48456457+0.i        ,-0.11153304+0.i        },
                                                            {-0.38393722+0.i        ,-0.42892828-0.30675499i,-0.42892828+0.30675499i,
@@ -45,8 +48,8 @@ namespace xt
 
         EXPECT_TRUE(allclose(xt::imag(eigvals), xt::imag(eig_expected_0)));
         EXPECT_TRUE(allclose(xt::real(eigvals), xt::real(eig_expected_0)));
-        EXPECT_TRUE(allclose(xt::imag(eigvecs), xt::imag(eig_expected_1)));
-        EXPECT_TRUE(allclose(xt::real(eigvecs), xt::real(eig_expected_1)));
+        EXPECT_TRUE(allclose(abs(imag(eigvecs)), abs(imag(eig_expected_1))));
+        EXPECT_TRUE(allclose(abs(real(eigvecs)), abs(real(eig_expected_1))));
     }
 
     TEST(xlapack, inverse)
