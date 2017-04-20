@@ -74,9 +74,6 @@ matrix:
             - libblas-dev
             - liblapack-dev
       env: COMPILER=clang CLANG=3.8
-    - os: osx
-      osx_image: xcode8
-      compiler: clang
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -114,12 +111,20 @@ install:
     - conda env create -f ./test-environment.yml
     - source activate test-xtensor
     - cd ..
+    - pwd
+    - tbd="$PWD"
+    - cd
+    - git clone https://github.com/QuantStack/xtensor
+    - cd xtensor
+    - cmake -DCMAKE_INSTALL_PREFIX=$HOME/miniconda .
+    - make install
+    - cd $tbd
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON .;
       else
         cmake -DBUILD_TESTS=ON .;
       fi
-    - make -j2 test_xtensor
+    - make -j2 test_xblas
     - cd test
 script:
-    - ./test_xtensor
+    - ./test_xblas

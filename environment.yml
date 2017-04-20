@@ -1,4 +1,4 @@
-name: xtensor
+name: xtensor-blas
 channels:
   - nodefaults
   - conda-forge
@@ -7,4 +7,4 @@ dependencies:
   - cling_ubuntu14
   - xtensor
   - flens
-  - xblas
+  - xtensor-blas
