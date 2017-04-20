@@ -23,14 +23,12 @@ in the `blas` and `lapack` namespace.
 
 ## Installation
 
-`xtensor-blas` is a header-only library.
+`xtensor-blas` is a header-only library that depends on `xtensor`, `LAPACK` and `BLAS`.
 You can directly install it from the sources:
 
 ```bash
 git clone https://github.com/QuantStack/xtensor-blas
 cd xtensor-blas
-git submodule init  # fetch FLENS!
-git submodule update
 mkdir build
 cd build
 cmake .. -D CMAKE_INSTALL_PREFIX=your_install_prefix  # for tests: -DBUILD_TESTS=ON
