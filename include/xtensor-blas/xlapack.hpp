@@ -67,6 +67,29 @@ namespace lapack
         return db;
     }
 
+    template <class E1>
+    auto getrf(const xexpression<E1>& A)
+    {
+        using value_type = typename E1::value_type;
+
+        auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        XTENSOR_ASSERT(dA.dimension() == 2);
+        XTENSOR_ASSERT(dA.layout() == layout_type::column_major);
+
+        std::vector<XBLAS_INDEX> piv(std::min(dA.shape()[0], dA.shape()[1]));
+
+        cxxlapack::getrf<XBLAS_INDEX>(
+            (XBLAS_INDEX) dA.shape()[0], 
+            (XBLAS_INDEX) dA.shape()[1],
+            dA.raw_data(),
+            (XBLAS_INDEX) dA.strides().back(), 
+            piv.data()
+        );
+
+        return std::make_tuple(std::move(dA), std::move(piv));
+    }
+
     /**
      * Interface to LAPACK getri.
      * 
@@ -78,10 +101,10 @@ namespace lapack
     {
         using value_type = typename E1::value_type;
 
-        auto dA = A.derived_cast();
+        auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         XTENSOR_ASSERT(dA.dimension() == 2);
-        XTENSOR_ASSERT(dA.layout() == xt::layout_type::column_major);
+        XTENSOR_ASSERT(dA.layout() == layout_type::column_major);
 
         std::vector<XBLAS_INDEX> piv(dA.shape()[0]);
 

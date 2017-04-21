@@ -219,6 +219,33 @@ namespace linalg
     }
 
     /**
+     * Compute the determinant by utilizing LU factorization
+     */
+    template <class T>
+    auto det(const T& t) {
+        using value_type = typename T::value_type;
+
+        auto temp = lapack::getrf(t);
+        auto LU = std::get<0>(temp);
+        auto pivs = std::get<1>(temp);
+
+        value_type result(1);
+        for (std::size_t i = 0; i < pivs.size(); ++i)
+        {
+            if (pivs[i] != int(i + 1))
+            {
+                result *= value_type(-1);
+            }
+        }
+
+        for (std::size_t i = 0; i < LU.shape()[0]; ++i)
+        {
+            result *= LU(i, i);
+        }
+        return result;
+    }
+
+    /**
      * Calculate matrix power A**n
      *
      * @param mat  The matrix

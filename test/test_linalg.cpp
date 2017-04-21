@@ -59,4 +59,17 @@ namespace xt
                                      {-0.0726041 ,-0.10253451, 0.08222825}};
         EXPECT_TRUE(allclose(t5res, t5expected));
     }
+
+    TEST(xlinalg, det)
+    {
+        xarray<double> a = {{1,2}, {3,4}};
+        double da = linalg::det(a);
+        EXPECT_EQ(da, -2.0);
+        xarray<double> b = {{0, 1,2}, {3,4, 5}, {6,7,8}};
+        double db = linalg::det(b);
+        EXPECT_EQ(db, 0.0);
+        xarray<double> c = {{12, 1,2}, {3,4, 5}, {6,7,8}};
+        double dc = linalg::det(c);
+        EXPECT_NEAR(dc, -36, 1e-06);
+    }
 }
