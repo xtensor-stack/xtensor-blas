@@ -9,12 +9,12 @@
 cmake_minimum_required(VERSION 3.1)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(xblas-test)
+    project(xtensor-blas-test)
 
     find_package(xtensor REQUIRED CONFIG)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIR})
-    find_package(xblas REQUIRED CONFIG)
-    set(XBLAS_INCLUDE_DIR ${xblas_INCLUDE_DIR})
+    find_package(xtensor-blas REQUIRED CONFIG)
+    set(XTENSOR_BLAS_INCLUDE_DIR ${xblas_INCLUDE_DIRS})
 endif ()
 
 message(STATUS "Forcing tests build type to Release")
@@ -94,12 +94,12 @@ set(XTENSOR_BLAS_TESTS
     test_linalg.cpp
 )
 
-set(XBLAS_TARGET test_xblas)
+set(XTENSOR_BLAS_TARGET test_xtensor_blas)
 
-add_executable(${XBLAS_TARGET} ${XTENSOR_BLAS_TESTS} ${XTENSOR_BLAS_HEADERS} ${XTENSOR_HEADERS})
+add_executable(${XTENSOR_BLAS_TARGET} ${XTENSOR_BLAS_TESTS} ${XTENSOR_BLAS_HEADERS} ${XTENSOR_HEADERS})
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    add_dependencies(${XBLAS_TARGET} gtest_main)
+    add_dependencies(${XTENSOR_BLAS_TARGET} gtest_main)
 endif()
 
-target_link_libraries(${XBLAS_TARGET} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${XTENSOR_BLAS_TARGET} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 add_custom_target(xtest COMMAND test_xblas DEPENDS ${XBLAS_TARGET})

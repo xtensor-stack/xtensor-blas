@@ -1,4 +1,4 @@
-name: test-xtensor
+name: test-xtensor-blas
 channels:
     - conda-forge
     - defaults
