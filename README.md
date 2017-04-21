@@ -15,8 +15,8 @@
 `xtensor-blas` is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries 
 through cxxblas and cxxlapack from the [FLENS](https://github.com/michael-lehn/FLENS) project.
 
-`xtensor-blas` currently provides non-broadcasting `dot`, `norm` (1- and 2-norm), `inverse`, `solve`,
-`eig`, and `cross`.
+`xtensor-blas` currently provides non-broadcasting `dot`, `norm` (1- and 2-norm for vectors), `inverse`, `solve`,
+`eig`, `cross`, `det`, `slogdet`, `matrix_rank`, `inv`, `cholesky`, `qr`, `svd` in the `xt::linalg` namespace (check the corresponding `xlinalg.hpp` header for the function signatures). The functions, and signatures, are trying to be 1-to-1 equivalent to NumPy.
 Low-level functions to interface with BLAS or LAPACK with xtensor containers are also offered 
 in the `blas` and `lapack` namespace.
 
