@@ -8,8 +8,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=gcc GCC=4.9
     - os: linux
       addons:
@@ -18,8 +16,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=gcc GCC=5
     - os: linux
       addons:
@@ -28,8 +24,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=gcc GCC=6
     - os: linux
       addons:
@@ -38,8 +32,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=gcc GCC=6 BOUND_CHECKS=1
     - os: linux
       addons:
@@ -49,8 +41,6 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=clang CLANG=3.6
     - os: linux
       addons:
@@ -60,8 +50,6 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=clang CLANG=3.7
     - os: linux
       addons:
@@ -71,9 +59,11 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
-            - libblas-dev
-            - liblapack-dev
       env: COMPILER=clang CLANG=3.8
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
+      env: PY=3
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -107,10 +97,12 @@ install:
     - conda update -q conda
     # Useful for debugging any issues with conda
     - conda info -a
+    - conda install blas lapack -c conda-forge 
     - cd test
     - conda env create -f ./test-environment.yml
-    - source activate test-xtensor
+    - source activate test-xtensor-blas
     - cd ..
+    # Replace this with a conda install when xtensor 0.10 is out
     - pwd
     - tbd="$PWD"
     - cd
@@ -124,7 +116,7 @@ install:
       else
         cmake -DBUILD_TESTS=ON .;
       fi
-    - make -j2 test_xblas
-    - cd test
+    - make -j2 test_xtensor_blas
 script:
-    - ./test_xblas
+    - cd test
+    - ./test_xtensor_blas
