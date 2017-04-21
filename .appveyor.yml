@@ -23,9 +23,17 @@ install:
   - conda update -q conda
   - conda info -a
   - conda install gtest cmake -c conda-forge
+  - conda install blas lapack -c conda-forge
+  - set "tbd=%cd%"
+  - cd\
+  - git clone https://github.com/QuantStack/xtensor
+  - cd xtensor
+  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\Library .
+  - nmake install
+  - cd %tbd%
   - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON .
-  - nmake test_xtensor
-  - cd test
+  - nmake test_xtensor_blas
 
 build_script:
-  - .\test_xtensor
+  - ce test
+  - .\test_xtensor_blas
