@@ -10,10 +10,9 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
-#include "xtensor-blas/xblas.hpp"
-#include "xtensor-blas/xlapack.hpp"
-#include "xtensor-blas/xlinalg.hpp"
 
+#include "xtensor-blas/xblas.hpp"
+#include "xtensor-blas/xlinalg.hpp"
 
 namespace xt
 {

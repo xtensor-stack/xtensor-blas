@@ -6,6 +6,12 @@
 
 ## Introduction
 
+----
+
+**DISCLAIMER** Please consider this software as BETA. We have not yet performed extensive testing and therefore there might be some bugs, or numerical issues, so don't use it to control your space rockets yet! Let us know if you find any issues.
+
+----
+
 `xtensor-blas` is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries 
 through cxxblas and cxxlapack from the [FLENS](https://github.com/michael-lehn/FLENS) project.
 

@@ -79,7 +79,6 @@ namespace xt
     template <class E>
     inline cxxblas::StorageOrder get_blas_storage_order(const E& e)
     {
-        cxxblas::StorageOrder storage_order;
         if (e.layout() == layout_type::row_major)
         {
             return cxxblas::StorageOrder::RowMajor;
