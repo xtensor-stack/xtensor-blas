@@ -12,13 +12,15 @@
 #include <algorithm>
 #include <limits>
 #include <sstream>
+#include <chrono>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xcomplex.hpp"
+#include "xtensor/xeval.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xstridedview.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
-#include "xtensor/xeval.hpp"
 
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlapack.hpp"
@@ -29,6 +31,13 @@ namespace xt
 namespace linalg
 {
 
+    enum normorder {
+        frob,
+        nuc,
+        inf,
+        neg_inf
+    };
+
     /**
      * Calculate 1- and 2-norm of vector.
      *
@@ -38,27 +47,131 @@ namespace linalg
      *
      * @tparam type of xexpression
      */
-    template <class E1>
-    typename E1::value_type norm(const xexpression<E1>& vec, int ord = 2)
+    template <class E>
+    typename E::value_type norm(const xexpression<E>& vec, int ord)
     {
-        if (ord == 1)
+        using value_type = typename E::value_type;
+
+        const auto& v = vec.derived_cast();
+
+        if (v.dimension() == 1)
         {
-            return blas::asum(vec);
+            if (ord == 1)
+            {
+                return blas::asum(v);
+            }
+            else if (ord == 2)
+            {
+                return blas::nrm2(v);
+            }
+            else if (ord == 0)
+            {
+                value_type result;
+                for (std::size_t i = 0; i < v.size(); ++i)
+                {
+                    result += (v(i) != 0);
+                }
+                return result;
+            }
+            else
+            {
+                value_type result = 0;
+                for (std::size_t i = 0; i < v.size(); ++i)
+                {
+                    result += std::abs(std::pow(v(i), ord));
+                }
+                return std::pow(result, 1./ (double) ord);
+            }
         }
-        else if (ord == 2)
+        else if (v.dimension() == 2)
         {
-            return blas::nrm2(vec);
+            if (ord == 1 || ord == -1)
+            {
+                xtensor<value_type, 1> s = xt::sum(xt::abs(v), {0});
+                if (ord == 1)
+                {
+                    return *std::max_element(s.begin(), s.end());
+                }
+                else
+                {
+                    return *std::min_element(s.begin(), s.end());
+                }
+            }
+            if (ord == 2 || ord == -2)
+            {
+                auto M = copy_to_layout<layout_type::column_major>(v);
+                auto res = lapack::gesdd(M, 'N');
+                auto& s = std::get<2>(res);
+                if (ord == 2)
+                {
+                    return *std::max_element(s.begin(), s.end());
+                }
+                else
+                {
+                    return *std::min_element(s.begin(), s.end());
+                }
+            }
         }
         std::stringstream ss;
         ss << "Norm " << ord << " not implemented!" << std::endl;
         throw std::runtime_error(ss.str());
     }
 
+    template <class E>
+    typename E::value_type norm(const xexpression<E>& vec, normorder ord)
+    {
+        using value_type = typename E::value_type;
+        const auto& v = vec.derived_cast();
+        if (v.dimension() == 2)
+        {
+            if (ord == normorder::frob)
+            {
+                return std::sqrt(xt::sum(xt::pow(xt::abs(v), 2))());
+            }
+            if (ord == normorder::nuc)
+            {
+                auto M = copy_to_layout<layout_type::column_major>(v);
+                auto res = lapack::gesdd(M, 'N');
+                auto& s = std::get<2>(res);
+                return std::accumulate(s.begin(), s.end(), value_type(0));
+            }
+            if (ord == normorder::inf || ord == normorder::neg_inf)
+            {
+                xtensor<value_type, 1> s = xt::sum(abs(v), {1});
+                if (ord == normorder::inf)
+                {
+                    return *std::max_element(s.begin(), s.end());
+                }
+                else
+                {
+                    return *std::min_element(s.begin(), s.end());
+                }
+            }
+        }
+        std::stringstream ss;
+        ss << "Norm " << ord << " not implemented!" << std::endl;
+        throw std::runtime_error(ss.str());
+    }
+
+    template <class E>
+    typename E::value_type norm(const xexpression<E>& vec)
+    {
+        const auto& v = vec.derived_cast();
+        if (v.dimension() == 1)
+        {
+            return norm(vec, 2);
+        }
+        else
+        {
+            return norm(vec, normorder::frob);
+        }
+    }
+
     /**
      * Solve a linear matrix equation, or system of linear scalar equations.
-     * Computes the “exact” solution, x, of the well-determined, i.e., full rank, 
+     * Computes the “exact” solution, x, of the well-determined, i.e., full rank,
      * linear matrix equation ax = b.
-     * 
+     *
      * @param a Coefficient matrix
      * @param b Ordinate or “dependent variable” values.
      * @return Solution to the system a x = b. Returned shape is identical to b.
@@ -89,12 +202,16 @@ namespace linalg
     auto inv(const xexpression<E1>& A)
     {
         auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
-        auto res_getrf = lapack::getrf(dA);
-        if (std::get<0>(res_getrf) != 0)
+
+        uvector<XBLAS_INDEX> piv(std::min(dA.shape()[0], dA.shape()[1]));
+
+        int info = lapack::getrf(dA, piv);
+        if (info != 0)
         {
             throw std::runtime_error("getrf failed");
         }
-        auto info = lapack::getri(dA, std::get<1>(res_getrf));
+
+        info = lapack::getri(dA, piv);
         if (info > 0)
         {
             throw std::runtime_error("Singular matrix not invertible (getri).");
@@ -103,50 +220,95 @@ namespace linalg
     }
 
     /**
+     * Calculate the condition number of matrix M
+     */
+    template <class E>
+    typename E::value_type cond(const xexpression<E>& M, int ord)
+    {
+        return norm(M, ord) * norm(inv(M), ord);
+    }
+
+    template <class E>
+    typename E::value_type cond(const xexpression<E>& M, normorder ord)
+    {
+        return norm(M, ord) * norm(inv(M), ord);
+    }
+
+    namespace detail
+    {
+        template <class T>
+        struct get_underlying_type;
+
+        template <class T>
+        struct get_underlying_type
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct get_underlying_type<std::complex<T>>
+        {
+            using type = T;
+        };
+    }
+
+    /**
      * Compute the eigenvalues and right eigenvectors of a square array.
      *
      * @param Matrix for which the eigenvalues and right eigenvectors will be computed
-     * @return std::tuple(w, v). The first element corresponds to the eigenvalues, 
-     *                    each repeated according to its multiplicity. The eigenvalues 
+     * @return std::tuple(w, v). The first element corresponds to the eigenvalues,
+     *                    each repeated according to its multiplicity. The eigenvalues
      *                    are not necessarily ordered.
      *                    The second (1) element are the normalized (unit “length”) eigenvectors,
      *                    such that the column v[:, i] corresponds to the eigenvalue w[i].
      */
-    template <class E1>
-    auto eig(const xexpression<E1>& A)
+    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    auto eig(const xexpression<E>& A)
     {
-        auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
+        using underlying_type = typename detail::get_underlying_type<typename E::value_type>::type;
+        using value_type = typename E::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> wr(vN);
+        xtensor<value_type, 1, layout_type::column_major> wi(vN);
+
+        std::array<std::size_t, 2> shp({N, N});
+        xtensor<value_type, 2, layout_type::column_major> VL(shp);
+        xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
         // jobvl N: left eigenvectors of A are not computed
         // jobvr V: then right eigenvectors of A are computed
-        auto geev_res = lapack::geev(dA, 'N', 'V');
+        int info = lapack::geev(M, 'N', 'V', wr, wi, VL, VR);
 
-        using value_type = typename E1::value_type;
-        const auto N = dA.shape()[0];
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue calculation did not converge.");
+        }
 
-        xtensor<std::complex<value_type>, 1> eig_vals;
-        eig_vals.reshape({N});
-        xtensor<std::complex<value_type>, 2> eig_vecs;
+        xtensor<std::complex<underlying_type>, 2> eig_vecs;
         eig_vecs.reshape({N, N});
+        xtensor<std::complex<underlying_type>, 1> eig_vals;
+        eig_vals.reshape({N});
 
-        xt::real(eig_vals) = std::get<1>(geev_res);
-        xt::imag(eig_vals) = std::get<2>(geev_res);
-
-        auto& VR = std::get<4>(geev_res);
+        xt::real(eig_vals) = wr;
+        xt::imag(eig_vals) = wi;
 
         for (std::size_t i = 0; i < N; ++i)
         {
             for (std::size_t j = 0; j < N; ++j)
             {
-                if (std::imag(eig_vals(j)) != 0)
+                if (wi(j) != 0)
                 {
-                    eig_vecs(i, j)     = std::complex<value_type>(VR(i, j),  VR(i, j + 1));
-                    eig_vecs(i, j + 1) = std::complex<value_type>(VR(i, j), -VR(i, j + 1));
+                    eig_vecs(i, j)     = std::complex<underlying_type>(VR(i, j),  VR(i, j + 1));
+                    eig_vecs(i, j + 1) = std::complex<underlying_type>(VR(i, j), -VR(i, j + 1));
                     ++j;
                 }
                 else
                 {
-                    eig_vecs(i, j) = std::complex<value_type>(VR(i, j), 0);
+                    eig_vecs(i, j) = std::complex<underlying_type>(VR(i, j), 0);
                 }
             }
         }
@@ -154,15 +316,102 @@ namespace linalg
         return std::make_tuple(eig_vals, eig_vecs);
     }
 
+    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    auto eig(const xexpression<E>& A)
+    {
+        using underlying_type = typename detail::get_underlying_type<typename E::value_type>::type;
+        using value_type = typename E::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> w(vN);
+
+        std::array<std::size_t, 2> shp({N, N});
+        xtensor<value_type, 2, layout_type::column_major> VL(shp);
+        xtensor<value_type, 2, layout_type::column_major> VR(shp);
+
+        // jobvl N: left eigenvectors of A are not computed
+        // jobvr V: then right eigenvectors of A are computed
+        int info = lapack::geev(M, 'N', 'V', w, VL, VR);
+
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue calculation did not converge.");
+        }
+
+        return std::make_tuple(w, VR);
+    }
+
+    /**
+     * Compute the eigenvalues of a square xexpression.
+     *
+     * @param Matrix for which the eigenvalues and right eigenvectors will be computed
+     * @return xtensor containing the eigenvalues.
+     */
+    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigvals(const xexpression<E>& A)
+    {
+        using value_type = typename E::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> wr(vN);
+        xtensor<value_type, 1, layout_type::column_major> wi(vN);
+
+        // TODO check if we can remove allocation and pass nullptr as VL / VR
+        std::array<std::size_t, 2> shp({N, N});
+        xtensor<value_type, 2, layout_type::column_major> VL(shp);
+        xtensor<value_type, 2, layout_type::column_major> VR(shp);
+
+        auto geev_res = lapack::geev(M, 'N', 'N', wr, wi, VL, VR);
+
+        using value_type = typename E::value_type;
+
+        xtensor<std::complex<value_type>, 1> eig_vals;
+        eig_vals.reshape({N});
+
+        xt::real(eig_vals) = wr;
+        xt::imag(eig_vals) = wi;
+
+        return eig_vals;
+    }
+
+    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigvals(const xexpression<E>& A)
+    {
+        using value_type = typename E::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> w(vN);
+
+        // TODO check if we can remove allocation and pass nullptr as VL / VR
+        std::array<std::size_t, 2> shp({N, N});
+        xtensor<value_type, 2, layout_type::column_major> VL(shp);
+        xtensor<value_type, 2, layout_type::column_major> VR(shp);
+
+        auto geev_res = lapack::geev(M, 'N', 'N', w, VL, VR);
+
+        using value_type = typename E::value_type;
+
+        return w;
+    }
+
     /**
      * Non-broadcasting dot function.
-     * In the case of two 1D vectors, computes the vector dot 
-     * product. In the case of complex vectors, computes the dot 
+     * In the case of two 1D vectors, computes the vector dot
+     * product. In the case of complex vectors, computes the dot
      * product without conjugating the first argument.
      * If \em t or \em o is a 2D matrix, computes the matrix-times-vector
      * product. If both \em t and \em o ar 2D matrices, computes
      * the matrix-product.
-     * 
+     *
      * @param t input array
      * @param o input array
      *
@@ -200,13 +449,13 @@ namespace linalg
     }
 
     /**
-     * Computes the dot product for two vectors. 
+     * Computes the dot product for two vectors.
      * Behaves different from \ref dot in the case of complex
      * vectors. If vectors are complex, vdot conjugates the first
      * argument \em t.
-     * Note: Unlike NumPy, xtensor-blas currently doesn't flatten 
+     * Note: Unlike NumPy, xtensor-blas currently doesn't flatten
      * the input arguments.
-     * 
+     *
      * @param t input vector (1D)
      * @param o input vector (1D)
      *
@@ -229,7 +478,7 @@ namespace linalg
 
     /**
      * Compute the outer product of two vectors.
-     * 
+     *
      * @param t input vector (1D)
      * @param o input vector (1D)
      *
@@ -249,16 +498,16 @@ namespace linalg
     auto det(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
-        auto LU = copy_to_layout<layout_type::column_major>(A.derived_cast());
+        xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
 
-        auto res = lapack::getrf(LU);
+        uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
-        auto pivs = std::get<1>(res);
+        int res = lapack::getrf(LU, piv);
 
         value_type result(1);
-        for (std::size_t i = 0; i < pivs.size(); ++i)
+        for (std::size_t i = 0; i < piv.size(); ++i)
         {
-            if (pivs[i] != int(i + 1))
+            if (piv[i] != int(i + 1))
             {
                 result *= value_type(-1);
             }
@@ -276,33 +525,31 @@ namespace linalg
     {
         using value_type = typename T::value_type;
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
+        uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
-        auto res = lapack::getrf(LU);
-        int info = std::get<0>(res);
+        int info = lapack::getrf(LU, piv);
 
         if (info != 0)
         {
             throw std::runtime_error("LU factorization did not compute.");
         }
 
-        auto pivs = std::get<1>(res);
-
         value_type result(0);
-        value_type sign = 1;
-        for (std::size_t i = 0; i < pivs.size(); ++i)
+        int sign = 0;
+        for (std::size_t i = 0; i < piv.size(); ++i)
         {
-            if (pivs[i] != int(i + 1))
-            {
-                sign *= value_type(-1);
-            }
+            sign += (piv[i] != int(i + 1));
         }
+
+        value_type v_sign = (sign % 2) ? -1 : 1;
 
         for (std::size_t i = 0; i < LU.shape()[0]; ++i)
         {
-            sign *= (LU(i, i) / std::abs(LU(i, i)));
-            result += std::log(std::abs(LU(i, i)));
+            auto abs_elem = std::abs(LU(i, i));
+            v_sign *= (LU(i, i) / abs_elem);
+            result += std::log(abs_elem);
         }
-        return std::make_tuple(sign, result);
+        return std::make_tuple(v_sign, result);
     }
 
     template <class T, std::enable_if_t<!is_complex<typename T::value_type>::value, int> = 0>
@@ -310,47 +557,43 @@ namespace linalg
     {
         using value_type = typename T::value_type;
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
+        uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
-        auto res = lapack::getrf(LU);
-        int info = std::get<0>(res);
+        int info = lapack::getrf(LU, piv);
 
         if (info != 0)
         {
-            throw std::runtime_error("LU factorization did not compute.");
+            return std::make_tuple(value_type(0),
+                                   -std::numeric_limits<value_type>::infinity());
         }
 
-        auto pivs = std::get<1>(res);
-
         value_type result(0);
-        value_type sign = 1;
-        for (std::size_t i = 0; i < pivs.size(); ++i)
+        int sign = 0;
+
+        for (std::size_t i = 0; i < piv.size(); ++i)
         {
-            if (pivs[i] != int(i + 1))
-            {
-                sign *= value_type(-1);
-            }
+            sign += (piv[i] != int(i + 1));
         }
 
         for (std::size_t i = 0; i < LU.shape()[0]; ++i)
         {
-            if (LU(i, i) < value_type(0))
+            value_type abs_el = LU(i, i);
+            if (abs_el < 0)
             {
-                sign *= -1;
-                result += std::log(-(LU(i, i)));
+                sign += 1;
+                abs_el = -abs_el;
             }
-            else
-            {
-                result += std::log(LU(i, i));
-            }
+            result += std::log(abs_el);
         }
 
-        return std::make_tuple(sign, result);
+        value_type v_sign = (sign % 2) ? -1 : 1;
+        return std::make_tuple(v_sign, result);
     }
 
     namespace detail
     {
         template <class E>
-        inline auto call_gqr(E& A, std::vector<typename E::value_type>& tau)
+        inline auto call_gqr(E& A, uvector<typename E::value_type>& tau)
             -> std::enable_if_t<!is_complex<typename E::value_type>::value>
         {
             int info = lapack::orgqr(A, tau);
@@ -361,7 +604,7 @@ namespace linalg
         }
 
         template <class E>
-        inline auto call_gqr(E& A, std::vector<typename E::value_type>& tau)
+        inline auto call_gqr(E& A, uvector<typename E::value_type>& tau)
             -> std::enable_if_t<is_complex<typename E::value_type>::value>
         {
             int info = lapack::ungqr(A, tau);
@@ -464,6 +707,49 @@ namespace linalg
     }
 
     /**
+     * Calculate Moore-Rose pseudo inverse using LAPACK SVD.
+     */
+    template <class T>
+    auto pinv(const xexpression<T>& A, double rcond = 1e-15)
+    {
+        using value_type = typename T::value_type;
+        const auto& dA = A.derived_cast();
+
+        xtensor<value_type, 2, layout_type::column_major> M = xt::conj(dA);
+
+        auto result = lapack::gesdd(M, 'S');
+
+        if (std::get<0>(result) != 0)
+        {
+            throw std::runtime_error("SVD decomposition failed.");
+        }
+
+        auto u = std::get<1>(result);
+        auto s = std::get<2>(result);
+        auto vt = std::get<3>(result);
+
+        value_type cutoff = rcond * (*std::max_element(s.begin(), s.end()));
+
+        for (std::size_t i = 0; i < s.size(); ++i)
+        {
+            if (s(i) > cutoff)
+            {
+                s(i) = 1. / s(i);
+            }
+            else
+            {
+                s(i) = 0;
+            }
+        }
+        auto ut = xt::transpose(u);
+        auto vww = xt::view(s, xt::all(), xt::newaxis());
+        auto m = vww * ut;
+        auto vtt = xt::transpose(vt);
+
+        return blas::gemm(vtt, m);
+    }
+
+    /**
      * Calculate matrix power A**n
      *
      * @param mat  The matrix
@@ -472,7 +758,7 @@ namespace linalg
      * @return resulting array
      */
     template <class E>
-    auto matrix_power(const xexpression<E>& A, int n)
+    auto matrix_power(const xexpression<E>& A, long n)
     {
         using input_type = std::decay_t<E>;
         using value_type = typename input_type::value_type;
@@ -508,7 +794,7 @@ namespace linalg
         }
 
         // if n > 3, do a binary decomposition (copied from NumPy)
-        int bits, var = n, i = 0;
+        long bits, var = n, i = 0;
         for(bits = 0; var != 0; ++bits)
         {
             var >>= 1;
@@ -531,10 +817,66 @@ namespace linalg
         return res;
     }
 
+
+    /**
+     * Compute the trace of a xexpression.
+     */
+    template <class T>
+    auto trace(const xexpression<T>& M, int offset = 0, int axis1 = 0, int axis2 = 1)
+    {
+        const auto& dM = M.derived_cast();
+        auto d = xt::diagonal(dM);
+
+        std::size_t dim = d.dimension();
+        if (dim == 1)
+        {
+            return xt::xarray<double>(xt::sum(d)());
+        }
+        else
+        {
+            return xt::xarray<double>(xt::sum(d, {dim - 1}));
+        }
+    }
+
+    /**
+     * Calculate the Kronecker product between two 2D xexpressions.
+     */
+
+    template <class T, class E>
+    auto kron(const xexpression<T>& a, const xexpression<E>& b)
+    {
+        using value_type = std::common_type_t<typename T::value_type, typename E::value_type>;
+
+        const auto& da = a.derived_cast();
+        const auto& db = b.derived_cast();
+
+        XTENSOR_ASSERT(da.dimension() == 2);
+        XTENSOR_ASSERT(db.dimension() == 2);
+
+        std::array<std::size_t, 2> shp({ da.shape()[0] * db.shape()[0], da.shape()[1] * db.shape()[1] });
+        xtensor<value_type, 2> res(shp);
+
+        for (std::size_t i = 0; i < da.shape()[0]; ++i)
+        {
+            for (std::size_t j = 0; j < da.shape()[1]; ++j)
+            {
+                for (std::size_t k = 0; k < db.shape()[0]; ++k)
+                {
+                    for (std::size_t h = 0; h < db.shape()[1]; ++h)
+                    {
+                        res(i * db.shape()[0] + k, j * db.shape()[1] + h) = da(i, j) * db(k, h);
+                    }
+                }
+            }
+        }
+
+        return res;
+    }
+
     /**
      * Calculate the matrix rank of \ref m.
      * If tol == -1, the tolerance is automatically computed.
-     * 
+     *
      * @param m matrix for which rank is calculated
      * @param tol tolerance for finding rank
      */
@@ -547,6 +889,7 @@ namespace linalg
         auto svd_res = svd(m, false);
         auto s = std::get<1>(svd_res);
         auto max_el = std::max_element(s.begin(), s.end());
+
         if (tol == -1)
         {
             tol = (*max_el) * (double) std::max(M.shape()[0], M.shape()[1]) * std::numeric_limits<value_type>::epsilon();
@@ -567,7 +910,7 @@ namespace linalg
      * Non-broadcasting cross product between two vectors
      * Calculate cross product between two 1D vectors with 2- or 3 entries.
      * If only two entries are available, the third entry is assumed to be 0.
-     * 
+     *
      * @param a input vector
      * @param b input vector
      * @return resulting array

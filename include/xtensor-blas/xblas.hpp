@@ -187,10 +187,12 @@ namespace blas
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
-        using return_type = typename select_xtype<E1, E2, 2>::type;
+        using cvalue_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
+        using return_type = xtensor<cvalue_type, 2, E1::static_layout>;
+
         typename return_type::shape_type s = {
-          transpose_A ? da.shape()[1] : da.shape()[0],
-          transpose_B ? db.shape()[0] : db.shape()[1],
+            transpose_A ? da.shape()[1] : da.shape()[0],
+            transpose_B ? db.shape()[0] : db.shape()[1],
         };
 
         return_type res(s);
@@ -200,7 +202,7 @@ namespace blas
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
             transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
             (BLAS_IDX) da.shape()[0],
-            (BLAS_IDX) da.shape()[1],
+            (BLAS_IDX) db.shape()[1],
             (BLAS_IDX) db.shape()[0],
             alpha(),
             da.raw_data(),
