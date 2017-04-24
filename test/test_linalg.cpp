@@ -293,4 +293,22 @@ namespace xt
         EXPECT_NEAR(0.98839145888, xt::linalg::norm(arg_1, linalg::normorder::inf), 1e-06);
         EXPECT_NEAR(0.785489192861, xt::linalg::norm(arg_1, linalg::normorder::neg_inf), 1e-06);
     }
+
+    TEST(xlinalg, vdot)
+    {
+        xarray<double> arg_0 = { 0.23451288, 0.98799529, 0.76599595, 0.77700444, 0.02798196};
+        xarray<double> arg_1 = { 0.17390652, 0.15408224, 0.07708648, 0.8898657 , 0.7503787 };
+        auto res = xt::linalg::vdot(arg_0, arg_1);
+        EXPECT_NEAR(0.964490439715, res, 1e-06);
+
+        xarray<std::complex<double>> carg_0 = { 0.23451288+0.17390652i, 0.98799529+0.15408224i, 0.76599595+0.07708648i,
+                                                0.77700444+0.8898657i , 0.02798196+0.7503787i };
+        xarray<std::complex<double>> carg_1 = { 0.17390652+0.23451288i, 0.15408224+0.98799529i, 0.07708648+0.76599595i,
+                                                0.88986570+0.77700444i, 0.75037870+0.02798196i};
+        auto res_c = xt::linalg::vdot(carg_0, carg_1);
+
+        EXPECT_NEAR(1.9289808794290355, std::real(res_c), 1e-06);
+        EXPECT_NEAR(0.8075433553117102, std::imag(res_c), 1e-06);
+
+    }
 }
