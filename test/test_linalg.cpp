@@ -266,6 +266,31 @@ namespace xt
         EXPECT_NEAR(cmplexp4, cmplres4, 1e-06);
         EXPECT_NEAR(cmplexp5, cmplres5, 1e-06);
         EXPECT_NEAR(cmplexp6, cmplres6, 1e-06);
+    }
 
+    TEST(xlinalg, vec_norm)
+    {
+        xarray<double> arg_0 = { 0.23451288, 0.98799529, 0.76599595, 0.77700444, 0.02798196};
+
+        EXPECT_NEAR(2.79349050582, xt::linalg::norm(arg_0, 1), 1e-6);
+        EXPECT_NEAR(1.49077149771, xt::linalg::norm(arg_0, 2), 1e-6);
+        EXPECT_NEAR(1.23766843269, xt::linalg::norm(arg_0, 3), 1e-6);
+        EXPECT_NEAR(1.13587319901, xt::linalg::norm(arg_0, 4), 1e-6);
+        EXPECT_NEAR(5.0, xt::linalg::norm(arg_0, 0), 1e-6);
+        EXPECT_NEAR(0.0229325662443, xt::linalg::norm(arg_0, -1), 1e-6);
+        EXPECT_NEAR(0.0277379546324, xt::linalg::norm(arg_0, -2), 1e-6);
+        EXPECT_NEAR(0.987995286517, xt::linalg::norm(arg_0, linalg::normorder::inf), 1e-6);
+        EXPECT_NEAR(0.0279819550429, xt::linalg::norm(arg_0, linalg::normorder::neg_inf), 1e-6);
+
+        xarray<std::complex<double>> arg_1 = { 0.23451288+0.77700444i, 0.98799529+0.02798196i, 0.76599595+0.17390652i};
+        EXPECT_NEAR(2.58550383197, xt::linalg::norm(arg_1, 1), 1e-06);
+        EXPECT_NEAR(1.50088078633, xt::linalg::norm(arg_1, 2), 1e-06);
+        EXPECT_NEAR(1.25673399279, xt::linalg::norm(arg_1, 3), 1e-06);
+        EXPECT_NEAR(1.15326879931, xt::linalg::norm(arg_1, 4), 1e-06);
+        EXPECT_NEAR(3.0, xt::linalg::norm(arg_1, 0), 1e-06);
+        EXPECT_NEAR(0.284338433895, xt::linalg::norm(arg_1, -1), 1e-06);
+        EXPECT_NEAR(0.490145522524, xt::linalg::norm(arg_1, -2), 1e-06);
+        EXPECT_NEAR(0.98839145888, xt::linalg::norm(arg_1, linalg::normorder::inf), 1e-06);
+        EXPECT_NEAR(0.785489192861, xt::linalg::norm(arg_1, linalg::normorder::neg_inf), 1e-06);
     }
 }

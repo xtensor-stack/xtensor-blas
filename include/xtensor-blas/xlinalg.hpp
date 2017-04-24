@@ -31,7 +31,7 @@ namespace xt
 namespace linalg
 {
 
-    enum normorder {
+    enum class normorder {
         frob,
         nuc,
         inf,
@@ -51,30 +51,38 @@ namespace linalg
     underlying_value_type_t<typename E::value_type>
     norm(const xexpression<E>& vec, int ord)
     {
-        using value_type = underlying_value_type_t<typename E::value_type>;
+        using value_type = typename E::value_type;
+        using underlying_value_type = underlying_value_type_t<value_type>;
 
         const auto& v = vec.derived_cast();
 
-        value_type result = 0;
+        underlying_value_type result = 0;
         if (v.dimension() == 1)
         {
             if (ord == 1)
             {
-                blas::asum(v, result);
-                return result;
+                if (is_complex<value_type>::value)
+                {
+                    for (std::size_t i = 0; i < v.size(); ++i)
+                    {
+                        result += std::abs(v(i));
+                    }
+                }
+                else
+                {
+                    blas::asum(v, result);
+                }
             }
             else if (ord == 2)
             {
                 blas::nrm2(v, result);
-                return result;
             }
             else if (ord == 0)
             {
                 for (std::size_t i = 0; i < v.size(); ++i)
                 {
-                    result += (v(i) != value_type(0));
+                    result += (v(i) != underlying_value_type(0));
                 }
-                return result;
             }
             else
             {
@@ -82,14 +90,15 @@ namespace linalg
                 {
                     result += std::abs(std::pow(v(i), ord));
                 }
-                return std::pow(result, 1./ (double) ord);
+                result = std::pow(result, 1./ (double) ord);
             }
+            return result;
         }
         else if (v.dimension() == 2)
         {
             if (ord == 1 || ord == -1)
             {
-                xtensor<value_type, 1> s = xt::sum(xt::abs(v), {0});
+                xtensor<underlying_value_type, 1> s = xt::sum(xt::abs(v), {0});
                 if (ord == 1)
                 {
                     return *std::max_element(s.begin(), s.end());
@@ -152,8 +161,23 @@ namespace linalg
                 }
             }
         }
+        else if (v.dimension() == 1)
+        {
+            if (ord == normorder::inf || ord == normorder::neg_inf)
+            {
+                auto s = abs(v);
+                if (ord == normorder::inf)
+                {
+                    return *std::max_element(s.begin(), s.end());
+                }
+                else
+                {
+                    return *std::min_element(s.begin(), s.end());
+                }
+            }
+        }
         std::stringstream ss;
-        ss << "Norm " << ord << " not implemented!" << std::endl;
+        ss << "Norm not implemented!" << std::endl;
         throw std::runtime_error(ss.str());
     }
 
