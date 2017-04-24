@@ -48,9 +48,10 @@ namespace linalg
      * @tparam type of xexpression
      */
     template <class E>
-    typename E::value_type norm(const xexpression<E>& vec, int ord)
+    underlying_value_type_t<typename E::value_type>
+    norm(const xexpression<E>& vec, int ord)
     {
-        using value_type = typename E::value_type;
+        using value_type = underlying_value_type_t<typename E::value_type>;
 
         const auto& v = vec.derived_cast();
 
@@ -71,7 +72,7 @@ namespace linalg
             {
                 for (std::size_t i = 0; i < v.size(); ++i)
                 {
-                    result += (v(i) != 0);
+                    result += (v(i) != value_type(0));
                 }
                 return result;
             }
@@ -119,15 +120,17 @@ namespace linalg
     }
 
     template <class E>
-    typename E::value_type norm(const xexpression<E>& vec, normorder ord)
+    underlying_value_type_t<typename E::value_type>
+    norm(const xexpression<E>& vec, normorder ord)
     {
-        using value_type = typename E::value_type;
+        using value_type = underlying_value_type_t<typename E::value_type>;
+
         const auto& v = vec.derived_cast();
         if (v.dimension() == 2)
         {
             if (ord == normorder::frob)
             {
-                return std::sqrt(xt::sum(xt::pow(xt::abs(v), 2))());
+                return std::sqrt(sum(pow(abs(v), 2))());
             }
             if (ord == normorder::nuc)
             {
@@ -327,6 +330,47 @@ namespace linalg
         return std::make_tuple(w, VR);
     }
 
+    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigh(const xexpression<E>& A, char UPLO = 'L')
+    {
+        using value_type = typename E::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> w(vN);
+
+        int info = lapack::syevd(M, 'V', UPLO, w);
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue computation did not converge.");
+        }
+
+        return std::make_tuple(w, M);
+    }
+
+    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigh(const xexpression<E>& A, char UPLO = 'L')
+    {
+        using value_type = typename E::value_type;
+        using underlying_value_type = typename value_type::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<underlying_value_type, 1, layout_type::column_major> w(vN);
+
+        int info = lapack::heevd(M, 'V', UPLO, w);
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue computation did not converge.");
+        }
+
+        return std::make_tuple(w, M);
+    }
+
     /**
      * Compute the eigenvalues of a square xexpression.
      *
@@ -351,8 +395,6 @@ namespace linalg
         xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
         auto geev_res = lapack::geev(M, 'N', 'N', wr, wi, VL, VR);
-
-        using value_type = typename E::value_type;
 
         xtensor<std::complex<value_type>, 1> eig_vals;
         eig_vals.reshape({N});
@@ -386,6 +428,46 @@ namespace linalg
         return w;
     }
 
+    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigvalsh(const xexpression<E>& A, char UPLO = 'L')
+    {
+        using value_type = typename E::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> w(vN);
+
+        int info = lapack::syevd(M, 'N', UPLO, w);
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue computation did not converge.");
+        }
+
+        return w;
+    }
+
+    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigvalsh(const xexpression<E>& A, char UPLO = 'L')
+    {
+        using value_type = typename E::value_type;
+        using underlying_value_type = typename value_type::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<underlying_value_type, 1, layout_type::column_major> w(vN);
+
+        int info = lapack::heevd(M, 'N', UPLO, w);
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue computation did not converge.");
+        }
+
+        return w;
+    }
     /**
      * Non-broadcasting dot function.
      * In the case of two 1D vectors, computes the vector dot
@@ -743,7 +825,8 @@ namespace linalg
         auto s = std::get<2>(gesdd_res);
         auto vt = std::get<3>(gesdd_res);
 
-        value_type cutoff = rcond * (*std::max_element(s.begin(), s.end()));
+        using real_value_type = typename decltype(s)::value_type;
+        real_value_type cutoff = rcond * (*std::max_element(s.begin(), s.end()));
 
         for (std::size_t i = 0; i < s.size(); ++i)
         {

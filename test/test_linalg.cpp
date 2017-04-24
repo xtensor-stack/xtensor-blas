@@ -145,4 +145,127 @@ namespace xt
         int rz = linalg::matrix_rank(zeros<double>({4, 4}));
         EXPECT_EQ(0, rz);
     }
+
+    TEST(xlinalg, eigh)
+    {
+        xarray<double> arg_0 = {{ -761. , -208. , -582. },
+                                { -208. , -623. ,-1605.5},
+                                { -582. ,-1605.5, -476. }};
+        auto res = xt::linalg::eigh(arg_0);
+        xarray<double> expected_0 = {-2351.3290686 , -609.79206435, 1101.12113295};
+        xarray<double, layout_type::column_major> expected_1 = {{-0.33220683,-0.93041946,-0.15478453},
+                                                                {-0.66309119, 0.34708777,-0.66320446},
+                                                                {-0.67078216, 0.11768479, 0.73225787}};
+        auto vals = std::get<0>(res);
+        auto vecs = std::get<1>(res);
+        EXPECT_TRUE(allclose(expected_0, vals));
+        EXPECT_TRUE(allclose(expected_1, vecs));
+
+        auto vals_2 = xt::linalg::eigvalsh(arg_0);
+        EXPECT_TRUE(allclose(expected_0, vals_2));
+
+        xarray<std::complex<double>> complarg_0 = {{ 1.+0.i,-0.-2.i},
+                                                   { 0.+2.i, 5.+0.i}};
+        auto complres = xt::linalg::eigh(complarg_0);
+
+        xarray<double> complexpected_0 = { 0.17157288, 5.82842712};
+        auto cmvals = std::get<0>(complres);
+        auto cmvecs = std::get<1>(complres);
+        EXPECT_TRUE(allclose(complexpected_0, cmvals));
+        xarray<std::complex<double>, layout_type::column_major> complexpected_1 = {{-0.92387953+0.i        ,-0.38268343+0.i        },
+                                                                                   { 0.00000000+0.38268343i, 0.00000000-0.92387953i}}; 
+        EXPECT_TRUE(allclose(imag(complexpected_1), imag(cmvecs)));
+        EXPECT_TRUE(allclose(real(complexpected_1), real(cmvecs)));
+
+        auto cmvals2 = xt::linalg::eigvalsh(complarg_0);
+        EXPECT_TRUE(allclose(complexpected_0, cmvals2));
+    }
+
+    TEST(xlinalg, pinv)
+    {
+        xarray<double> arg_0 = {{ 1.47351391, 0.94686323, 0.92236842,-1.44141916,-1.53123963,-0.36949144},
+                                {-0.76686921,-0.01087083,-1.11100036,-0.59745592,-0.99849726, 0.45296729},
+                                {-0.35274989,-1.27760231, 1.50092545,-2.7243503 ,-0.79326768,-1.00826405},
+                                { 0.05763039, 1.04069983,-0.502178  ,-1.01776144, 0.6496664 ,-0.2374513 },
+                                {-1.45517735, 0.42523508, 0.41400096, 0.87164292, 1.87754145, 0.16358461},
+                                { 1.07487297,-0.26417364, 1.82998799, 0.97985789,-0.74820612,-0.75097366},
+                                { 0.91375249, 1.14211989,-0.23055478,-0.48264987,-0.4591723 , 0.83185472},
+                                { 0.05318152,-0.30014836, 1.68456715, 0.07388112, 0.0607432 ,-0.51529535},
+                                {-1.36227295,-0.12015569,-0.45599178,-1.07135129,-0.27405687, 0.50177945}};
+        auto res = xt::linalg::pinv(arg_0);
+        xarray<double> expected = {{-0.12524671,-0.41299325, 0.09108576,-0.07346514,-0.29603324,-0.1702256 ,
+                      0.28503799,-0.08979346,-0.29415286},
+                    { 0.38896886, 0.28355746,-0.26406943, 0.36828839, 0.29271933, 0.19368219,
+                     -0.11433648, 0.05102866, 0.11050527},
+                    { 0.05803293,-0.11353613, 0.08736754,-0.20744326, 0.21647828, 0.11201996,
+                      0.26187311, 0.24550066, 0.13766844},
+                    { 0.01037663, 0.15710257,-0.24647364,-0.06611398, 0.0482986 , 0.21835662,
+                     -0.18763349, 0.01747553,-0.02066564},
+                    {-0.23681835,-0.44982904, 0.14998634, 0.07608489, 0.04751429,-0.27436861,
+                      0.18626331,-0.01520331,-0.18144752},
+                    {-0.25580995,-0.33606213, 0.10424938,-0.64100544, 0.01084618,-0.28963573,
+                      0.89629794, 0.12987378, 0.22451995}};
+        EXPECT_TRUE(allclose(expected, res));
+
+        xarray<std::complex<double>> cmpl_arg_0 = {{-0.32865615+1.56868725i, 0.28804396+0.52266479i},
+                                                   {-1.29703842+0.34647524i,-2.14982936+0.31425111i},
+                                                   {-0.69224750-1.36725801i, 2.22948403+1.4612309i }};
+        auto cmpl_res = xt::linalg::pinv(cmpl_arg_0);
+        xarray<std::complex<double>> cmpl_expected = {{-0.06272312-0.24840107i,-0.20530381-0.00548715i,-0.14179276+0.16337684i},
+                         { 0.05975312-0.0502577i ,-0.17431091-0.05525696i, 0.16047967-0.14140846i}};
+        EXPECT_TRUE(allclose(real(cmpl_expected), real(cmpl_res)));
+        EXPECT_TRUE(allclose(imag(cmpl_expected), imag(cmpl_res)));
+    }
+
+    TEST(xlinalg, mat_norm)
+    {
+        xarray<double> arg_0 = {{ 0.06817001, 0.50274712,-0.36802027,-0.93123204},
+                                {-0.5990272 ,-0.67439921,-0.09397038,-1.55915724},
+                                { 2.22694395, 0.59099048,-0.43162172, 0.19410077},
+                                { 0.41859591, 1.68555153, 1.82660739, 1.24427635}};
+        auto res1 = xt::linalg::norm(arg_0, 1);
+        auto res2 = xt::linalg::norm(arg_0, linalg::normorder::frob);
+        auto res3 = xt::linalg::norm(arg_0, linalg::normorder::inf);
+        auto res4 = xt::linalg::norm(arg_0, linalg::normorder::neg_inf);
+        auto res5 = xt::linalg::norm(arg_0, linalg::normorder::nuc);
+        auto res6 = xt::linalg::norm(arg_0, 2);
+        double exp1 = 3.92876639061;
+        double exp2 = 4.23639347394;
+        double exp3 = 5.17503118283;
+        double exp4 = 1.87016943835;
+        double exp5 = 7.42677006218;
+        double exp6 = 3.29152325862;
+
+        EXPECT_NEAR(exp1, res1, 1e-06);
+        EXPECT_NEAR(exp2, res2, 1e-06);
+        EXPECT_NEAR(exp3, res3, 1e-06);
+        EXPECT_NEAR(exp4, res4, 1e-06);
+        EXPECT_NEAR(exp5, res5, 1e-06);
+        EXPECT_NEAR(exp6, res6, 1e-06);
+
+        xarray<std::complex<double>> cmplarg_0 = {{ 0.40101756+0.71233018i, 0.62731701+0.42786349i, 0.32415089+0.2977805i },
+                                                  { 0.24475928+0.49208478i, 0.69475518+0.74029639i, 0.59390240+0.35772892i},
+                                                  { 0.63179202+0.41720995i, 0.44025718+0.65472131i, 0.08372648+0.37380143i}};
+        auto cmplres1 = xt::linalg::norm(cmplarg_0, 1);
+        auto cmplres2 = xt::linalg::norm(cmplarg_0, linalg::normorder::frob);
+        auto cmplres3 = xt::linalg::norm(cmplarg_0, linalg::normorder::inf);
+        auto cmplres4 = xt::linalg::norm(cmplarg_0, linalg::normorder::neg_inf);
+        auto cmplres5 = xt::linalg::norm(cmplarg_0, linalg::normorder::nuc);
+        auto cmplres6 = xt::linalg::norm(cmplarg_0, 2);
+
+        double cmplexp1 = 2.56356133004;
+        double cmplexp2 = 2.14347558031;
+        double cmplexp3 = 2.25815855456;
+        double cmplexp4 = 1.92915797164;
+        double cmplexp5 = 2.77947580342;
+        double cmplexp6 = 2.0683368289;
+
+        EXPECT_NEAR(cmplexp1, cmplres1, 1e-06);
+        EXPECT_NEAR(cmplexp2, cmplres2, 1e-06);
+        EXPECT_NEAR(cmplexp3, cmplres3, 1e-06);
+        EXPECT_NEAR(cmplexp4, cmplres4, 1e-06);
+        EXPECT_NEAR(cmplexp5, cmplres5, 1e-06);
+        EXPECT_NEAR(cmplexp6, cmplres6, 1e-06);
+
+    }
 }

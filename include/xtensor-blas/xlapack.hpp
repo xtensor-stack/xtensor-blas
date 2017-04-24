@@ -30,14 +30,9 @@ namespace lapack
 {
     /**
      * Interface to LAPACK gesv.
-     *
-     * @param A matrix in
-     * @param b vector (right hand side)
-     *
-     * @return solution to ``Ax = b``
      */
-    template <class E1, class E2>
-    int gesv(E1& A, E2& b)
+    template <class E, class F>
+    int gesv(E& A, F& b)
     {
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
@@ -62,8 +57,8 @@ namespace lapack
         return info;
     }
 
-    template <class E1, class E2>
-    auto getrf(E1& A, E2& piv)
+    template <class E, class F>
+    auto getrf(E& A, F& piv)
     {
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
@@ -79,10 +74,10 @@ namespace lapack
         return info;
     }
 
-    template <class E1>
-    inline auto orgqr(E1& A, uvector<typename E1::value_type>& tau)
+    template <class E>
+    inline auto orgqr(E& A, uvector<typename E::value_type>& tau)
     {
-        using value_type = typename E1::value_type;
+        using value_type = typename E::value_type;
 
         uvector<value_type> work(1);
 
@@ -118,10 +113,10 @@ namespace lapack
         return info;
     }
 
-    template <class E1>
-    inline auto ungqr(E1& A, uvector<typename E1::value_type>& tau)
+    template <class E>
+    inline auto ungqr(E& A, uvector<typename E::value_type>& tau)
     {
-        using value_type = typename E1::value_type;
+        using value_type = typename E::value_type;
 
         uvector<value_type> work(1);
 
@@ -157,10 +152,10 @@ namespace lapack
         return info;
     }
 
-    template <class E1>
-    auto geqrf(E1& A)
+    template <class E>
+    auto geqrf(E& A)
     {
-        using value_type = typename E1::value_type;
+        using value_type = typename E::value_type;
 
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
@@ -199,10 +194,10 @@ namespace lapack
         return std::make_tuple(info, tau);
     }
 
-    template <class E1>
-    auto gesdd(E1& A, char jobz = 'A')
+    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    auto gesdd(E& A, char jobz = 'A')
     {
-        using value_type = typename E1::value_type;
+        using value_type = typename E::value_type;
         using xtype1 = xtensor<value_type, 1, layout_type::column_major>;
         using xtype2 = xtensor<value_type, 2, layout_type::column_major>;
 
@@ -279,9 +274,109 @@ namespace lapack
         return std::make_tuple(info, u, s, vt);
     }
 
+    // TODO merge with above function to reduce code bloat
+    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    auto gesdd(E& A, char jobz = 'A')
+    {
+        using value_type = typename E::value_type;
+        using underlying_value_type = typename value_type::value_type;
+        using xtype1 = xtensor<underlying_value_type, 1, layout_type::column_major>;
+        using xtype2 = xtensor<value_type, 2, layout_type::column_major>;
 
-    template <class E1>
-    int potr(E1& A, char uplo = 'L')
+        XTENSOR_ASSERT(A.dimension() == 2);
+        XTENSOR_ASSERT(A.layout() == layout_type::column_major);
+
+        std::size_t m = A.shape()[0];
+        std::size_t n = A.shape()[1];
+
+        uvector<value_type> work(1);
+        uvector<underlying_value_type> rwork(1);
+        uvector<XBLAS_INDEX> iwork(8 * std::min(m, n));
+
+        std::size_t mx = std::max(m, n);
+        std::size_t mn = std::min(m, n);
+        if (jobz == 'N')
+        {
+            rwork.resize(5 * mn);
+        }
+        else if (mx > mn)
+        {
+            // TODO verify size
+            rwork.resize(5*mn*mn + 5*mn);
+        }
+        else
+        {
+            // TODO verify size
+            rwork.resize(std::max(5*mn*mn + 5*mn, 2*mx*mn + 2*mn*mn + mn));
+        }
+
+        xtype1 s;
+        s.reshape({ std::max(1ul, std::min(m, n)) });
+
+        xtype2 u, vt;
+        XBLAS_INDEX u_stride = 1, vt_stride = 1;
+
+        if (jobz == 'A' || (jobz == 'O' && m < n))
+        {
+            u.reshape({m, m});
+            vt.reshape({m, m});
+            u_stride = (XBLAS_INDEX) u.strides().back();
+            vt_stride = (XBLAS_INDEX) vt.strides().back();
+        }
+        if (jobz == 'S')
+        {
+            u.reshape({m, std::min(m, n)});
+            vt.reshape({n, std::min(m, n)});
+            u_stride = (XBLAS_INDEX) u.strides().back();
+            vt_stride = (XBLAS_INDEX) vt.strides().back();
+        }
+
+        int info = cxxlapack::gesdd<XBLAS_INDEX>(
+            jobz,
+            (XBLAS_INDEX) A.shape()[0],
+            (XBLAS_INDEX) A.shape()[1],
+            A.raw_data(),
+            (XBLAS_INDEX) A.strides().back(),
+            s.raw_data(),
+            u.raw_data(),
+            u_stride,
+            vt.raw_data(),
+            vt_stride,
+            work.data(),
+            (XBLAS_INDEX) -1,
+            rwork.data(),
+            iwork.data()
+        );
+
+        if (info != 0)
+        {
+            throw std::runtime_error("Could not find workspace size for gesdd.");
+        }
+        work.resize((std::size_t) std::real(work[0]));
+
+        info = cxxlapack::gesdd<XBLAS_INDEX>(
+            jobz,
+            (XBLAS_INDEX) A.shape()[0],
+            (XBLAS_INDEX) A.shape()[1],
+            A.raw_data(),
+            (XBLAS_INDEX) A.strides().back(),
+            s.raw_data(),
+            u.raw_data(),
+            u_stride,
+            vt.raw_data(),
+            vt_stride,
+            work.data(),
+            (XBLAS_INDEX) work.size(),
+            rwork.data(),
+            iwork.data()
+        );
+
+        return std::make_tuple(info, u, s, vt);
+    }
+
+
+    template <class E>
+    int potr(E& A, char uplo = 'L')
     {
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
@@ -302,10 +397,10 @@ namespace lapack
      * @param A matrix to invert
      * @return inverse of A
      */
-    template <class E1>
-    int getri(E1& A, uvector<XBLAS_INDEX>& piv)
+    template <class E>
+    int getri(E& A, uvector<XBLAS_INDEX>& piv)
     {
-        using value_type = typename E1::value_type;
+        using value_type = typename E::value_type;
 
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
@@ -343,7 +438,6 @@ namespace lapack
 
     /**
      * Interface to LAPACK geev.
-     * 
      * @returns info
      */
     template <class E, class W, class V>
@@ -395,6 +489,60 @@ namespace lapack
             (XBLAS_INDEX) VR.strides().back(),
             work.data(),
             (XBLAS_INDEX) work.size()
+        );
+
+        return info;
+    }
+
+    /**
+     * Interface to LAPACK syevd.
+     * @returns info
+     */
+    template <class E, class W>
+    int syevd(E& A, char jobz, char uplo, W& w)
+    {
+        XTENSOR_ASSERT(A.dimension() == 2);
+        XTENSOR_ASSERT(A.layout() == layout_type::column_major);
+
+        using value_type = typename E::value_type;
+        using xtype = xtensor<value_type, 2, layout_type::column_major>;
+
+        auto N = A.shape()[0];
+        uvector<value_type> work(1);
+        uvector<XBLAS_INDEX> iwork(1);
+
+        int info = cxxlapack::syevd<XBLAS_INDEX>(
+            jobz,
+            uplo,
+            (XBLAS_INDEX) N,
+            A.raw_data(),
+            (XBLAS_INDEX) A.strides().back(),
+            w.raw_data(),
+            work.data(),
+            (XBLAS_INDEX) -1,
+            iwork.data(),
+            (XBLAS_INDEX) -1
+        );
+
+        if (info != 0)
+        {
+            throw std::runtime_error("Could not find workspace size for syevd.");
+        }
+
+        work.resize(std::size_t(work[0]));
+        iwork.resize(std::size_t(iwork[0]));
+
+        info = cxxlapack::syevd<XBLAS_INDEX>(
+            jobz,
+            uplo,
+            (XBLAS_INDEX) N,
+            A.raw_data(),
+            (XBLAS_INDEX) A.strides().back(),
+            w.raw_data(),
+            work.data(),
+            (XBLAS_INDEX) work.size(),
+            iwork.data(),
+            (XBLAS_INDEX) iwork.size()
         );
 
         return info;
@@ -461,6 +609,63 @@ namespace lapack
         return info;
     }
 
+    template <class E, class W>
+    int heevd(E& A, char jobz, char uplo, W& w)
+    {
+        XTENSOR_ASSERT(A.dimension() == 2);
+        XTENSOR_ASSERT(A.layout() == layout_type::column_major);
+
+        using value_type = typename E::value_type;
+        using underlying_value_type = typename value_type::value_type;
+        using xtype = xtensor<value_type, 2, layout_type::column_major>;
+
+        auto N = A.shape()[0];
+        uvector<value_type> work(1);
+        uvector<underlying_value_type> rwork(1);
+        uvector<XBLAS_INDEX> iwork(1);
+
+        int info = cxxlapack::heevd<XBLAS_INDEX>(
+            jobz,
+            uplo,
+            (XBLAS_INDEX) N,
+            A.raw_data(),
+            (XBLAS_INDEX) A.strides().back(),
+            w.raw_data(),
+            work.data(),
+            (XBLAS_INDEX) -1,
+            rwork.data(),
+            (XBLAS_INDEX) -1,
+            iwork.data(),
+            (XBLAS_INDEX) -1
+        );
+
+        if (info != 0)
+        {
+            throw std::runtime_error("Could not find workspace size for heevd.");
+        }
+
+        work.resize(std::size_t(std::real(work[0])));
+        rwork.resize(std::size_t(rwork[0]));
+        iwork.resize(std::size_t(iwork[0]));
+
+        info = cxxlapack::heevd<XBLAS_INDEX>(
+            jobz,
+            uplo,
+            (XBLAS_INDEX) N,
+            A.raw_data(),
+            (XBLAS_INDEX) A.strides().back(),
+            w.raw_data(),
+            work.data(),
+            (XBLAS_INDEX) work.size(),
+            rwork.data(),
+            (XBLAS_INDEX) rwork.size(),
+            iwork.data(),
+            (XBLAS_INDEX) iwork.size()
+        );
+
+        return info;
+    }
+
     template <class E, class F, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
     auto gelsd(E& A, F& b, double rcond = -1)
     {
@@ -496,7 +701,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for geev.");
+            throw std::runtime_error("Could not find workspace size for gelsd.");
         }
 
         work.resize(std::size_t(work[0]));
@@ -559,7 +764,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for geev.");
+            throw std::runtime_error("Could not find workspace size for gelsd.");
         }
 
         work.resize(std::size_t(std::real(work[0])));

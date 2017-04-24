@@ -76,13 +76,14 @@ template <typename IndexType>
           IndexType              n,
           std::complex<float >   *A,
           IndexType              ldA,
-          std::complex<float >   *s,
+          double                 *s,
           std::complex<float >   *U,
           IndexType              ldU,
           std::complex<float >   *Vt,
           IndexType              ldVt,
           std::complex<float >   *work,
           IndexType              lWork,
+          float                  *rWork,
           IndexType              *iWork);
 
 
@@ -93,13 +94,14 @@ template <typename IndexType>
           IndexType              n,
           std::complex<double>   *A,
           IndexType              ldA,
-          std::complex<double>   *s,
+          double                 *s,
           std::complex<double>   *U,
           IndexType              ldU,
           std::complex<double>   *Vt,
           IndexType              ldVt,
           std::complex<double>   *work,
           IndexType              lWork,
+          double                 *rWork,
           IndexType              *iWork);
 
 } // namespace cxxlapack

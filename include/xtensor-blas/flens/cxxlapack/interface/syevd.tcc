@@ -64,7 +64,7 @@ syevd(char           jobZ,
                         work,
                         &lWork,
                         iWork,
-                        liWork,
+                        &liWork,
                         &info);
 #   ifndef NDEBUG
     if (info<0) {
@@ -100,7 +100,7 @@ syevd(char           jobZ,
                         work,
                         &lWork,
                         iWork,
-                        liWork,
+                        &liWork,
                         &info);
 #   ifndef NDEBUG
     if (info<0) {

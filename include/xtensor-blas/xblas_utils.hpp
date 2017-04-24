@@ -105,5 +105,23 @@ namespace xt
     constexpr bool is_xfunction(T&& t) {
         return decltype(detail::is_xfunction_impl(t))::value;
     }
+
+    template <class T>
+    struct underlying_value_type;
+
+    template <class T>
+    struct underlying_value_type<std::complex<T>>
+    {
+        using type = T;
+    };
+
+    template <class T>
+    struct underlying_value_type
+    {
+        using type = T;
+    };
+
+    template <class T>
+    using underlying_value_type_t = typename underlying_value_type<T>::type;
 }
 #endif
