@@ -28,18 +28,17 @@ namespace xt
 namespace blas
 {
     /**
-     * Calculate the dot product between two vectors, conjugating 
+     * Calculate the dot product between two vectors, conjugating
      * the first argument \em a in the case of complex vectors.
-     * 
+     *
      * @param a vector of n elements
      * @param b vector of n elements
      * @returns scalar result
      */
-    template <class E1, class E2>
-    xarray<typename E1::value_type> dot(const xexpression<E1>& a, const xexpression<E2>& b)
+    template <class E1, class E2, class R>
+    void dot(const xexpression<E1>& a, const xexpression<E2>& b,
+             R& result)
     {
-        xarray<typename E1::value_type> res({0});
-
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
 
@@ -49,24 +48,21 @@ namespace blas
             (BLAS_IDX) ad.strides().front(),
             bd.raw_data() + bd.raw_data_offset(),
             (BLAS_IDX) bd.strides().front(),
-            res(0)
+            result
         );
-        return res;
     }
 
     /**
-     * Calculate the dot product between two complex vectors, not conjugating the 
+     * Calculate the dot product between two complex vectors, not conjugating the
      * first argument \em a.
-     * 
+     *
      * @param a vector of n elements
      * @param b vector of n elements
      * @returns scalar result
      */
-    template <class E1, class E2>
-    xarray<typename E1::value_type> dotu(const xexpression<E1>& a, const xexpression<E2>& b)
+    template <class E1, class E2, class R>
+    void dotu(const xexpression<E1>& a, const xexpression<E2>& b, R& result)
     {
-        xarray<typename E1::value_type> res({0});
-
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
 
@@ -76,54 +72,50 @@ namespace blas
             (BLAS_IDX) ad.strides().front(),
             bd.raw_data() + bd.raw_data_offset(),
             (BLAS_IDX) bd.strides().front(),
-            res(0)
+            result
         );
-        return res;
     }
 
     /**
      * Calculate the 1-norm of a vector
-     * 
+     *
      * @param a vector of n elements
      * @returns scalar result
      */
-    template <class E1>
-    typename E1::value_type asum(const xexpression<E1>& a)
+    template <class E, class R>
+    void asum(const xexpression<E>& a, R& result)
     {
-        typename E1::value_type res;
-        auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
+        auto&& ad = view_eval<E::static_layout>(a.derived_cast());
+
         cxxblas::asum<BLAS_IDX>(
             (BLAS_IDX) ad.size(),
             ad.raw_data() + ad.raw_data_offset(),
-            (BLAS_IDX) ad.strides().front(), 
-            res
+            (BLAS_IDX) ad.strides().front(),
+            result
         );
-        return res;
     }
 
     /**
      * Calculate the 2-norm of a vector
-     * 
+     *
      * @param a vector of n elements
      * @returns scalar result
      */
-    template <class E1>
-    typename E1::value_type nrm2(const xexpression<E1>& a)
+    template <class E, class R>
+    void nrm2(const xexpression<E>& a, R& result)
     {
-        typename E1::value_type res;
-        auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
+        auto&& ad = view_eval<E::static_layout>(a.derived_cast());
 
         cxxblas::nrm2<BLAS_IDX>(
             (BLAS_IDX) ad.size(),
             ad.raw_data() + ad.raw_data_offset(),
-            (BLAS_IDX) ad.strides().front(), 
-            res
+            (BLAS_IDX) ad.strides().front(),
+            result
         );
-        return res;
     }
 
     /**
-     * Calculate the general matrix times vector product according to 
+     * Calculate the general matrix times vector product according to
      * ``y := alpha * A * x + beta * y``.
      *
      * @param A matrix of n x m elements
@@ -132,87 +124,70 @@ namespace blas
      * @param alpha scalar scale factor
      * @returns the resulting vector
      */
-    template <class E1, class E2, class value_type = typename E1::value_type>
-    xt::xarray<value_type> gemv(const xexpression<E1>& A, const xexpression<E2>& x, 
-                                bool transpose = false,
-                                const xscalar<value_type> alpha = value_type(1))
+    template <class E1, class E2, class R, class value_type = typename E1::value_type>
+    void gemv(const xexpression<E1>& A, const xexpression<E2>& x,
+              R& result,
+              bool transpose = false,
+              const xscalar<value_type> alpha = value_type(1),
+              const xscalar<value_type> beta = value_type(0))
     {
         auto&& dA = view_eval<E1::static_layout>(A.derived_cast());
-        auto&& dx = view_eval<E2::static_layout>(x.derived_cast());
-
-        using result_type = typename select_xtype<E1, E2, 1>::type;
-        typename result_type::shape_type result_shape({dA.shape()[0]});
-
-        if (transpose)
-        {
-            std::reverse(result_shape.begin(), result_shape.end());
-        }
-
-        result_type res(result_shape);  // TODO make double 
+        auto&& dx = view_eval<E1::static_layout>(x.derived_cast());
 
         cxxblas::gemv<BLAS_IDX>(
-            get_blas_storage_order(dA), 
-            transpose ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
+            get_blas_storage_order(dA),
+            transpose ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             (BLAS_IDX) dA.shape()[0],
             (BLAS_IDX) dA.shape()[1],
-            alpha(), // alpha
+            alpha(),
             dA.raw_data(),
             (BLAS_IDX) dA.strides().front(),
             dx.raw_data(),
-            (BLAS_IDX) dx.strides().front(), 
-            value_type(0), // beta 
-            res.raw_data(),
+            (BLAS_IDX) dx.strides().front(),
+            beta(),
+            result.raw_data() + result.raw_data_offset(),
             (BLAS_IDX) 1
         );
-
-        return res;
     }
 
     /**
      * Calculate the matrix-matrix product of matrix @A and matrix @B
+     *
+     * C := alpha*op( A )*op( B ) + beta*C
+     *
      * @param A matrix of m-by-n elements
      * @param B matrix of n-by-k elements
      * @returns matrix of m-by-k elements
      */
-    template <class E1, class E2, class value_type = typename E1::value_type>
-    xarray<value_type> gemm(const xexpression<E1>& A, const xexpression<E2>& B,
-                            const xscalar<value_type> alpha = value_type(1),
-                            const xscalar<value_type> beta = value_type(0),
-                            bool transpose_A = false, bool transpose_B = false)
+    template <class E, class F, class R, class value_type = typename E::value_type>
+    void gemm(const xexpression<E>& A, const xexpression<F>& B, R& result,
+              const xscalar<value_type> alpha = value_type(1),
+              const xscalar<value_type> beta = value_type(0),
+              bool transpose_A = false, bool transpose_B = false)
     {
-        auto&& da = view_eval(A.derived_cast());
-        auto&& db = view_eval(B.derived_cast());
+        auto&& da = view_eval<E::static_layout>(A.derived_cast());
+        auto&& db = view_eval<E::static_layout>(B.derived_cast());
 
         XTENSOR_ASSERT(da.layout() == db.layout());
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
-        using return_type = typename select_xtype<E1, E2, 2>::type;
-        typename return_type::shape_type s = {
-          transpose_A ? da.shape()[1] : da.shape()[0],
-          transpose_B ? db.shape()[0] : db.shape()[1],
-        };
-
-        return_type res(s);
-
         cxxblas::gemm<BLAS_IDX>(
-            get_blas_storage_order(da), 
-            transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
-            transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans, 
+            get_blas_storage_order(da),
+            transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
+            transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             (BLAS_IDX) da.shape()[0],
-            (BLAS_IDX) da.shape()[1],
+            (BLAS_IDX) db.shape()[1],
             (BLAS_IDX) db.shape()[0],
             alpha(),
             da.raw_data(),
             (BLAS_IDX) da.strides().front(),
             db.raw_data(),
-            (BLAS_IDX) db.strides().front(), 
+            (BLAS_IDX) db.strides().front(),
             beta(),
-            res.raw_data(),
-            (BLAS_IDX) res.strides().front()
+            result.raw_data(),
+            (BLAS_IDX) result.strides().front()
         );
-
-        return res;
     }
 
     /**
@@ -224,33 +199,29 @@ namespace blas
      * @param alpha scalar scale factor
      * @returns matrix of n-by-m elements
      */
-    template <class E1, class E2, class value_type = typename E1::value_type>
-    xarray<value_type> ger(const xexpression<E1>& x, const xexpression<E2>& y,
-                           const xscalar<value_type> alpha = 1)
+    template <class E1, class E2, class R, class value_type = typename E1::value_type>
+    void ger(const xexpression<E1>& x, const xexpression<E2>& y,
+             R& result,
+             const xscalar<value_type> alpha = value_type(1))
     {
-        // outer product
-        // A := alpha * x * y' + A
         auto&& dx = view_eval(x.derived_cast());
         auto&& dy = view_eval(y.derived_cast());
 
         XTENSOR_ASSERT(dx.dimension() == 1);
         XTENSOR_ASSERT(dy.dimension() == 1);
 
-        using return_type = typename select_xtype<E1, E2, 2>::type;
-        typename return_type::shape_type s = {dx.shape()[0], dy.shape()[0]};
-        return_type res(s, 0);
-
         cxxblas::ger<BLAS_IDX>(
-            get_blas_storage_order(res), 
+            get_blas_storage_order(result),
             (BLAS_IDX) dx.shape()[0],
             (BLAS_IDX) dy.shape()[0],
             alpha(),
-            dx.raw_data(),  (BLAS_IDX) dx.strides().front(),
-            dy.raw_data(),  (BLAS_IDX) dy.strides().front(), 
-            res.raw_data(), (BLAS_IDX) res.strides().front()
+            dx.raw_data(),
+            (BLAS_IDX) dx.strides().front(),
+            dy.raw_data(),
+            (BLAS_IDX) dy.strides().front(),
+            result.raw_data() + result.raw_data_offset(),
+            (BLAS_IDX) result.strides().front()
         );
-
-        return res;
     }
 }
 }

@@ -33,6 +33,15 @@ namespace xt
         EXPECT_EQ(expected2, res2);
     }
 
+    TEST(xblas, dot_2d)
+    {
+        xarray<double> a = {{1,2,3,4,5}, {1,2,3,4,5}};
+        xarray<double> b = {5,4,3,2,1};
+        auto res = linalg::dot(a, b);
+        xarray<double> expected = {35, 35};
+        EXPECT_EQ(expected, res);
+    }
+
     TEST(xblas, view_dot)
     {
         xarray<double> a = {1,2,3,4,5};

@@ -106,29 +106,22 @@ namespace xt
         return decltype(detail::is_xfunction_impl(t))::value;
     }
 
-    namespace detail
+    template <class T>
+    struct underlying_value_type;
+
+    template <class T>
+    struct underlying_value_type<std::complex<T>>
     {
-        template <class A, class B, class T, std::size_t NEW_DIM>
-        struct get_type_impl {
-            using type = xarray<T>;
-        };
-
-        template <class A, std::size_t N, class B, std::size_t M, class T, std::size_t NEW_DIM>
-        struct get_type_impl<std::array<A, N>, std::array<B, M>, T, NEW_DIM> {
-            using type = xtensor<T, NEW_DIM>;
-        };
-
-    }
-
-    template <class A, class B, std::size_t NEW_DIM>
-    struct select_xtype
-    {
-        using type = std::remove_const_t<
-                        typename detail::get_type_impl<
-                            typename A::shape_type, typename B::shape_type, 
-                            std::common_type_t<typename A::value_type, typename B::value_type>,
-                            NEW_DIM>::type>;
+        using type = T;
     };
-}
 
+    template <class T>
+    struct underlying_value_type
+    {
+        using type = T;
+    };
+
+    template <class T>
+    using underlying_value_type_t = typename underlying_value_type<T>::type;
+}
 #endif
