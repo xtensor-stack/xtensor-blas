@@ -54,19 +54,21 @@ namespace linalg
 
         const auto& v = vec.derived_cast();
 
+        value_type result = 0;
         if (v.dimension() == 1)
         {
             if (ord == 1)
             {
-                return blas::asum(v);
+                blas::asum(v, result);
+                return result;
             }
             else if (ord == 2)
             {
-                return blas::nrm2(v);
+                blas::nrm2(v, result);
+                return result;
             }
             else if (ord == 0)
             {
-                value_type result;
                 for (std::size_t i = 0; i < v.size(); ++i)
                 {
                     result += (v(i) != 0);
@@ -75,7 +77,6 @@ namespace linalg
             }
             else
             {
-                value_type result = 0;
                 for (std::size_t i = 0; i < v.size(); ++i)
                 {
                     result += std::abs(std::pow(v(i), ord));
@@ -100,8 +101,8 @@ namespace linalg
             if (ord == 2 || ord == -2)
             {
                 auto M = copy_to_layout<layout_type::column_major>(v);
-                auto res = lapack::gesdd(M, 'N');
-                auto& s = std::get<2>(res);
+                auto gesdd_res = lapack::gesdd(M, 'N');
+                auto& s = std::get<2>(gesdd_res);
                 if (ord == 2)
                 {
                     return *std::max_element(s.begin(), s.end());
@@ -131,8 +132,8 @@ namespace linalg
             if (ord == normorder::nuc)
             {
                 auto M = copy_to_layout<layout_type::column_major>(v);
-                auto res = lapack::gesdd(M, 'N');
-                auto& s = std::get<2>(res);
+                auto gesdd_res = lapack::gesdd(M, 'N');
+                auto& s = std::get<2>(gesdd_res);
                 return std::accumulate(s.begin(), s.end(), value_type(0));
             }
             if (ord == normorder::inf || ord == normorder::neg_inf)
@@ -223,33 +224,15 @@ namespace linalg
      * Calculate the condition number of matrix M
      */
     template <class E>
-    typename E::value_type cond(const xexpression<E>& M, int ord)
+    auto cond(const xexpression<E>& M, int ord)
     {
         return norm(M, ord) * norm(inv(M), ord);
     }
 
     template <class E>
-    typename E::value_type cond(const xexpression<E>& M, normorder ord)
+    auto cond(const xexpression<E>& M, normorder ord)
     {
         return norm(M, ord) * norm(inv(M), ord);
-    }
-
-    namespace detail
-    {
-        template <class T>
-        struct get_underlying_type;
-
-        template <class T>
-        struct get_underlying_type
-        {
-            using type = T;
-        };
-
-        template <class T>
-        struct get_underlying_type<std::complex<T>>
-        {
-            using type = T;
-        };
     }
 
     /**
@@ -265,7 +248,7 @@ namespace linalg
     template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
     auto eig(const xexpression<E>& A)
     {
-        using underlying_type = typename detail::get_underlying_type<typename E::value_type>::type;
+        using underlying_type = typename E::value_type;
         using value_type = typename E::value_type;
 
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
@@ -319,8 +302,8 @@ namespace linalg
     template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
     auto eig(const xexpression<E>& A)
     {
-        using underlying_type = typename detail::get_underlying_type<typename E::value_type>::type;
         using value_type = typename E::value_type;
+        using underlying_type = typename value_type::value_type;
 
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
@@ -419,33 +402,44 @@ namespace linalg
      */
     template <class T, class O>
     auto dot(const T& t, const O& o) {
+        using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
+        using return_type = xarray<common_type>;
+
+        return_type result;
+
         if (t.dimension() == 1 && o.dimension() == 1)
         {
+            result.reshape(std::vector<std::size_t>{1});
             if (is_complex<typename T::value_type>::value)
             {
-                return blas::dotu(t, o);
+                blas::dotu(t, o, result(0));
             }
             else
             {
-                return blas::dot(t, o);
+                blas::dot(t, o, result(0));
             }
+            return result;
         }
         else
         {
             if (t.dimension() == 2 && o.dimension() == 1)
             {
-                return blas::gemv(t, o);
+                result.reshape(std::vector<std::size_t>{t.shape()[0]});
+                blas::gemv(t, o, result);
             }
             else if (t.dimension() == 1 && o.dimension() == 2)
             {
-                return blas::gemv(o, t, true);
+                result.reshape(std::vector<std::size_t>{o.shape()[0]});
+                blas::gemv(o, t, result, true);
             }
             else if (t.dimension() == 2 && o.dimension() == 2)
             {
-                return blas::gemm(o, t);
+                result.reshape(std::vector<std::size_t>{t.shape()[0], o.shape()[1]});
+                blas::gemm(o, t, result);
             }
+            return result;
         }
-        throw std::exception();
+        throw std::runtime_error("Dot broadcasting not implemented yet. Only 1- and 2-dim work.");
     }
 
     /**
@@ -462,18 +456,27 @@ namespace linalg
      * @return resulting array
      */
     template <class T, class O>
-    auto vdot(const T& t, const O& o) {
-        XTENSOR_ASSERT(t.dimension() == 1);
-        XTENSOR_ASSERT(o.dimension() == 1);
+    auto vdot(const xexpression<T>& a, const xexpression<O>& b) {
 
+        using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
+
+        const auto da = a.derived_cast();
+        const auto db = b.derived_cast();
+
+        XTENSOR_ASSERT(da.dimension() == 1);
+        XTENSOR_ASSERT(db.dimension() == 1);
+
+        common_type result = 0;
         if (is_complex<typename T::value_type>::value)
         {
-            return blas::dot(t, o);
+            blas::dot(da, db, result);
         }
         else
         {
-            return blas::dotu(t, o);
+            blas::dotu(da, db, result);
         }
+
+        return result;
     }
 
     /**
@@ -485,10 +488,22 @@ namespace linalg
      * @return resulting array
      */
     template <class T, class O>
-    auto outer(const T& t, const O& o) {
-        XTENSOR_ASSERT(t.dimension() == 1);
-        XTENSOR_ASSERT(o.dimension() == 1);
-        return blas::ger(t, o);
+    auto outer(const xexpression<T>& a, const xexpression<O>& b) {
+        using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
+        using return_type = xtensor<common_type, 2>;
+
+        const auto da = a.derived_cast();
+        const auto db = b.derived_cast();
+
+        XTENSOR_ASSERT(da.dimension() == 1);
+        XTENSOR_ASSERT(db.dimension() == 1);
+
+        typename return_type::shape_type s = {da.shape()[0], db.shape()[0]};
+        return_type result(s, 0);
+
+        blas::ger(da, db, result);
+
+        return result;
     }
 
     /**
@@ -717,16 +732,16 @@ namespace linalg
 
         xtensor<value_type, 2, layout_type::column_major> M = xt::conj(dA);
 
-        auto result = lapack::gesdd(M, 'S');
+        auto gesdd_res = lapack::gesdd(M, 'S');
 
-        if (std::get<0>(result) != 0)
+        if (std::get<0>(gesdd_res) != 0)
         {
             throw std::runtime_error("SVD decomposition failed.");
         }
 
-        auto u = std::get<1>(result);
-        auto s = std::get<2>(result);
-        auto vt = std::get<3>(result);
+        auto u = std::get<1>(gesdd_res);
+        auto s = std::get<2>(gesdd_res);
+        auto vt = std::get<3>(gesdd_res);
 
         value_type cutoff = rcond * (*std::max_element(s.begin(), s.end()));
 
@@ -746,7 +761,10 @@ namespace linalg
         auto m = vww * ut;
         auto vtt = xt::transpose(vt);
 
-        return blas::gemm(vtt, m);
+        std::array<std::size_t, 2> shp({vtt.shape()[0], m.shape()[1]});
+        xtensor<value_type, 2> result(shp);
+        blas::gemm(vtt, m, result);
+        return result;
     }
 
     /**
@@ -771,7 +789,6 @@ namespace linalg
         XTENSOR_ASSERT(mat.shape()[0] == mat_inp.shape()[1]);
 
         xtype res(mat.shape());
-
         if (n == 0)
         {
             res = eye(mat.shape()[0]);
@@ -783,12 +800,15 @@ namespace linalg
             n = -n;
         }
 
+
+        xtype temp(mat.shape());
         res = mat;
         if (n <= 3)
         {
             for (int i = 0; i < n - 1; ++i)
             {
-                res = blas::gemm(res, mat);
+                blas::gemm(res, mat, temp);
+                res = temp;
             }
             return res;
         }
@@ -801,17 +821,20 @@ namespace linalg
         }
         while (~n & (1 << i))
         {
-            mat = blas::gemm(mat, mat);
+            blas::gemm(mat, mat, temp);
+            temp = res;
             ++i;
         }
         ++i;
         res = mat;
         for (; i < bits; ++i)
         {
-            mat = blas::gemm(mat, mat);
+            blas::gemm(mat, mat, temp);
+            mat = temp;
             if (n & (1 << i))
             {
-                res = blas::gemm(res, mat);
+                blas::gemm(res, mat, temp);
+                res = temp;
             }
         }
         return res;
