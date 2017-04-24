@@ -125,8 +125,7 @@ namespace blas
      * @returns the resulting vector
      */
     template <class E1, class E2, class R, class value_type = typename E1::value_type>
-    void gemv(const xexpression<E1>& A,
-              const xexpression<E2>& x,
+    void gemv(const xexpression<E1>& A, const xexpression<E2>& x,
               R& result,
               bool transpose = false,
               const xscalar<value_type> alpha = value_type(1),
@@ -173,7 +172,6 @@ namespace blas
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
-
         cxxblas::gemm<BLAS_IDX>(
             get_blas_storage_order(da),
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
@@ -206,17 +204,11 @@ namespace blas
              R& result,
              const xscalar<value_type> alpha = value_type(1))
     {
-        // outer product
-        // A := alpha * x * y' + A
         auto&& dx = view_eval(x.derived_cast());
         auto&& dy = view_eval(y.derived_cast());
 
         XTENSOR_ASSERT(dx.dimension() == 1);
         XTENSOR_ASSERT(dy.dimension() == 1);
-
-        // using return_type = typename select_xtype<E1, E2, 2>::type;
-        // typename return_type::shape_type s = {dx.shape()[0], dy.shape()[0]};
-        // return_type res(s, 0);
 
         cxxblas::ger<BLAS_IDX>(
             get_blas_storage_order(result),
