@@ -509,7 +509,7 @@ namespace linalg
     template <class T, class O>
     auto dot(const T& t, const O& o) {
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
-        using return_type = xarray<common_type>;
+        using return_type = xarray<common_type, T::static_layout>;
 
         return_type result;
 
@@ -540,8 +540,8 @@ namespace linalg
             }
             else if (t.dimension() == 2 && o.dimension() == 2)
             {
-                result.reshape(std::vector<std::size_t>{t.shape()[0], o.shape()[1]});
-                blas::gemm(o, t, result);
+                result.reshape(std::vector<std::size_t>{ t.shape()[0], o.shape()[1] });
+                blas::gemm(t, o, result);
             }
             return result;
         }
@@ -713,57 +713,96 @@ namespace linalg
 
     namespace detail
     {
-        template <class E>
-        inline auto call_gqr(E& A, uvector<typename E::value_type>& tau)
+        template <class E, class T>
+        inline auto call_gqr(E& A, T& tau, XBLAS_INDEX n)
             -> std::enable_if_t<!is_complex<typename E::value_type>::value>
         {
-            int info = lapack::orgqr(A, tau);
+            int info = lapack::orgqr(A, tau, n);
             if (info > 0)
             {
                 throw std::runtime_error("Could not find Q (orgqr).");
             }
         }
 
-        template <class E>
-        inline auto call_gqr(E& A, uvector<typename E::value_type>& tau)
+        template <class E, class T>
+        inline auto call_gqr(E& A, T& tau, XBLAS_INDEX n)
             -> std::enable_if_t<is_complex<typename E::value_type>::value>
         {
-            int info = lapack::ungqr(A, tau);
+            int info = lapack::ungqr(A, tau, n);
             if (info > 0)
             {
                 throw std::runtime_error("Could not find Q (ungqr).");
             }
         }
     }
+
+    // K = min(M, N)
+    enum class qrmode {
+        reduced, //< return q, r with dimensions (M, K), (K, N) (default)
+        complete, //< returns q, r with dimensions (M, M), (M, N)
+        r, //< returns r only with dimensions (K, N)
+        raw //< returns h, tau with dimensions (N, M), (K, 1)
+    };
+
     /**
      * Compute the QR decomposition of \em t.
      * @param t The matrix to calculate Q and R for
      * @return std::tuple with Q and R
      */
     template <class T>
-    auto qr(const xexpression<T>& A, bool calculate_q = true)
+    auto qr(const xexpression<T>& A, qrmode mode = qrmode::reduced)
     {
         using value_type = typename T::value_type;
         using xtype = xtensor<value_type, 2, layout_type::column_major>;
+        using result_xtype = xtensor<value_type, 2>;
 
         xtype R = A.derived_cast();
-        auto res = lapack::geqrf(R);
 
-        if (std::get<0>(res) != 0)
+        std::size_t M = R.shape()[0];
+        std::size_t N = R.shape()[1];
+        std::size_t K = std::min(M, N);
+        std::size_t mc;
+
+        std::array<std::size_t, 2> tau_shp = {K, 1};
+        xtype tau(tau_shp);
+        int info = lapack::geqrf(R, tau);
+
+        if (info != 0)
         {
             throw std::runtime_error("QR decomposition failed.");
         }
 
         xtype Q;
-        if (calculate_q)
+
+        if (mode == qrmode::raw)
+        {
+            return std::make_tuple(R, tau);
+        }
+
+        if (mode == qrmode::reduced)
         {
             Q = R;
-            detail::call_gqr(Q, std::get<1>(res));
+            detail::call_gqr(Q, tau, (XBLAS_INDEX) K);
+            auto vR = view(R, range(0ul, K), all());
+            R = vR;
+        }
+        if (mode == qrmode::complete)
+        {
+            Q.reshape({M, M});
+            // TODO replace with assignment to view
+            for (std::size_t i = 0; i < R.shape()[0]; ++i)
+            {
+                for (std::size_t j = 0; j < R.shape()[1]; ++j)
+                {
+                    Q(i, j) = R(i, j);
+                }
+            }
+            detail::call_gqr(Q, tau, (XBLAS_INDEX) M);
         }
 
         for (std::size_t i = 0; i < R.shape()[0]; ++i)
         {
-            for (std::size_t j = 0; j < i; j++)
+            for (std::size_t j = 0; j < i && j < R.shape()[1]; j++)
             {
                 R(i, j) = 0;
             }
