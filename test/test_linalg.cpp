@@ -11,6 +11,7 @@
 #include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
+#include "xtensor/xrandom.hpp"
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlapack.hpp"
 #include "xtensor-blas/xlinalg.hpp"
@@ -309,6 +310,88 @@ namespace xt
 
         EXPECT_NEAR(1.9289808794290355, std::real(res_c), 1e-06);
         EXPECT_NEAR(0.8075433553117102, std::imag(res_c), 1e-06);
+    }
 
+    TEST(xlinalg, kron)
+    {
+        xarray<int> arg_0 = {{2,1,8},
+                             {3,5,0},
+                             {2,6,2},
+                             {4,4,6}};
+
+        xarray<int> arg_1 = {{3,0,6,4,7},
+                             {6,7,1,5,7}};
+
+        auto res = xt::linalg::kron(arg_0, arg_1);
+
+        xarray<int> expected = {{ 6, 0,12, 8,14, 3, 0, 6, 4, 7,24, 0,48,32,56},
+                                {12,14, 2,10,14, 6, 7, 1, 5, 7,48,56, 8,40,56},
+                                { 9, 0,18,12,21,15, 0,30,20,35, 0, 0, 0, 0, 0},
+                                {18,21, 3,15,21,30,35, 5,25,35, 0, 0, 0, 0, 0},
+                                { 6, 0,12, 8,14,18, 0,36,24,42, 6, 0,12, 8,14},
+                                {12,14, 2,10,14,36,42, 6,30,42,12,14, 2,10,14},
+                                {12, 0,24,16,28,12, 0,24,16,28,18, 0,36,24,42},
+                                {24,28, 4,20,28,24,28, 4,20,28,36,42, 6,30,42}};
+
+        EXPECT_EQ(expected, res);
+    }
+
+    TEST(xlinalg, cholesky)
+    {
+        xarray<double> arg_0 = {{  4, 12,-16},
+                             { 12, 37,-43},
+                             {-16,-43, 98}};
+
+        auto res = xt::linalg::cholesky(arg_0);
+        xarray<double> expected = {{ 2., 0., 0.},
+                                { 6., 1., 0.},
+                                {-8., 5., 3.}};
+        EXPECT_EQ(expected, res);
+
+        xarray<std::complex<double>> cmplarg_0 = {{ 1.+0.i,-0.-2.i},
+                                                  { 0.+2.i, 5.+0.i}};
+        auto cmplres = xt::linalg::cholesky(cmplarg_0);
+        xarray<std::complex<double>> cmplexpected = {{ 1.+0.i, 0.+0.i},
+                                                     { 0.+2.i, 1.+0.i}};
+        EXPECT_EQ(cmplexpected, cmplres);
+
+    }
+
+    TEST(xlinalg, qr)
+    {
+        xarray<double, layout_type::column_major> a = xt::random::rand<double>({9, 6});
+        auto res = xt::linalg::qr(a);
+        auto& q = std::get<0>(res);
+        auto& r = std::get<1>(res);
+        auto resf = xt::linalg::qr(a, linalg::qrmode::complete);
+        auto resr = xt::linalg::qr(a, linalg::qrmode::r);
+        auto& qf = std::get<0>(resf);
+        auto& rf = std::get<1>(resf);
+
+        auto neara = xt::linalg::dot(q, r);
+        EXPECT_TRUE(allclose(neara, a));
+        auto nearaf = xt::linalg::dot(qf, rf);
+        EXPECT_TRUE(allclose(nearaf, a));
+        EXPECT_EQ(std::get<1>(resr), rf);
+        EXPECT_EQ(std::get<0>(resr).size(), 1);
+        EXPECT_EQ(std::get<0>(resr).dimension(), 2);
+        xarray<double, layout_type::column_major> erawR = {{ -1.12249722e+01, -1.28285396e+01, -1.44321071e+01},
+                                                            {  2.67261242e-01, -1.19522861e+00, -2.39045722e+00},
+                                                            {  5.34522484e-01, -2.61215421e-01,  3.48440273e-15},
+                                                            {  8.01783726e-01, -7.25290754e-01,  2.74044353e-01}};
+
+        xarray<double, layout_type::column_major> eTau = {{ 1.        , 1.25448465, 1.86029153}};
+
+        xarray<double, layout_type::column_major> AA = {{  0.,  1.,  2.},
+                                                        {  3.,  4.,  5.},
+                                                        {  6.,  7.,  8.},
+                                                        {  9., 10., 11.}};
+
+        auto resraw = xt::linalg::qr(AA, linalg::qrmode::raw);
+        auto& tau = std::get<1>(resraw);
+        auto& rawR = std::get<0>(resraw);
+
+        EXPECT_TRUE(allclose(tau, eTau));
+        EXPECT_TRUE(allclose(erawR, rawR));
     }
 }

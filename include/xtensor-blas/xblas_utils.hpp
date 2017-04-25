@@ -36,7 +36,7 @@ namespace xt
 
     template <layout_type L = layout_type::row_major, class T, class I = std::decay_t<T>>
     inline auto view_eval(T&& t)
-        -> std::enable_if_t<(!has_raw_data_interface<T>::value || I::static_layout != L) 
+        -> std::enable_if_t<(!has_raw_data_interface<T>::value || I::static_layout != L)
                                 && detail::is_array<typename I::shape_type>::value,
                             xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value, L>>
     {
@@ -45,8 +45,8 @@ namespace xt
 
     template <layout_type L = layout_type::row_major, class T, class I = std::decay_t<T>>
     inline auto view_eval(T&& t)
-        -> std::enable_if_t<(!has_raw_data_interface<T>::value || I::static_layout != L) && 
-                                !detail::is_array<typename I::shape_type>::value, 
+        -> std::enable_if_t<(!has_raw_data_interface<T>::value || I::static_layout != L) &&
+                                !detail::is_array<typename I::shape_type>::value,
                             xarray<typename I::value_type, L>>
     {
         xarray<typename I::value_type, L> ret = t;
@@ -70,7 +70,7 @@ namespace xt
 
     template <layout_type L = layout_type::row_major, class T, class I = std::decay_t<T>>
     inline auto copy_to_layout(T&& t)
-        -> std::enable_if_t<std::decay_t<T>::static_layout != L && !detail::is_array<typename I::shape_type>::value, 
+        -> std::enable_if_t<std::decay_t<T>::static_layout != L && !detail::is_array<typename I::shape_type>::value,
                             xarray<typename I::value_type, L>>
     {
         return t;
@@ -88,6 +88,39 @@ namespace xt
             return cxxblas::StorageOrder::ColMajor;
         }
         throw std::runtime_error("Cannot handle layout_type of e.");
+    }
+
+    /**
+     * Get leading stride
+     */
+
+    template <class A, std::enable_if_t<A::static_layout == layout_type::column_major>* = nullptr>
+    inline BLAS_IDX get_leading_stride(const A& a)
+    {
+        return (BLAS_IDX) a.strides().back();
+    }
+
+    template <class A, std::enable_if_t<A::static_layout == layout_type::row_major>* = nullptr>
+    inline BLAS_IDX get_leading_stride(const A& a)
+    {
+        return (BLAS_IDX) a.strides().front();
+    }
+
+    template <class A, std::enable_if_t<A::static_layout != layout_type::row_major && A::static_layout != layout_type::column_major>* = nullptr>
+    inline BLAS_IDX get_leading_stride(const A& a)
+    {
+        if (a.layout() == layout_type::row_major)
+        {
+            return (BLAS_IDX) a.strides().front();
+        }
+        else if (a.layout() == layout_type::column_major)
+        {
+            return (BLAS_IDX) a.strides().back();
+        }
+        else
+        {
+            throw std::runtime_error("No valid layout chosen.");
+        }
     }
 
     /*******************************

@@ -141,12 +141,12 @@ namespace blas
             (BLAS_IDX) dA.shape()[1],
             alpha(),
             dA.raw_data(),
-            (BLAS_IDX) dA.strides().front(),
+            get_leading_stride(dA),
             dx.raw_data(),
-            (BLAS_IDX) dx.strides().front(),
+            get_leading_stride(dx),
             beta(),
             result.raw_data() + result.raw_data_offset(),
-            (BLAS_IDX) 1
+            get_leading_stride(result)
         );
     }
 
@@ -169,6 +169,7 @@ namespace blas
         auto&& db = view_eval<E::static_layout>(B.derived_cast());
 
         XTENSOR_ASSERT(da.layout() == db.layout());
+        XTENSOR_ASSERT(result.layout() == da.layout());
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
@@ -181,12 +182,12 @@ namespace blas
             (BLAS_IDX) db.shape()[0],
             alpha(),
             da.raw_data(),
-            (BLAS_IDX) da.strides().front(),
+            get_leading_stride(da),
             db.raw_data(),
-            (BLAS_IDX) db.strides().front(),
+            get_leading_stride(db),
             beta(),
             result.raw_data(),
-            (BLAS_IDX) result.strides().front()
+            get_leading_stride(result)
         );
     }
 

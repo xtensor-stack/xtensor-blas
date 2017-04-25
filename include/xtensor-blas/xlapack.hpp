@@ -74,20 +74,25 @@ namespace lapack
         return info;
     }
 
-    template <class E>
-    inline auto orgqr(E& A, uvector<typename E::value_type>& tau)
+    template <class E, class T>
+    inline auto orgqr(E& A, T& tau, XBLAS_INDEX n = -1)
     {
         using value_type = typename E::value_type;
 
         uvector<value_type> work(1);
 
+        if (n == -1)
+        {
+            n = (XBLAS_INDEX) A.shape()[1];
+        }
+
         int info = cxxlapack::orgqr<XBLAS_INDEX>(
             (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            n,
             (XBLAS_INDEX) tau.size(),
             A.raw_data(),
             (XBLAS_INDEX) A.strides().back(),
-            tau.data(),
+            tau.raw_data(),
             work.data(),
             (XBLAS_INDEX) -1
         );
@@ -97,15 +102,15 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for orgqr.");
         }
 
-        work.resize(work[0]);
+        work.resize((std::size_t) work[0]);
 
         info = cxxlapack::orgqr<XBLAS_INDEX>(
             (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            n,
             (XBLAS_INDEX) tau.size(),
             A.raw_data(),
             (XBLAS_INDEX) A.strides().back(),
-            tau.data(),
+            tau.raw_data(),
             work.data(),
             (XBLAS_INDEX) work.size()
         );
@@ -113,20 +118,25 @@ namespace lapack
         return info;
     }
 
-    template <class E>
-    inline auto ungqr(E& A, uvector<typename E::value_type>& tau)
+    template <class E, class T>
+    inline auto ungqr(E& A, T& tau, XBLAS_INDEX n = -1)
     {
         using value_type = typename E::value_type;
 
         uvector<value_type> work(1);
 
+        if (n == -1)
+        {
+            n = (XBLAS_INDEX) A.shape()[1];
+        }
+
         int info = cxxlapack::ungqr<XBLAS_INDEX>(
             (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            n,
             (XBLAS_INDEX) tau.size(),
             A.raw_data(),
             (XBLAS_INDEX) A.strides().back(),
-            tau.data(),
+            tau.raw_data(),
             work.data(),
             (XBLAS_INDEX) -1
         );
@@ -140,11 +150,11 @@ namespace lapack
 
         info = cxxlapack::ungqr<XBLAS_INDEX>(
             (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            n,
             (XBLAS_INDEX) tau.size(),
             A.raw_data(),
             (XBLAS_INDEX) A.strides().back(),
-            tau.data(),
+            tau.raw_data(),
             work.data(),
             (XBLAS_INDEX) work.size()
         );
@@ -152,15 +162,13 @@ namespace lapack
         return info;
     }
 
-    template <class E>
-    auto geqrf(E& A)
+    template <class E, class T>
+    int geqrf(E& A, T& tau)
     {
         using value_type = typename E::value_type;
 
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
-
-        uvector<value_type> tau(std::min(A.shape()[0], A.shape()[1]));
 
         uvector<value_type> work(1);
 
@@ -169,7 +177,7 @@ namespace lapack
             (XBLAS_INDEX) A.shape()[1],
             A.raw_data(),
             (XBLAS_INDEX) A.strides().back(),
-            tau.data(),
+            tau.raw_data(),
             work.data(),
             (XBLAS_INDEX) -1
         );
@@ -186,12 +194,12 @@ namespace lapack
             (XBLAS_INDEX) A.shape()[1],
             A.raw_data(),
             (XBLAS_INDEX) A.strides().back(),
-            tau.data(),
+            tau.raw_data(),
             work.data(),
             (XBLAS_INDEX) work.size()
         );
 
-        return std::make_tuple(info, tau);
+        return info;
     }
 
     template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
@@ -253,7 +261,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for gesdd.");
         }
 
-        work.resize((std::size_t) std::real(work[0]));
+        work.resize((std::size_t) work[0]);
 
         info = cxxlapack::gesdd<XBLAS_INDEX>(
             jobz,
