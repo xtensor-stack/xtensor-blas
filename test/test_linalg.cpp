@@ -12,6 +12,7 @@
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xrandom.hpp"
+#include "xtensor/xio.hpp"
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlapack.hpp"
 #include "xtensor-blas/xlinalg.hpp"
@@ -375,6 +376,8 @@ namespace xt
         EXPECT_EQ(std::get<1>(resr), rf);
         EXPECT_EQ(std::get<0>(resr).size(), 1);
         EXPECT_EQ(std::get<0>(resr).dimension(), 2);
+
+        // the stuff below tests fine on Fedora 25, but apparently not on Ubuntu?
         xarray<double, layout_type::column_major> erawR = {{ -1.12249722e+01, -1.28285396e+01, -1.44321071e+01},
                                                             {  2.67261242e-01, -1.19522861e+00, -2.39045722e+00},
                                                             {  5.34522484e-01, -2.61215421e-01,  3.48440273e-15},
@@ -390,7 +393,8 @@ namespace xt
         auto resraw = xt::linalg::qr(AA, linalg::qrmode::raw);
         auto tau = std::get<1>(resraw);
         auto rawR = std::get<0>(resraw);
-
+        std::cout << tau << std::endl;
+        std::cout << rawR << std::endl;
         EXPECT_TRUE(allclose(tau, eTau));
         EXPECT_TRUE(allclose(erawR, rawR));
     }
