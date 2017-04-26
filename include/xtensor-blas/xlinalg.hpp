@@ -994,7 +994,7 @@ namespace linalg
     auto trace(const xexpression<T>& M, int offset = 0, int axis1 = 0, int axis2 = 1)
     {
         const auto& dM = M.derived_cast();
-        auto d = xt::diagonal(dM);
+        auto d = xt::diagonal(dM, offset, axis1, axis2);
 
         std::size_t dim = d.dimension();
         if (dim == 1)
