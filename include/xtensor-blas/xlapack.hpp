@@ -674,16 +674,10 @@ namespace lapack
         return info;
     }
 
-    template <class E, class F, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
-    auto gelsd(E& A, F& b, double rcond = -1)
+    template <class E, class F, class S, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    int gelsd(E& A, F& b, S& s, XBLAS_INDEX& rank, double rcond)
     {
         using value_type = typename E::value_type;
-
-        std::size_t M = A.shape()[0], N = A.shape()[1];
-        std::array<std::size_t, 1> shp = {std::min(M, N)};
-        xtensor<value_type, 1, layout_type::column_major> s(shp);
-
-        XBLAS_INDEX rank;
 
         uvector<value_type> work(1);
         uvector<XBLAS_INDEX> iwork(1);
@@ -731,20 +725,14 @@ namespace lapack
             iwork.data()
         );
 
-        return std::make_tuple(info, s);
+        return info;
     }
 
-    template <class E, class F, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
-    auto gelsd(E& A, F& b, double rcond = -1)
+    template <class E, class F, class S, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    int gelsd(E& A, F& b, S& s, XBLAS_INDEX& rank, double rcond = -1)
     {
         using value_type = typename E::value_type;
         using underlying_value_type = typename value_type::value_type;
-
-        std::size_t M = A.shape()[0], N = A.shape()[1];
-        std::array<std::size_t, 1> shp = {std::min(M, N)};
-        xtensor<value_type, 1, layout_type::column_major> s(shp);
-
-        XBLAS_INDEX rank;
 
         uvector<value_type> work(1);
         uvector<underlying_value_type> rwork(1);
@@ -796,7 +784,7 @@ namespace lapack
             iwork.data()
         );
 
-        return std::make_tuple(info, s);
+        return info;
     }
 }
 

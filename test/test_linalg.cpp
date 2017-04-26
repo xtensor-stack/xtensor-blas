@@ -135,16 +135,19 @@ namespace xt
 
     TEST(xlinalg, matrix_rank)
     {
-        int a = linalg::matrix_rank(eye<double>(4));
+        xarray<double> eall = eye<double>(4);
+        int a = linalg::matrix_rank(eall);
         EXPECT_EQ(4, a);
 
         xarray<double> b = eye<double>(4);
         b(1, 1) = 0;
         int rb = linalg::matrix_rank(b);
         EXPECT_EQ(3, rb);
-        int ro = linalg::matrix_rank(ones<double>({4, 4}));
+        xarray<double> ones_arr = ones<double>({4, 4});
+        int ro = linalg::matrix_rank(ones_arr);
         EXPECT_EQ(1, ro);
-        int rz = linalg::matrix_rank(zeros<double>({4, 4}));
+        xarray<double> zarr = zeros<double>({4, 4});
+        int rz = linalg::matrix_rank(zarr);
         EXPECT_EQ(0, rz);
     }
 
@@ -355,7 +358,6 @@ namespace xt
         xarray<std::complex<double>> cmplexpected = {{ 1.+0.i, 0.+0.i},
                                                      { 0.+2.i, 1.+0.i}};
         EXPECT_EQ(cmplexpected, cmplres);
-
     }
 
     TEST(xlinalg, qr)
@@ -408,5 +410,50 @@ namespace xt
         // std::cout << rawR << std::endl;
         // EXPECT_TRUE(allclose(tau, eTau));
         // EXPECT_TRUE(allclose(erawR, rawR));
+    }
+
+    TEST(xlinalg, lstsq)
+    {
+        xarray<double> arg_0 = {{ 0., 1.},
+                                { 1., 1.},
+                                { 2., 1.},
+                                { 3., 1.}};
+
+        xarray<double> arg_1 = {{-1., 0.2, 0.9, 2.1}, 
+                                { 2., 3. , 2. , 1. }};
+        arg_1 = transpose(arg_1);
+        auto res = xt::linalg::lstsq(arg_0, arg_1);
+
+        xarray<double, layout_type::column_major> el_0 = {{ 1.  ,-0.4 },
+                                                          {-0.95, 2.6 }};
+        xarray<double> el_1 = { 0.05, 1.2 };
+        int el_2 = 2;
+        xarray<double> el_3 = { 4.10003045, 1.09075677};
+
+    
+        EXPECT_TRUE(allclose(el_0, std::get<0>(res)));
+        EXPECT_TRUE(allclose(el_1, std::get<1>(res)));
+        EXPECT_EQ(el_2, std::get<2>(res));
+        EXPECT_TRUE(allclose(el_3, std::get<3>(res)));
+
+        xarray<std::complex<double>> carg_0 = {{ 0., 1.},
+                                              { 1. - 3i, 1.},
+                                              { 2., 1.},
+                                              { 3., 1.}};
+        xarray<std::complex<double>> carg_1 = {{-1. , 0.2+4i, 0.9, 2.1-1i}, {2,3i,2,1}};
+        carg_1 = transpose(carg_1);
+        auto cres = xt::linalg::lstsq(carg_0, carg_1);
+
+        xarray<std::complex<double>, layout_type::column_major> cel_0 = {{-0.40425532-0.38723404i,-0.61702128-0.44680851i},
+                                                                         { 1.44680851+1.02765957i, 2.51063830+0.95744681i}};
+        xarray<double> cel_1 = { 16.11787234,  2.68085106};
+        int cel_2 = 2;
+        xarray<double> cel_3 = { 5.01295356, 1.36758789};
+
+        EXPECT_TRUE(allclose(imag(cel_0), imag(std::get<0>(cres))));
+        EXPECT_TRUE(allclose(real(cel_0), real(std::get<0>(cres))));
+        EXPECT_TRUE(allclose(cel_1, std::get<1>(cres)));
+        EXPECT_EQ(cel_2, std::get<2>(cres));
+        EXPECT_TRUE(allclose(cel_3, std::get<3>(cres)));
     }
 }
