@@ -1010,7 +1010,6 @@ namespace linalg
     /**
      * Calculate the Kronecker product between two 2D xexpressions.
      */
-
     template <class T, class E>
     auto kron(const xexpression<T>& a, const xexpression<E>& b)
     {
@@ -1073,6 +1072,78 @@ namespace linalg
             }
         }
         return sm;
+    }
+
+    /**
+     * Calculate the least-squares solution to a linear matrix equation.
+     *
+     * @param A coefficient matrix
+     * @param b Ordinate, or dependent variable values. If b is two-dimensional, 
+     *          the least-squares solution is calculated for each of the K columns of b.
+     * @param rcond Cut-off ratio for small singular values of \em A. 
+     *              For the purposes of rank determination, singular values are treated 
+     *              as zero if they are smaller than rcond times the largest singular value of a.
+     *
+     * @return tuple containing (x, residuals, rank, s) where:
+     *         \em x is the least squares solution. Note that the solution is always returned as 
+     *               a 2D matrix where the columns are the solutions (even for a 1D \em b).
+     *         \em s Sums of residuals; squared Euclidean 2-norm for each column in b - a*x. 
+     *               If the rank of \em A is < N or M <= N, this is an empty xtensor.
+     *         \em rank the rank of \em A
+     *         \em s singular values of \em A
+     */
+    template <class T, class E>
+    auto lstsq(const xexpression<T>& A, const xexpression<E>& b, double rcond = -1)
+    {
+        using value_type = typename T::value_type;
+        using underlying_value_type = underlying_value_type_t<typename T::value_type>;
+
+        xtensor<value_type, 2, layout_type::column_major> dA = A.derived_cast();
+        xtensor<value_type, 2, layout_type::column_major> db;
+
+        const auto& db_t = b.derived_cast();
+        if (db_t.dimension() == 1)
+        {
+            std::size_t sz = db_t.shape()[0];
+            db.reshape({sz, 1});
+            std::copy(db_t.data().begin(), db_t.data().end(), db.data().begin());
+        }
+        else
+        {
+            db = db_t;
+        }
+
+        std::size_t M = dA.shape()[0];
+        std::size_t N = dA.shape()[1];
+
+        std::array<std::size_t, 1> shp = { std::min(M, N) };
+        xtensor<underlying_value_type, 1, layout_type::column_major> s(shp);
+
+        XBLAS_INDEX rank;
+
+        int info = lapack::gelsd(dA, db, s, rank, rcond);
+
+        std::array<std::size_t, 1> residuals_shp({0});
+        xtensor<underlying_value_type, 1> residuals(residuals_shp);
+
+        if (std::size_t(rank) == N && M > N)
+        {
+            residuals.reshape({db.shape()[1]});
+            for (std::size_t i = 0; i < db.shape()[1]; ++i)
+            {
+                underlying_value_type temp = 0;
+                for (std::size_t j = N; j < db.shape()[0]; ++j)
+                {
+                    temp += std::pow(std::abs(db(j, i)), 2);
+                }
+                residuals(i) = temp;
+            }
+        }
+
+        auto vdb = view(db, range(0ul, N));
+        db = vdb;
+
+        return std::make_tuple(db, residuals, rank, s);
     }
 
     /**
