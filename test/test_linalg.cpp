@@ -456,4 +456,33 @@ namespace xt
         EXPECT_EQ(cel_2, std::get<2>(cres));
         EXPECT_TRUE(allclose(cel_3, std::get<3>(cres)));
     }
+
+    TEST(xlinalg, trace)
+    {
+        auto e1 = eye<double>(10);
+        xarray<double> e2 = eye<double>(5);
+
+        auto t1 = linalg::trace(e1);
+        auto t11 = linalg::trace(e1, 1);
+        auto t1n1 = linalg::trace(e1, -1);
+        EXPECT_EQ(10, t1());
+        EXPECT_EQ(0, t11());
+        EXPECT_EQ(0, t1n1());
+
+        auto t2 = linalg::trace(e2);
+        auto t22 = linalg::trace(e2, 1);
+        EXPECT_EQ(5, t2());
+        EXPECT_EQ(0, t22());
+
+        xarray<double> ar = xt::arange(9);
+        ar.reshape({3, 3});
+
+        auto ar1 = linalg::trace(ar);
+        auto ar2 = linalg::trace(ar, 1);
+        auto ar3 = linalg::trace(ar, -1);
+
+        EXPECT_EQ(12, ar1());
+        EXPECT_EQ(6,  ar2());
+        EXPECT_EQ(10, ar3());
+    }
 }
