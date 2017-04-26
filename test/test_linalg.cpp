@@ -135,16 +135,19 @@ namespace xt
 
     TEST(xlinalg, matrix_rank)
     {
-        int a = linalg::matrix_rank(eye<double>(4));
+        xarray<double> eall = eye<double>(4);
+        int a = linalg::matrix_rank(eall);
         EXPECT_EQ(4, a);
 
         xarray<double> b = eye<double>(4);
         b(1, 1) = 0;
         int rb = linalg::matrix_rank(b);
         EXPECT_EQ(3, rb);
-        int ro = linalg::matrix_rank(ones<double>({4, 4}));
+        xarray<double> ones_arr = ones<double>({4, 4});
+        int ro = linalg::matrix_rank(ones_arr);
         EXPECT_EQ(1, ro);
-        int rz = linalg::matrix_rank(zeros<double>({4, 4}));
+        xarray<double> zarr = zeros<double>({4, 4});
+        int rz = linalg::matrix_rank(zarr);
         EXPECT_EQ(0, rz);
     }
 
