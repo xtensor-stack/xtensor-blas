@@ -27,24 +27,26 @@ We make an effort to keep the interfaces very similar.
 
 For example, calculating a determinant:
 
-.. code-block:: c++
-  #include "xtensor-blas/xlinalg.hpp"
+.. highlight cpp
 
-  int main()
-  {
-    xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
-    auto d = xt::linalg::det(a);
-    std::cout << d << std::endl;  // 6.661338e-16
-  }
+.. code-block::
+    #include "xtensor-blas/xlinalg.hpp"
+    
+    int main()
+    {
+        xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
+        auto d = xt::linalg::det(a);
+        std::cout << d << std::endl;  // 6.661338e-16
+    }
 
 We can also try to compute the same determinant using the ``slogdet`` function, which
 is more robust against under- or overflows by summing up the logarithm. The slogdet
 function in NumPy returns a tuple of (sign, val). In C++, we emulate the behaviour by
-returning a ``std::tuple``, which can be unpacked using std::get<N>(tuple).
+returning a ``std::tuple``, which can be unpacked using ``std::get<N>(tuple)``.
 
-.. code-block c++
-  xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
-  auto d = xt::linalg::slogdet(a);
-  std::cout << std::get<0>(d) << ", " << std::get<1>(d) << std::endl;  // 1, -34.9450...
+.. code-block::
+    xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
+    auto d = xt::linalg::slogdet(a);
+    std::cout << std::get<0>(d) << ", " << std::get<1>(d) << std::endl;  // 1, -34.9450...
 
 Returning tuples is used throughout the xlinalg package.
