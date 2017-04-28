@@ -35,5 +35,6 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
 
    installation
    usage
+   reference
  
 .. _FLENS: https://github.com/michael-lehn/FLENS
