@@ -29,7 +29,8 @@ For example, calculating a determinant:
 
 .. highlight cpp
 
-.. code-block::
+.. code-block:: cpp
+
     #include "xtensor-blas/xlinalg.hpp"
     
     int main()
@@ -44,9 +45,20 @@ is more robust against under- or overflows by summing up the logarithm. The slog
 function in NumPy returns a tuple of (sign, val). In C++, we emulate the behaviour by
 returning a ``std::tuple``, which can be unpacked using ``std::get<N>(tuple)``.
 
-.. code-block::
+.. code-block:: cpp
+
     xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
     auto d = xt::linalg::slogdet(a);
     std::cout << std::get<0>(d) << ", " << std::get<1>(d) << std::endl;  // 1, -34.9450...
 
 Returning tuples is used throughout the xlinalg package.
+
+Using xblas and xlapack directly
+--------------------------------
+
+It is not necessarily recommended to use xblas or xlapack directly, but it's possible and can, 
+under certain circumstances, increase the speed of the application. Some things have to be taken
+into consideration. For one thing, the result container needs to be allocated and passed into the
+function beforehand. And for the LAPACK functions, all arguments have to be in column_major order.
+Furthermore it's required that the xexpressions are evaluated and are stored in contigous memory.
+All of this is taken care of in xlinalg.

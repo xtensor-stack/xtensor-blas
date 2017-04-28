@@ -1,6 +1,7 @@
 PROJECT_NAME      = "xtensor-blas"
 XML_OUTPUT        = xml
 INPUT             = ../include
+EXCLUDE           = ../include/xtensor-blas/flens
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
 GENERATE_RTF      = NO

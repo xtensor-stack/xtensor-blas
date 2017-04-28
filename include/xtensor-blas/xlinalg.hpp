@@ -31,25 +31,26 @@ namespace xt
 namespace linalg
 {
 
+    /// Selects special norm orders
     enum class normorder {
-        frob,
-        nuc,
-        inf,
-        neg_inf
+        frob,    ///< Frobenius norm
+        nuc,     ///< Nuclear norm
+        inf,     ///< Positive infinity norm
+        neg_inf  ///< Negative infinity norm
     };
 
     /**
-     * Calculate 1- and 2-norm of vector.
+     * Calculate norm of vector, or matrix
      *
      * @param vec input vector
-     * @param ord order of norm (1 or 2)
+     * @param ord order of norm. This can be any integer for a vector
+     *            or [-2,-1,1,2] for a matrix.
      * @return scalar result
      *
      * @tparam type of xexpression
      */
     template <class E>
-    underlying_value_type_t<typename E::value_type>
-    norm(const xexpression<E>& vec, int ord)
+    auto norm(const xexpression<E>& vec, int ord)
     {
         using value_type = typename E::value_type;
         using underlying_value_type = underlying_value_type_t<value_type>;
@@ -128,9 +129,16 @@ namespace linalg
         throw std::runtime_error(ss.str());
     }
 
+    /**
+     * Calculate matrix or vector norm using \ref normorder.
+     *
+     * @param vec The matrix or vector to take the norm of
+     * @param ord normorder (frob, nuc, inf, neg_inf)
+     *
+     * @return norm value
+     */
     template <class E>
-    underlying_value_type_t<typename E::value_type>
-    norm(const xexpression<E>& vec, normorder ord)
+    auto norm(const xexpression<E>& vec, normorder ord)
     {
         using value_type = underlying_value_type_t<typename E::value_type>;
 
@@ -181,6 +189,12 @@ namespace linalg
         throw std::runtime_error(ss.str());
     }
 
+    /**
+     * Calculate default norm (2-norm for vector, Frobenius norm for matrix)
+     *
+     * @param vec Input vector or matrix
+     * @return norm
+     */
     template <class E>
     typename E::value_type norm(const xexpression<E>& vec)
     {
@@ -223,7 +237,7 @@ namespace linalg
     /**
      * Compute the (multiplicative) inverse of a matrix.
      *
-     * @param a Matrix to be inverted
+     * @param A xexpression to be inverted
      * @return (Multiplicative) inverse of the matrix a.
      */
     template <class E1>
@@ -266,11 +280,10 @@ namespace linalg
      * Compute the eigenvalues and right eigenvectors of a square array.
      *
      * @param Matrix for which the eigenvalues and right eigenvectors will be computed
-     * @return std::tuple(w, v). The first element corresponds to the eigenvalues,
-     *                    each repeated according to its multiplicity. The eigenvalues
-     *                    are not necessarily ordered.
-     *                    The second (1) element are the normalized (unit “length”) eigenvectors,
-     *                    such that the column v[:, i] corresponds to the eigenvalue w[i].
+     * @return (eigenvalues, eigenvectors) tuple. The first element corresponds to the eigenvalues,
+     *         each repeated according to its multiplicity. The eigenvalues are not necessarily
+     *         ordered. The second (1) element are the normalized (unit “length”) eigenvectors,
+     *         such that the column v[:, i] corresponds to the eigenvalue w[i].
      */
     template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
     auto eig(const xexpression<E>& A)
@@ -298,10 +311,8 @@ namespace linalg
             throw std::runtime_error("Eigenvalue calculation did not converge.");
         }
 
-        xtensor<std::complex<underlying_type>, 2> eig_vecs;
-        eig_vecs.reshape({N, N});
-        xtensor<std::complex<underlying_type>, 1> eig_vals;
-        eig_vals.reshape({N});
+        auto eig_vecs = xtensor<std::complex<underlying_type>, 2>::from_shape({ N, N });
+        auto eig_vals = xtensor<std::complex<underlying_type>, 1>::from_shape({ N });
 
         xt::real(eig_vals) = wr;
         xt::imag(eig_vals) = wi;
@@ -354,6 +365,12 @@ namespace linalg
         return std::make_tuple(w, VR);
     }
 
+    /**
+     * Compute the eigenvalues and eigenvectors of a square Hermitian or real symmetric xexpression.
+     *
+     * @param A Matrix for which the eigenvalues and right eigenvectors are computed
+     * @return xtensor containing the eigenvalues.
+     */
     template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
     auto eigh(const xexpression<E>& A, char UPLO = 'L')
     {
@@ -398,7 +415,7 @@ namespace linalg
     /**
      * Compute the eigenvalues of a square xexpression.
      *
-     * @param Matrix for which the eigenvalues and right eigenvectors will be computed
+     * @param A Matrix for which the eigenvalues are computed
      * @return xtensor containing the eigenvalues.
      */
     template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
@@ -452,6 +469,12 @@ namespace linalg
         return w;
     }
 
+    /**
+     * Compute the eigenvalues of a Hermitian or real symmetric matrix xexpression.
+     *
+     * @param Matrix for which the eigenvalues are computed
+     * @return xtensor containing the eigenvalues.
+     */
     template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
     auto eigvalsh(const xexpression<E>& A, char UPLO = 'L')
     {
@@ -492,6 +515,7 @@ namespace linalg
 
         return w;
     }
+
     /**
      * Non-broadcasting dot function.
      * In the case of two 1D vectors, computes the vector dot
@@ -507,9 +531,12 @@ namespace linalg
      * @return resulting array
      */
     template <class T, class O>
-    auto dot(const T& t, const O& o) {
+    auto dot(const xexpression<T>& xt, const xexpression<O>& xo) {
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
         using return_type = xarray<common_type, T::static_layout>;
+
+        const auto& t = xt.derived_cast();
+        const auto& o = xo.derived_cast();
 
         return_type result;
 
@@ -550,6 +577,7 @@ namespace linalg
 
     /**
      * Computes the dot product for two vectors.
+     *
      * Behaves different from \ref dot in the case of complex
      * vectors. If vectors are complex, vdot conjugates the first
      * argument \em t.
@@ -614,6 +642,9 @@ namespace linalg
 
     /**
      * Compute the determinant by utilizing LU factorization
+     *
+     * @param A matrix for which determinant is to be computed
+     * @returns determinant of the \em A
      */
     template <class T>
     auto det(const xexpression<T>& A)
@@ -641,6 +672,16 @@ namespace linalg
         return result;
     }
 
+    /**
+     * Compute the sign and (natural) logarithm of the determinant of an xexpression.
+     *
+     * If an array has a very small or very large determinant, then a call to det may
+     * overflow or underflow. This routine is more robust against such issues, because
+     * it computes the logarithm of the determinant rather than the determinant itself.
+     *
+     * @param A matrix for which determinant is to be computed
+     * @returns tuple containing (sign, determinant)
+     */
     template <class T, std::enable_if_t<is_complex<typename T::value_type>::value, int> = 0>
     auto slogdet(const xexpression<T>& A)
     {
@@ -673,6 +714,7 @@ namespace linalg
         return std::make_tuple(v_sign, result);
     }
 
+    /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class T, std::enable_if_t<!is_complex<typename T::value_type>::value, int> = 0>
     auto slogdet(const xexpression<T>& A)
     {
@@ -710,6 +752,7 @@ namespace linalg
         value_type v_sign = (sign % 2) ? -1 : 1;
         return std::make_tuple(v_sign, result);
     }
+    /// @endcond
 
     namespace detail
     {
@@ -736,16 +779,16 @@ namespace linalg
         }
     }
 
-    // K = min(M, N)
+    /// Select the mode for the qr decomposition ``K = min(M, K)``
     enum class qrmode {
-        reduced, //< return q, r with dimensions (M, K), (K, N) (default)
-        complete, //< returns q, r with dimensions (M, M), (M, N)
-        r, //< returns r only with dimensions (K, N)
-        raw //< returns h, tau with dimensions (N, M), (K, 1)
+        reduced,  ///< return Q, R with dimensions (M, K), (K, N) (default)
+        complete, ///< return Q, R with dimensions (M, M), (M, N)
+        r,        ///< return empty Q and R with dimensions (0, 0), (K, N)
+        raw       ///< return H, Tau with dimensions (N, M), (K, 1)
     };
 
     /**
-     * Compute the QR decomposition of \em t.
+     * Compute the QR decomposition of \em A.
      * @param t The matrix to calculate Q and R for
      * @return std::tuple with Q and R
      */
@@ -812,7 +855,7 @@ namespace linalg
     }
 
     /**
-     * Compute the Cholesky decomposition of \em t.
+     * Compute the Cholesky decomposition of \em A.
      * @return the decomposed matrix
      */
     template <class T>
@@ -1078,16 +1121,16 @@ namespace linalg
      * Calculate the least-squares solution to a linear matrix equation.
      *
      * @param A coefficient matrix
-     * @param b Ordinate, or dependent variable values. If b is two-dimensional, 
+     * @param b Ordinate, or dependent variable values. If b is two-dimensional,
      *          the least-squares solution is calculated for each of the K columns of b.
-     * @param rcond Cut-off ratio for small singular values of \em A. 
-     *              For the purposes of rank determination, singular values are treated 
+     * @param rcond Cut-off ratio for small singular values of \em A.
+     *              For the purposes of rank determination, singular values are treated
      *              as zero if they are smaller than rcond times the largest singular value of a.
      *
      * @return tuple containing (x, residuals, rank, s) where:
-     *         \em x is the least squares solution. Note that the solution is always returned as 
+     *         \em x is the least squares solution. Note that the solution is always returned as
      *               a 2D matrix where the columns are the solutions (even for a 1D \em b).
-     *         \em s Sums of residuals; squared Euclidean 2-norm for each column in b - a*x. 
+     *         \em s Sums of residuals; squared Euclidean 2-norm for each column in b - a*x.
      *               If the rank of \em A is < N or M <= N, this is an empty xtensor.
      *         \em rank the rank of \em A
      *         \em s singular values of \em A
@@ -1116,19 +1159,18 @@ namespace linalg
         std::size_t M = dA.shape()[0];
         std::size_t N = dA.shape()[1];
 
-        std::array<std::size_t, 1> shp = { std::min(M, N) };
-        xtensor<underlying_value_type, 1, layout_type::column_major> s(shp);
+        auto s = xtensor<underlying_value_type, 1, layout_type::column_major>::from_shape({ std::min(M, N) });
 
         XBLAS_INDEX rank;
 
         int info = lapack::gelsd(dA, db, s, rank, rcond);
 
         std::array<std::size_t, 1> residuals_shp({0});
-        xtensor<underlying_value_type, 1> residuals(residuals_shp);
+        auto residuals = xtensor<underlying_value_type, 1>::from_shape({0});
 
         if (std::size_t(rank) == N && M > N)
         {
-            residuals.reshape({db.shape()[1]});
+            residuals.reshape({ db.shape()[1] });
             for (std::size_t i = 0; i < db.shape()[1]; ++i)
             {
                 underlying_value_type temp = 0;
@@ -1147,7 +1189,8 @@ namespace linalg
     }
 
     /**
-     * Non-broadcasting cross product between two vectors
+     * @brief Non-broadcasting cross product between two vectors.
+     *
      * Calculate cross product between two 1D vectors with 2- or 3 entries.
      * If only two entries are available, the third entry is assumed to be 0.
      *
@@ -1159,7 +1202,7 @@ namespace linalg
     auto cross(const xexpression<E1>& a, const xexpression<E2>& b)
     {
         using return_type = xtensor<typename E1::value_type, 1>;
-        return_type res(typename return_type::shape_type{3});
+        auto res = return_type::from_shape({ 3 });
         const E1& da = a.derived_cast();
         const E2& db = b.derived_cast();
 
