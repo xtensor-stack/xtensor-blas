@@ -27,7 +27,8 @@ namespace xt
                                 && detail::is_array<typename I::shape_type>::value,
                             xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value, L>>
     {
-        return xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value, L>(std::forward<T>(t));
+        xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value, L> ret = t;
+        return ret;
     }
 
     template <layout_type L = layout_type::row_major, class T, class I = std::decay_t<T>>
