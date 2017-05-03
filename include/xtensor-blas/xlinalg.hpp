@@ -516,6 +516,64 @@ namespace linalg
         return w;
     }
 
+    namespace detail
+    {
+        template <class A>
+        struct offset_iter_without_axis
+        {
+
+            using shape_type = typename A::shape_type;
+            using size_type = typename A::size_type;
+            using index_type = xindex_type_t<shape_type>;
+
+            offset_iter_without_axis(const A& a, std::size_t axis)
+                : m_a(a), m_axis(axis)
+            {
+                resize_container(m_idx, a.dimension());
+                m_offset = 0;
+            }
+
+            inline bool next()
+            {
+                int dim = m_a.dimension();
+                for (int i = dim - 1; i >= 0; --i)
+                {
+                    if (i == m_axis)
+                    {
+                        // skip
+                    }
+                    else if (m_idx[i] == m_a.shape()[i] - 1)
+                    {
+                        m_offset -= m_idx[i] * m_a.strides()[i];
+                        m_idx[i] = 0;
+                        if (i == 0 || m_axis == 0 && i == 1)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        ++m_idx[i];
+                        m_offset += m_a.strides()[i];
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            inline size_type offset() const
+            {
+                return m_offset;
+            }
+
+        private:
+            const A& m_a;
+            index_type m_idx;
+            size_type m_axis;
+            size_type m_offset;
+        };
+    }
+
     /**
      * Non-broadcasting dot function.
      * In the case of two 1D vectors, computes the vector dot
@@ -570,9 +628,64 @@ namespace linalg
                 result.reshape({t.shape()[0], o.shape()[1]});
                 blas::gemm(t, o, result);
             }
+            else
+            {
+                std::size_t l = t.shape().back();
+                std::size_t match_dim = 0;
+
+                if (o.dimension() > 1)
+                {
+                    match_dim = o.dimension() - 2;
+                }
+                if (o.shape()[match_dim] != l)
+                {
+                    throw std::runtime_error("Dot alignment error.");
+                }
+
+                int a_dim = (int) t.dimension();
+                int b_dim = (int) o.dimension();
+
+                int nd = a_dim + b_dim - 2;
+
+                std::size_t j = 0;
+                std::vector<std::size_t> dimensions((std::size_t) nd);
+
+                for (int i = 0; i < a_dim - 1; ++i)
+                {
+                    dimensions[j++] = t.shape()[i];
+                }
+                for (int i = 0; i < b_dim - 2; ++i)
+                {
+                    dimensions[j++] = o.shape()[i];
+                }
+                if (b_dim > 1)
+                {
+                    dimensions[j++] = o.shape().back();
+                }
+
+                result.reshape(dimensions);
+
+                int a_stride = t.strides().back();
+                int b_stride = o.strides()[match_dim];
+
+                auto a_iter = detail::offset_iter_without_axis<T>(t, t.dimension() - 1);
+                auto b_iter = detail::offset_iter_without_axis<O>(o, match_dim);
+
+                double temp;
+                auto result_it = result.begin();
+
+                do
+                {
+                    do
+                    {
+                        cxxblas::dot<int>(l, t.raw_data() + a_iter.offset(), a_stride, o.raw_data() + b_iter.offset(), b_stride, temp);
+                        *(result_it++) = temp;
+                    } while (b_iter.next());
+                } while (a_iter.next());
+
+            }
             return result;
         }
-        throw std::runtime_error("Dot broadcasting not implemented yet. Only 1- and 2-dim work.");
     }
 
     /**
