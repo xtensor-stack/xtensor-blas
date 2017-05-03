@@ -535,10 +535,10 @@ namespace linalg
 
             inline bool next()
             {
-                int dim = m_a.dimension();
+                int dim = (int) m_a.dimension();
                 for (int i = dim - 1; i >= 0; --i)
                 {
-                    if (i == m_axis)
+                    if (i == (int) m_axis)
                     {
                         // skip
                     }
@@ -593,8 +593,8 @@ namespace linalg
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
         using return_type = xarray<common_type, T::static_layout>;
 
-        const auto& t = xt.derived_cast();
-        const auto& o = xo.derived_cast();
+        auto&& t = view_eval<layout_type::row_major>(xt.derived_cast());
+        auto&& o = view_eval<layout_type::row_major>(xo.derived_cast());
 
         return_type result;
 
@@ -665,22 +665,24 @@ namespace linalg
 
                 result.reshape(dimensions);
 
-                int a_stride = t.strides().back();
-                int b_stride = o.strides()[match_dim];
+                int a_stride = (int) t.strides().back();
+                int b_stride = (int) o.strides()[match_dim];
 
-                auto a_iter = detail::offset_iter_without_axis<T>(t, t.dimension() - 1);
-                auto b_iter = detail::offset_iter_without_axis<O>(o, match_dim);
+                auto a_iter = detail::offset_iter_without_axis<std::decay_t<decltype(t)>>(t, t.dimension() - 1);
+                auto b_iter = detail::offset_iter_without_axis<std::decay_t<decltype(o)>>(o, match_dim);
 
-                double temp;
+                common_type temp;
                 auto result_it = result.begin();
 
                 do
                 {
                     do
                     {
-                        cxxblas::dot<int>(l, t.raw_data() + a_iter.offset(), a_stride, o.raw_data() + b_iter.offset(), b_stride, temp);
+                        cxxblas::dot<int>((int) l, t.raw_data() + a_iter.offset(), a_stride, o.raw_data() + b_iter.offset(), b_stride, temp);
                         *(result_it++) = temp;
+
                     } while (b_iter.next());
+
                 } while (a_iter.next());
 
             }
