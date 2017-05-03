@@ -10,23 +10,10 @@
 #define XBLAS_UTILS_HPP
 
 #include "flens/cxxblas/typedefs.h"
+#include "xtensor/xstridedview.hpp"  // for has_raw_data_interface
 
 namespace xt
 {
-    template <typename T>
-    class has_raw_data_interface
-    {
-        template <typename C>
-        static std::true_type test(decltype(std::declval<C>().raw_data_offset()));
-
-        template <typename C>
-        static std::false_type test(...);
-
-    public:
-        constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
-    };
-
-
     template <layout_type L = layout_type::row_major, class T>
     inline auto view_eval(T&& t)
         -> std::enable_if_t<has_raw_data_interface<T>::value && std::decay_t<T>::static_layout == L, T&&>
@@ -126,6 +113,7 @@ namespace xt
     /*******************************
      * is_xfunction implementation *
      *******************************/
+
     namespace detail
     {
         template<class xF, class xR, class fE, class... xE>
@@ -138,23 +126,5 @@ namespace xt
     constexpr bool is_xfunction(T&& t) {
         return decltype(detail::is_xfunction_impl(t))::value;
     }
-
-    template <class T>
-    struct underlying_value_type;
-
-    template <class T>
-    struct underlying_value_type<std::complex<T>>
-    {
-        using type = T;
-    };
-
-    template <class T>
-    struct underlying_value_type
-    {
-        using type = T;
-    };
-
-    template <class T>
-    using underlying_value_type_t = typename underlying_value_type<T>::type;
 }
 #endif

@@ -18,9 +18,8 @@ namespace xt
 {
     TEST(xblas, matrix_times_vector)
     {
-        xarray<double> m1
-          {{1, 2, 3},
-           {4, 5, 6}};
+        xarray<double> m1 = {{1, 2, 3},
+                             {4, 5, 6}};
         xarray<double> b = {1, 2, 3};
 
         auto res = linalg::dot(m1, b);
@@ -35,11 +34,31 @@ namespace xt
 
     TEST(xblas, dot_2d)
     {
-        xarray<double> a = {{1,2,3,4,5}, {1,2,3,4,5}};
-        xarray<double> b = {5,4,3,2,1};
+        xarray<double> a = {{1, 2, 3, 4, 5}, {1, 2, 3, 4, 5}};
+        xarray<double> b = {5, 4, 3, 2, 1};
+        xarray<double> c = {1, 2};
         auto res = linalg::dot(a, b);
         xarray<double> expected = {35, 35};
+
+        auto res_ca = linalg::dot(c, a);
+        xarray<double> expected_ca = {3, 6, 9, 12, 15};
+
         EXPECT_EQ(expected, res);
+        EXPECT_EQ(expected_ca, res_ca);
+    }
+
+    TEST(xblas, matrix_matrix)
+    {
+        xarray<double> a = arange(3 * 3);
+        a.reshape({3, 3});
+        xarray<double> b = arange(5 * 3);
+        b.reshape({3, 5});
+
+        auto ab = linalg::dot(a, b);
+        xarray<double> ab_expected ={{ 25,  28,  31,  34,  37},
+                                     { 70,  82,  94, 106, 118},
+                                     {115, 136, 157, 178, 199}};
+        EXPECT_EQ(ab_expected, ab);
     }
 
     TEST(xblas, view_dot)

@@ -53,7 +53,7 @@ namespace linalg
     auto norm(const xexpression<E>& vec, int ord)
     {
         using value_type = typename E::value_type;
-        using underlying_value_type = underlying_value_type_t<value_type>;
+        using underlying_value_type = complex_value_type_t<value_type>;
 
         const auto& v = vec.derived_cast();
 
@@ -140,7 +140,7 @@ namespace linalg
     template <class E>
     auto norm(const xexpression<E>& vec, normorder ord)
     {
-        using value_type = underlying_value_type_t<typename E::value_type>;
+        using value_type = complex_value_type_t<typename E::value_type>;
 
         const auto& v = vec.derived_cast();
         if (v.dimension() == 2)
@@ -557,17 +557,17 @@ namespace linalg
         {
             if (t.dimension() == 2 && o.dimension() == 1)
             {
-                result.reshape(std::vector<std::size_t>{t.shape()[0]});
+                result.reshape({t.shape()[0]});
                 blas::gemv(t, o, result);
             }
             else if (t.dimension() == 1 && o.dimension() == 2)
             {
-                result.reshape(std::vector<std::size_t>{o.shape()[0]});
+                result.reshape({o.shape()[1]});
                 blas::gemv(o, t, result, true);
             }
             else if (t.dimension() == 2 && o.dimension() == 2)
             {
-                result.reshape(std::vector<std::size_t>{ t.shape()[0], o.shape()[1] });
+                result.reshape({t.shape()[0], o.shape()[1]});
                 blas::gemm(t, o, result);
             }
             return result;
@@ -686,6 +686,7 @@ namespace linalg
     auto slogdet(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
+
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
         uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
@@ -1139,7 +1140,7 @@ namespace linalg
     auto lstsq(const xexpression<T>& A, const xexpression<E>& b, double rcond = -1)
     {
         using value_type = typename T::value_type;
-        using underlying_value_type = underlying_value_type_t<typename T::value_type>;
+        using underlying_value_type = complex_value_type_t<typename T::value_type>;
 
         xtensor<value_type, 2, layout_type::column_major> dA = A.derived_cast();
         xtensor<value_type, 2, layout_type::column_major> db;
