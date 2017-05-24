@@ -40,6 +40,15 @@ cmake .. -D CMAKE_INSTALL_PREFIX=your_install_prefix  # for tests: -DBUILD_TESTS
 make install
 ```
 
+## Dependency on `xtensor`
+
+`xtensor-blas` depends on the `xtensor` package
+
+| `xtensor-blas`  | `xtensor` |
+|-----------------|-----------|
+| master          |  ^0.10.2  |
+| 0.1.0           |  ^0.10.2  |
+
 ## License
 
 We use a shared copyright model that enables all contributors to maintain the
