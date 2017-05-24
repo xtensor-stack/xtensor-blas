@@ -102,4 +102,4 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 
 target_link_libraries(${XTENSOR_BLAS_TARGET} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-add_custom_target(xtest COMMAND test_xblas DEPENDS ${XBLAS_TARGET})
+add_custom_target(xtest COMMAND test_xtensor_blas DEPENDS ${XBLAS_TARGET})

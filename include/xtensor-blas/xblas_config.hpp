@@ -10,7 +10,7 @@
 #define XBLAS_CONFIG_HPP
 
 #define XTENSOR_BLAS_VERSION_MAJOR 0
-#define XTENSOR_BLAS_VERSION_MINOR 8
+#define XTENSOR_BLAS_VERSION_MINOR 1
 #define XTENSOR_BLAS_VERSION_PATCH 0
 
 #ifndef USE_CXXLAPACK
@@ -23,7 +23,7 @@
 
 namespace xt
 {
-	using XBLAS_INDEX = int;
+    using XBLAS_INDEX = int;
 }
 
 #endif
