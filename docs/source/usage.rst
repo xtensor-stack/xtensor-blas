@@ -35,7 +35,7 @@ For example, calculating a determinant:
     
     int main()
     {
-        xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         auto d = xt::linalg::det(a);
         std::cout << d << std::endl;  // 6.661338e-16
     }
@@ -47,7 +47,7 @@ returning a ``std::tuple``, which can be unpacked using ``std::get<N>(tuple)``.
 
 .. code-block:: cpp
 
-    xt::xarray<double> a = {{1,2,3}, {4,5,6}, {7,8,9}};
+    xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
     auto d = xt::linalg::slogdet(a);
     std::cout << std::get<0>(d) << ", " << std::get<1>(d) << std::endl;  // 1, -34.9450...
 

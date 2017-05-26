@@ -25,6 +25,17 @@ Although ``xtensor-blas`` is a header-only library, we provide standardized mean
 
 Besides the xtendor headers, all these methods place the `cmake` project configuration file in the right location so that third-party projects can use cmake's find_package to locate xtensor headers.
 
+.. image:: conda.svg
+
+Using the conda package
+-----------------------
+
+A package for xtensor-blas is available on the conda package manager.
+
+.. code::
+
+    conda install -c conda-forge xtensor-blas
+
 .. image:: cmake.svg
 
 From source with cmake
