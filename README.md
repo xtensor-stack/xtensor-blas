@@ -7,11 +7,7 @@
 
 ## Introduction
 
-----
-
-**DISCLAIMER** Please consider this software as BETA. We have not yet performed extensive testing and therefore there might be some bugs, or numerical issues, so don't use it to control your space rockets yet! Let us know if you find any issues.
-
-----
+**xtensor-blas is an early developer preview, and is not suitable for general usage yet. Features and implementation are subject to change.**
 
 `xtensor-blas` is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries 
 through cxxblas and cxxlapack from the [FLENS](https://github.com/michael-lehn/FLENS) project.
@@ -28,17 +24,27 @@ in the `blas` and `lapack` namespace.
 
 ## Installation
 
-`xtensor-blas` is a header-only library that depends on `xtensor`, `LAPACK` and `BLAS`.
-You can directly install it from the sources:
+xtensor-blas is a header-only library. We provide a package for the conda package manager.
 
-```bash
-git clone https://github.com/QuantStack/xtensor-blas
-cd xtensor-blas
-mkdir build
-cd build
-cmake .. -D CMAKE_INSTALL_PREFIX=your_install_prefix  # for tests: -DBUILD_TESTS=ON
+```
+conda install -c conda-forge xtensor-blas
+```
+
+which will also install the core `xtensor` package.
+
+Or you can directly install it from the sources:
+
+```
+cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
+
+To build the tests or actually use `xtensor-blas` you will also binaries for
+
+ - `openblas`
+ - `lapack`
+
+which are also available on conda-forge.
 
 ## Dependency on `xtensor`
 
