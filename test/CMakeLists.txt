@@ -80,8 +80,13 @@ endif()
 find_package(Threads)
 
 find_package(xtensor REQUIRED)
-find_package(LAPACK REQUIRED)
-find_package(BLAS REQUIRED)
+if (WIN32)
+    find_package(OpenBLAS REQUIRED)
+    set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
+else()
+    find_package(LAPACK REQUIRED)
+    find_package(BLAS REQUIRED)
+endif()
 
 include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${XBLAS_INCLUDE_DIR})
@@ -102,4 +107,5 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 
 target_link_libraries(${XTENSOR_BLAS_TARGET} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
 add_custom_target(xtest COMMAND test_xtensor_blas DEPENDS ${XBLAS_TARGET})
