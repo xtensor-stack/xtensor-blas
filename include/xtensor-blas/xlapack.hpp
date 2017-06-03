@@ -218,7 +218,7 @@ namespace lapack
         std::size_t n = A.shape()[1];
 
         xtype1 s;
-        s.reshape({ std::max(1ul, std::min(m, n)) });
+        s.reshape({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
         XBLAS_INDEX u_stride = 1, vt_stride = 1;
@@ -310,16 +310,16 @@ namespace lapack
         else if (mx > mn)
         {
             // TODO verify size
-            rwork.resize(5*mn*mn + 5*mn);
+            rwork.resize(5 * mn * mn + 5 * mn);
         }
         else
         {
             // TODO verify size
-            rwork.resize(std::max(5*mn*mn + 5*mn, 2*mx*mn + 2*mn*mn + mn));
+            rwork.resize(std::max(5 * mn * mn + 5 * mn, 2 * mx * mn + 2 * mn * mn + mn));
         }
 
         xtype1 s;
-        s.reshape({ std::max(1ul, std::min(m, n)) });
+        s.reshape({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
         XBLAS_INDEX u_stride = 1, vt_stride = 1;

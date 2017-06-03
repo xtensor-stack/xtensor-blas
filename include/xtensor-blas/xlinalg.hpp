@@ -298,7 +298,7 @@ namespace linalg
         xtensor<value_type, 1, layout_type::column_major> wr(vN);
         xtensor<value_type, 1, layout_type::column_major> wi(vN);
 
-        std::array<std::size_t, 2> shp({N, N});
+        std::array<std::size_t, 2> shp = {N, N};
         xtensor<value_type, 2, layout_type::column_major> VL(shp);
         xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
@@ -920,7 +920,6 @@ namespace linalg
         std::size_t M = R.shape()[0];
         std::size_t N = R.shape()[1];
         std::size_t K = std::min(M, N);
-        std::size_t mc;
 
         std::array<std::size_t, 2> tau_shp = {K, 1};
         xtype tau(tau_shp);
@@ -942,7 +941,7 @@ namespace linalg
         {
             Q = R;
             detail::call_gqr(Q, tau, (XBLAS_INDEX) K);
-            auto vR = view(R, range(0ul, K), all());
+            auto vR = view(R, range(std::size_t(0), K), all());
             R = vR;
         }
         if (mode == qrmode::complete)
@@ -1066,7 +1065,7 @@ namespace linalg
         auto m = vww * ut;
         auto vtt = xt::transpose(vt);
 
-        std::array<std::size_t, 2> shp({vtt.shape()[0], m.shape()[1]});
+        std::array<std::size_t, 2> shp = {vtt.shape()[0], m.shape()[1]};
         xtensor<value_type, 2> result(shp);
         blas::gemm(vtt, m, result);
         return result;
@@ -1180,7 +1179,7 @@ namespace linalg
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
-        std::array<std::size_t, 2> shp({ da.shape()[0] * db.shape()[0], da.shape()[1] * db.shape()[1] });
+        std::array<std::size_t, 2> shp = { da.shape()[0] * db.shape()[0], da.shape()[1] * db.shape()[1] };
         xtensor<value_type, 2> res(shp);
 
         for (std::size_t i = 0; i < da.shape()[0]; ++i)
@@ -1281,7 +1280,7 @@ namespace linalg
 
         int info = lapack::gelsd(dA, db, s, rank, rcond);
 
-        std::array<std::size_t, 1> residuals_shp({0});
+        std::array<std::size_t, 1> residuals_shp = {0};
         auto residuals = xtensor<underlying_value_type, 1>::from_shape({0});
 
         if (std::size_t(rank) == N && M > N)
@@ -1298,7 +1297,7 @@ namespace linalg
             }
         }
 
-        auto vdb = view(db, range(0ul, N));
+        auto vdb = view(db, range(std::size_t(0), N));
         db = vdb;
 
         return std::make_tuple(db, residuals, rank, s);

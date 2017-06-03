@@ -23,20 +23,20 @@ namespace xt
 {
     TEST(xlinalg, matrixpower)
     {
-        xarray<double> t1arg_0 = {{0,1,2},
-                                  {3,4,5},
-                                  {6,7,8}};
+        xarray<double> t1arg_0 = {{0, 1, 2},
+                                  {3, 4, 5},
+                                  {6, 7, 8}};
 
         auto t1res = xt::linalg::matrix_power(t1arg_0, 2);
-        xarray<long> t1expected = {{ 15, 18, 21},
-                                   { 42, 54, 66},
-                                   { 69, 90,111}};
+        xarray<double> t1expected = {{ 15, 18, 21},
+                                     { 42, 54, 66},
+                                     { 69, 90,111}};
         EXPECT_TRUE(allclose(t1res, t1expected));
 
         auto t2res = xt::linalg::matrix_power(t1arg_0, 5);
-        xarray<long> t2expected = {{ 32400, 41796, 51192},
-                                   { 99468,128304,157140},
-                                   {166536,214812,263088}};
+        xarray<double> t2expected = {{ 32400,  41796,  51192},
+                                     { 99468, 128304, 157140},
+                                     {166536, 214812, 263088}};
         EXPECT_TRUE(allclose(t2res, t2expected));
 
         auto t3res = xt::linalg::matrix_power(t1arg_0, 41);
@@ -343,13 +343,13 @@ namespace xt
     TEST(xlinalg, cholesky)
     {
         xarray<double> arg_0 = {{  4, 12,-16},
-                             { 12, 37,-43},
-                             {-16,-43, 98}};
+                                { 12, 37,-43},
+                                {-16,-43, 98}};
 
         auto res = xt::linalg::cholesky(arg_0);
         xarray<double> expected = {{ 2., 0., 0.},
-                                { 6., 1., 0.},
-                                {-8., 5., 3.}};
+                                   { 6., 1., 0.},
+                                   {-8., 5., 3.}};
         EXPECT_EQ(expected, res);
 
         xarray<std::complex<double>> cmplarg_0 = {{ 1.+0.i,-0.-2.i},
@@ -407,7 +407,7 @@ namespace xt
         // auto tau = std::get<1>(resraw);
         // auto rawR = std::get<0>(resraw);
         // std::cout << tau << std::endl;
-        // std::cout << rawR << std::endl;
+        // std::cout << rawR << std::endl;   
         // EXPECT_TRUE(allclose(tau, eTau));
         // EXPECT_TRUE(allclose(erawR, rawR));
     }
@@ -437,9 +437,9 @@ namespace xt
         EXPECT_TRUE(allclose(el_3, std::get<3>(res)));
 
         xarray<std::complex<double>> carg_0 = {{ 0., 1.},
-                                              { 1. - 3i, 1.},
-                                              { 2., 1.},
-                                              { 3., 1.}};
+                                               { 1. - 3i, 1.},
+                                               { 2., 1.},
+                                               { 3., 1.}};
         xarray<std::complex<double>> carg_1 = {{-1. , 0.2+4i, 0.9, 2.1-1i}, {2,3i,2,1}};
         carg_1 = transpose(carg_1);
         auto cres = xt::linalg::lstsq(carg_0, carg_1);
@@ -488,98 +488,95 @@ namespace xt
 
     TEST(xlinalg, dots)
     {
-        xarray<long> arg_0 = {{{ 0, 1, 2},
-                               { 3, 4, 5},
-                               { 6, 7, 8}},
-                             
-                              {{ 9,10,11},
-                               {12,13,14},
-                               {15,16,17}}};
+        xarray<double> arg_0 = {{{ 0, 1, 2},
+                                 { 3, 4, 5},
+                                 { 6, 7, 8}},
 
-        xarray<long> arg_1 = {{{ 0, 1, 2},
-                               { 3, 4, 5},
-                               { 6, 7, 8}},
-                             
-                              {{ 9,10,11},
-                               {12,13,14},
-                               {15,16,17}},
-                             
-                              {{18,19,20},
-                               {21,22,23},
-                               {24,25,26}}};
+                                {{ 9,10,11},
+                                 {12,13,14},
+                                 {15,16,17}}};
+
+        xarray<double> arg_1 = {{{ 0, 1, 2},
+                                 { 3, 4, 5},
+                                 { 6, 7, 8}},
+
+                                 {{ 9,10,11},
+                                  {12,13,14},
+                                  {15,16,17}},
+
+                                 {{18,19,20},
+                                  {21,22,23},
+                                  {24,25,26}}};
 
         auto res1 = xt::linalg::dot(arg_0, arg_1);
-        xarray<long> expected1 = {{{{  15,  18,  21},
-                                   {  42,  45,  48},
-                                   {  69,  72,  75}},
+        xarray<double> expected1 = {{{{  15,  18,  21},
+                                      {  42,  45,  48},
+                                      {  69,  72,  75}},
+
+                                     {{  42,  54,  66},
+                                      { 150, 162, 174},
+                                      { 258, 270, 282}},
+
+                                     {{  69,  90, 111},
+                                      { 258, 279, 300},
+                                      { 447, 468, 489}}},
                                 
-                                  {{  42,  54,  66},
-                                   { 150, 162, 174},
-                                   { 258, 270, 282}},
+                                    {{{  96, 126, 156},
+                                      { 366, 396, 426},
+                                      { 636, 666, 696}},
+
+                                     {{ 123, 162, 201},
+                                      { 474, 513, 552},
+                                      { 825, 864, 903}},
                                 
-                                  {{  69,  90, 111},
-                                   { 258, 279, 300},
-                                   { 447, 468, 489}}},
-                                
-                                
-                                 {{{  96, 126, 156},
-                                   { 366, 396, 426},
-                                   { 636, 666, 696}},
-                                
-                                  {{ 123, 162, 201},
-                                   { 474, 513, 552},
-                                   { 825, 864, 903}},
-                                
-                                  {{ 150, 198, 246},
-                                   { 582, 630, 678},
-                                   {1014,1062,1110}}}};
+                                     {{ 150, 198, 246},
+                                      { 582, 630, 678},
+                                      {1014,1062,1110}}}};
 
         EXPECT_TRUE(allclose(expected1, res1));
 
         auto res2 = xt::linalg::dot(arg_1, arg_0);
-        xarray<long> expected2 = {{{{  15,  18,  21},
-                                   {  42,  45,  48}},
-                                
-                                  {{  42,  54,  66},
-                                   { 150, 162, 174}},
-                                
-                                  {{  69,  90, 111},
-                                   { 258, 279, 300}}},
-                                
-                                
-                                 {{{  96, 126, 156},
-                                   { 366, 396, 426}},
-                                
-                                  {{ 123, 162, 201},
-                                   { 474, 513, 552}},
-                                
-                                  {{ 150, 198, 246},
-                                   { 582, 630, 678}}},
-                                
-                                
-                                 {{{ 177, 234, 291},
-                                   { 690, 747, 804}},
-                                
-                                  {{ 204, 270, 336},
-                                   { 798, 864, 930}},
-                                
-                                  {{ 231, 306, 381},
-                                   { 906, 981,1056}}}};
+        xarray<double> expected2 = {{{{  15,  18,  21},
+                                      {  42,  45,  48}},
+
+                                     {{  42,  54,  66},
+                                      { 150, 162, 174}},
+
+                                     {{  69,  90, 111},
+                                      { 258, 279, 300}}},
+
+                                    {{{  96, 126, 156},
+                                      { 366, 396, 426}},
+
+                                     {{ 123, 162, 201},
+                                      { 474, 513, 552}},
+
+                                     {{ 150, 198, 246},
+                                      { 582, 630, 678}}},
+
+                                    {{{ 177, 234, 291},
+                                      { 690, 747, 804}},
+
+                                     {{ 204, 270, 336},
+                                      { 798, 864, 930}},
+
+                                     {{ 231, 306, 381},
+                                      { 906, 981,1056}}}};
 
         EXPECT_TRUE(allclose(expected2, res2));
 
-        xarray<long> arg_2 = {0,1,2};
+        xarray<double> arg_2 = {0, 1, 2};
         auto res3 = xt::linalg::dot(arg_0, arg_2);
 
-        xarray<long> expected3 = {{ 5,14,23},
-                                  {32,41,50}};
+        xarray<double> expected3 = {{ 5, 14, 23},
+                                    {32, 41, 50}};
 
         EXPECT_TRUE(allclose(expected3, res3));
 
         auto res4 = xt::linalg::dot(arg_2, arg_0);
 
-        xarray<long> expected4 = {{15,18,21},
-                                  {42,45,48}};
+        xarray<double> expected4 = {{15, 18, 21},
+                                    {42, 45, 48}};
 
         EXPECT_TRUE(allclose(expected4, res4));
     }
