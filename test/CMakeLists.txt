@@ -79,14 +79,18 @@ endif()
 
 find_package(Threads)
 
+message(STATUS "Prefix path: " ${CMAKE_PREFIX_PATH})
+
 find_package(xtensor REQUIRED)
 if (WIN32)
     find_package(OpenBLAS REQUIRED)
     set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
 else()
-    find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
 endif()
+
+message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
+message(STATUS "BLAS LIBRARIES: " ${BLAS_LIBRARIES})
 
 include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${XBLAS_INCLUDE_DIR})

@@ -63,8 +63,8 @@ namespace xt
 
     TEST(xblas, view_dot)
     {
-        xarray<double> a = {1,2,3,4,5};
-        xarray<double> b = {5,4,3,2,1};
+        xarray<double> a = {1, 2, 3, 4, 5};
+        xarray<double> b = {5, 4, 3, 2, 1};
         auto res = linalg::dot(a, b);
 
         xarray<double> expected = {35};
@@ -84,7 +84,7 @@ namespace xt
     {
         auto a = linalg::norm(xt::arange<double>(15), 1);
         auto b = linalg::norm(xt::arange<double>(15), 2);
-        xarray<double> c = {6,4,2,1};
+        xarray<double> c = {6, 4, 2, 1};
         auto res = linalg::norm(c);
 
         EXPECT_EQ(a, 105.0);
@@ -98,13 +98,13 @@ namespace xt
 
         xarray<double> b = arange(0, 3);
 
-        xarray<long> expected = {{0,1,2},
-                                 {0,1,2},
-                                 {0,1,2}};
+        xarray<double> expected = {{0, 1, 2},
+                                   {0, 1, 2},
+                                   {0, 1, 2}};
 
         auto t = linalg::outer(a, b);
-        auto t2 = linalg::outer(a, xt::arange(0, 3));
-        auto t3 = linalg::outer(xt::ones<double>({3}), xt::arange(0, 3));
+        auto t2 = linalg::outer(a, xt::arange<double>(0, 3));
+        auto t3 = linalg::outer(xt::ones<double>({3}), xt::arange<double>(0, 3));
 
         EXPECT_TRUE(all(equal(expected, t)));
         EXPECT_TRUE(all(equal(expected, t2)));
