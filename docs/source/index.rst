@@ -46,5 +46,6 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    :caption: DEVELOPER ZONE
 
    build-options
+   releasing
 
 .. _FLENS: https://github.com/michael-lehn/FLENS
