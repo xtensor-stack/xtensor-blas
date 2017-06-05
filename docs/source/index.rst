@@ -34,7 +34,17 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    :maxdepth: 2
 
    installation
+
+.. toctree::
+   :caption: USAGE
+   :maxdepth: 2
+
    usage
    reference
- 
+
+.. toctree::
+   :caption: DEVELOPER ZONE
+
+   build-options
+
 .. _FLENS: https://github.com/michael-lehn/FLENS

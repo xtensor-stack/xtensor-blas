@@ -21,8 +21,8 @@
 Usage
 =====
 
-To use xtensor-blas functions, the `xlinalg.hpp` header has to be included.
-In the `xt::linalg` namespace, many of NumPy's `np.linalg` functions are implemented. 
+To use xtensor-blas functions, the ``xlinalg.hpp`` header has to be included.
+In the ``xt::linalg`` namespace, many of NumPy's ``np.linalg`` functions are implemented. 
 We make an effort to keep the interfaces very similar.
 
 For example, calculating a determinant:
@@ -56,9 +56,8 @@ Returning tuples is used throughout the xlinalg package.
 Using xblas and xlapack directly
 --------------------------------
 
-It is not necessarily recommended to use xblas or xlapack directly, but it's possible and can, 
-under certain circumstances, increase the speed of the application. Some things have to be taken
-into consideration. For one thing, the result container needs to be allocated and passed into the
+It is not necessarily recommended to use ``xblas`` or ``xlapack`` directly, but it's possible and can improve performance in certain cases. Some things have to be taken into consideration:
+For one thing, the result container needs to be allocated and passed into the
 function beforehand. And for the LAPACK functions, all arguments have to be in column_major order.
-Furthermore it's required that the xexpressions are evaluated and are stored in contigous memory.
-All of this is taken care of in xlinalg.
+Furthermore it's required that the xexpressions are evaluated and are stored in contiguous memory.
+All of this is taken care of when using ``xlinalg``.

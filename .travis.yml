@@ -8,7 +8,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc GCC=4.9
+      env: COMPILER=gcc GCC=4.9 BLAS=OpenBLAS
     - os: linux
       addons:
         apt:
@@ -16,7 +16,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc GCC=5
+      env: COMPILER=gcc GCC=5 BLAS=OpenBLAS
     - os: linux
       addons:
         apt:
@@ -24,7 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6
+      env: COMPILER=gcc GCC=6 BLAS=OpenBLAS
     - os: linux
       addons:
         apt:
@@ -32,7 +32,31 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1
+      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BLAS=OpenBLAS
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=gcc GCC=4.9 BLAS=mkl
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=gcc GCC=5 BLAS=mkl
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: COMPILER=gcc GCC=6 BLAS=mkl
     - os: linux
       addons:
         apt:
@@ -41,7 +65,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: COMPILER=clang CLANG=3.6
+      env: COMPILER=clang CLANG=3.6 BLAS=OpenBLAS
     - os: linux
       addons:
         apt:
@@ -50,7 +74,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-      env: COMPILER=clang CLANG=3.7
+      env: COMPILER=clang CLANG=3.7 BLAS=OpenBLAS
     - os: linux
       addons:
         apt:
@@ -59,11 +83,11 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
-      env: COMPILER=clang CLANG=3.8
+      env: COMPILER=clang CLANG=3.8 BLAS=OpenBLAS
     - os: osx
       osx_image: xcode8
       compiler: clang
-      env: PY=3
+      env: BLAS=OpenBLAS
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -90,31 +114,26 @@ install:
         MINCONDA_OS=$MINCONDA_OSX;
       fi
     - wget "http://repo.continuum.io/miniconda/Miniconda3-$MINCONDA_VERSION-$MINCONDA_OS.sh" -O miniconda.sh;
-    - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:$PATH"
+    - export CONDA_PREFIX=$HOME/miniconda
+    - bash miniconda.sh -b -p $CONDA_PREFIX
+    - export PATH="$CONDA_PREFIX/bin:$PATH"
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
-    # Useful for debugging any issues with conda
     - conda info -a
-    - conda install blas lapack -c conda-forge 
-    - cd test
-    - conda env create -f ./test-environment.yml
-    - source activate test-xtensor-blas
-    - cd ..
-    # Replace this with a conda install when xtensor 0.10 is out
-    - pwd
-    - tbd="$PWD"
-    - cd
-    - git clone https://github.com/QuantStack/xtensor
-    - cd xtensor
-    - cmake -DCMAKE_INSTALL_PREFIX=$HOME/miniconda .
-    - make install
-    - cd $tbd
+    - conda install gtest cmake -c conda-forge
+    # Install xtensor and BLAS
+    - conda install xtensor -c conda-forge
+    - if [[ "$BLAS" == "OpenBLAS" ]]; then
+        conda install openblas -c conda-forge;
+      elif [[ "$BLAS" == "mkl" ]]; then
+        conda install mkl;
+      fi 
+    # Testing
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
-        cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON .;
+        cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;
       else
-        cmake -DBUILD_TESTS=ON .;
+        cmake -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;
       fi
     - make -j2 test_xtensor_blas
 script:

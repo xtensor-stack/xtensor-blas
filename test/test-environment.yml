@@ -1,7 +1,0 @@
-name: test-xtensor-blas
-channels:
-    - conda-forge
-    - defaults
-dependencies:
-    - cmake
-    - gtest
