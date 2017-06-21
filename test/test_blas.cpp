@@ -110,4 +110,40 @@ namespace xt
         EXPECT_TRUE(all(equal(expected, t2)));
         EXPECT_TRUE(all(equal(expected, t3)));
     }
+
+    TEST(xblas, gemm_transpose)
+    {
+        xt::xarray<double> X = {{1, 2, 3},
+                                {1, 2, 3}};
+
+        auto M = xt::xarray<double>::from_shape({3, 3});
+        auto O = xt::xarray<double>::from_shape({2, 2});
+
+        xt::blas::gemm(X, X, M, xt::xscalar<double>(1), xt::xscalar<double>(0), true, false);
+        xt::blas::gemm(X, X, O, xt::xscalar<double>(1), xt::xscalar<double>(0), false, true);
+
+        xt::xarray<double> expM = {{ 2,  4,  6},
+                                   { 4,  8, 12},
+                                   { 6, 12, 18}};
+
+        xt::xarray<double> expO = {{ 14, 14},
+                                   { 14, 14}};
+
+        EXPECT_TRUE(all(equal(expM, M)));
+        EXPECT_TRUE(all(equal(expO, O)));
+    }
+
+    TEST(xblas, gemv_transpose)
+    {
+        xt::xarray<double> X = {{1, 2, 3},
+                                {1, 2, 3}};
+        xt::xarray<double> v = {1, 2};
+        auto R = xt::xarray<double>::from_shape({3});
+
+        xt::blas::gemv(X, v, R, true, xt::xscalar<double>(1), xt::xscalar<double>(0));
+
+        xt::xarray<double> expR = {3, 6, 9};
+
+        EXPECT_TRUE(all(equal(expR, R)));
+    }
 }

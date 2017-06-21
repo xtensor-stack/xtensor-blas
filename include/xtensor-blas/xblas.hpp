@@ -127,7 +127,7 @@ namespace blas
     template <class E1, class E2, class R, class value_type = typename E1::value_type>
     void gemv(const xexpression<E1>& A, const xexpression<E2>& x,
               R& result,
-              bool transpose = false,
+              bool transpose_A = false,
               const xscalar<value_type> alpha = value_type(1),
               const xscalar<value_type> beta = value_type(0))
     {
@@ -136,7 +136,7 @@ namespace blas
 
         cxxblas::gemv<BLAS_IDX>(
             get_blas_storage_order(dA),
-            transpose ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
+            transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             (BLAS_IDX) dA.shape()[0],
             (BLAS_IDX) dA.shape()[1],
             alpha(),
@@ -177,9 +177,9 @@ namespace blas
             get_blas_storage_order(da),
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
-            (BLAS_IDX) da.shape()[0],
-            (BLAS_IDX) db.shape()[1],
-            (BLAS_IDX) db.shape()[0],
+            (BLAS_IDX) transpose_A ? da.shape()[1] : da.shape()[0],
+            (BLAS_IDX) transpose_B ? db.shape()[0] : db.shape()[1],
+            (BLAS_IDX) transpose_B ? db.shape()[1] : db.shape()[0],
             alpha(),
             da.raw_data() + da.raw_data_offset(),
             get_leading_stride(da),
