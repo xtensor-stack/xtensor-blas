@@ -128,8 +128,8 @@ namespace blas
     void gemv(const xexpression<E1>& A, const xexpression<E2>& x,
               R& result,
               bool transpose_A = false,
-              const xscalar<value_type> alpha = value_type(1),
-              const xscalar<value_type> beta = value_type(0))
+              const value_type& alpha = value_type(1.0),
+              const value_type& beta = value_type(0.0))
     {
         auto&& dA = view_eval<E1::static_layout>(A.derived_cast());
         auto&& dx = view_eval<E1::static_layout>(x.derived_cast());
@@ -139,12 +139,12 @@ namespace blas
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             (BLAS_IDX) dA.shape()[0],
             (BLAS_IDX) dA.shape()[1],
-            alpha(),
+            alpha,
             dA.raw_data() + dA.raw_data_offset(),
             get_leading_stride(dA),
             dx.raw_data() + dx.raw_data_offset(),
             get_leading_stride(dx),
-            beta(),
+            beta,
             result.raw_data() + result.raw_data_offset(),
             get_leading_stride(result)
         );
@@ -153,17 +153,21 @@ namespace blas
     /**
      * Calculate the matrix-matrix product of matrix @A and matrix @B
      *
-     * C := alpha*op( A )*op( B ) + beta*C
+     * C := alpha * A * B + beta * C
      *
      * @param A matrix of m-by-n elements
      * @param B matrix of n-by-k elements
-     * @returns matrix of m-by-k elements
+     * @param transpose_A transpose A on the fly
+     * @param transpose_B transpose B on the fly
+     * @param alpha scale factor for A * B (defaults to 1)
+     * @param beta scale factor for C (defaults to 0)
      */
     template <class E, class F, class R, class value_type = typename E::value_type>
     void gemm(const xexpression<E>& A, const xexpression<F>& B, R& result,
-              const xscalar<value_type> alpha = value_type(1),
-              const xscalar<value_type> beta = value_type(0),
-              bool transpose_A = false, bool transpose_B = false)
+              bool transpose_A = false,
+              bool transpose_B = false,
+              const value_type& alpha = value_type(1.0),
+              const value_type& beta = value_type(0.0))
     {
         auto&& da = view_eval<E::static_layout>(A.derived_cast());
         auto&& db = view_eval<E::static_layout>(B.derived_cast());
@@ -177,15 +181,15 @@ namespace blas
             get_blas_storage_order(da),
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
-            (BLAS_IDX) transpose_A ? da.shape()[1] : da.shape()[0],
-            (BLAS_IDX) transpose_B ? db.shape()[0] : db.shape()[1],
-            (BLAS_IDX) transpose_B ? db.shape()[1] : db.shape()[0],
-            alpha(),
+            (BLAS_IDX) (transpose_A ? da.shape()[1] : da.shape()[0]),
+            (BLAS_IDX) (transpose_B ? db.shape()[0] : db.shape()[1]),
+            (BLAS_IDX) (transpose_B ? db.shape()[1] : db.shape()[0]),
+            alpha,
             da.raw_data() + da.raw_data_offset(),
             get_leading_stride(da),
             db.raw_data() + db.raw_data_offset(),
             get_leading_stride(db),
-            beta(),
+            beta,
             result.raw_data() + result.raw_data_offset(),
             get_leading_stride(result)
         );
@@ -203,7 +207,7 @@ namespace blas
     template <class E1, class E2, class R, class value_type = typename E1::value_type>
     void ger(const xexpression<E1>& x, const xexpression<E2>& y,
              R& result,
-             const xscalar<value_type> alpha = value_type(1))
+             const value_type& alpha = value_type(1.0))
     {
         auto&& dx = view_eval(x.derived_cast());
         auto&& dy = view_eval(y.derived_cast());
@@ -215,7 +219,7 @@ namespace blas
             get_blas_storage_order(result),
             (BLAS_IDX) dx.shape()[0],
             (BLAS_IDX) dy.shape()[0],
-            alpha(),
+            alpha,
             dx.raw_data() + dx.raw_data_offset(),
             (BLAS_IDX) dx.strides().front(),
             dy.raw_data() + dy.raw_data_offset(),
