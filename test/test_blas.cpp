@@ -119,8 +119,8 @@ namespace xt
         auto M = xt::xarray<double>::from_shape({3, 3});
         auto O = xt::xarray<double>::from_shape({2, 2});
 
-        xt::blas::gemm(X, X, M, 1, 0, true, false);
-        xt::blas::gemm(X, X, O, 1, 0, false, true);
+        xt::blas::gemm(X, X, M, true, false, 1.0, 0.0);
+        xt::blas::gemm(X, X, O, false, true, 1.0, 0.0);
 
         xt::xarray<double> expM = {{ 2,  4,  6},
                                    { 4,  8, 12},

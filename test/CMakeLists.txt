@@ -87,6 +87,7 @@ if (WIN32)
     set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
 else()
     find_package(BLAS REQUIRED)
+    find_package(LAPACK REQUIRED)
 endif()
 
 message(STATUS "BLAS VENDOR:    " ${BLA_VENDOR})
