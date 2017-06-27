@@ -1,5 +1,5 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+* Copyright (c) 2016, Wolf Vollprecht, Johan Mabille and Sylvain Corlay    *
 *                                                                          *
 * Distributed under the terms of the BSD 3-Clause License.                 *
 *                                                                          *
@@ -119,8 +119,8 @@ namespace xt
         auto M = xt::xarray<double>::from_shape({3, 3});
         auto O = xt::xarray<double>::from_shape({2, 2});
 
-        xt::blas::gemm(X, X, M, xt::xscalar<double>(1), xt::xscalar<double>(0), true, false);
-        xt::blas::gemm(X, X, O, xt::xscalar<double>(1), xt::xscalar<double>(0), false, true);
+        xt::blas::gemm(X, X, M, true, false, 1.0, 0.0);
+        xt::blas::gemm(X, X, O, false, true, 1.0, 0.0);
 
         xt::xarray<double> expM = {{ 2,  4,  6},
                                    { 4,  8, 12},
@@ -140,7 +140,7 @@ namespace xt
         xt::xarray<double> v = {1, 2};
         auto R = xt::xarray<double>::from_shape({3});
 
-        xt::blas::gemv(X, v, R, true, xt::xscalar<double>(1), xt::xscalar<double>(0));
+        xt::blas::gemv(X, v, R, true, 1, 0);
 
         xt::xarray<double> expR = {3, 6, 9};
 
