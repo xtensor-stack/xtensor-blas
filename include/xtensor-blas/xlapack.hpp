@@ -18,7 +18,7 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
 
-#include "flens/cxxlapack/cxxlapack.cxx"
+#include "cxxlapack/cxxlapack.cxx"
 
 #include "xtensor-blas/xblas_config.hpp"
 #include "xtensor-blas/xblas_utils.hpp"

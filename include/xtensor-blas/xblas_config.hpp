@@ -21,6 +21,9 @@
 #define BLAS_IDX int
 #endif
 
+#pragma cling load("libblas")
+#pragma cling load("liblapack")
+
 namespace xt
 {
     using XBLAS_INDEX = int;
