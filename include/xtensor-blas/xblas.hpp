@@ -41,9 +41,10 @@ namespace blas
     {
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
+        XTENSOR_ASSERT(ad.dimension() == 1);
 
         cxxblas::dot<BLAS_IDX>(
-            (BLAS_IDX) ad.size(),
+            (BLAS_IDX) ad.shape()[0],
             ad.raw_data() + ad.raw_data_offset(),
             (BLAS_IDX) ad.strides().front(),
             bd.raw_data() + bd.raw_data_offset(),
@@ -65,9 +66,10 @@ namespace blas
     {
         auto&& ad = view_eval<E1::static_layout>(a.derived_cast());
         auto&& bd = view_eval<E1::static_layout>(b.derived_cast());
+        XTENSOR_ASSERT(ad.dimension() == 1);
 
         cxxblas::dotu<BLAS_IDX>(
-            (BLAS_IDX) ad.size(),
+            (BLAS_IDX) ad.shape()[0],
             ad.raw_data() + ad.raw_data_offset(),
             (BLAS_IDX) ad.strides().front(),
             bd.raw_data() + bd.raw_data_offset(),
@@ -86,9 +88,10 @@ namespace blas
     void asum(const xexpression<E>& a, R& result)
     {
         auto&& ad = view_eval<E::static_layout>(a.derived_cast());
+        XTENSOR_ASSERT(ad.dimension() == 1);
 
         cxxblas::asum<BLAS_IDX>(
-            (BLAS_IDX) ad.size(),
+            (BLAS_IDX) ad.shape()[0],
             ad.raw_data() + ad.raw_data_offset(),
             (BLAS_IDX) ad.strides().front(),
             result
@@ -105,9 +108,10 @@ namespace blas
     void nrm2(const xexpression<E>& a, R& result)
     {
         auto&& ad = view_eval<E::static_layout>(a.derived_cast());
+        XTENSOR_ASSERT(ad.dimension() == 1);
 
         cxxblas::nrm2<BLAS_IDX>(
-            (BLAS_IDX) ad.size(),
+            (BLAS_IDX) ad.shape()[0],
             ad.raw_data() + ad.raw_data_offset(),
             (BLAS_IDX) ad.strides().front(),
             result
