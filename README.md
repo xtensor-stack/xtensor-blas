@@ -52,8 +52,9 @@ which are also available on conda-forge.
 
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
-| master          |  ^0.10.2  |
-| 0.1.0           |  ^0.10.2  |
+| master          |  ^0.11.0  |
+| 0.3.1           |  ^0.10.2  |
+| 0.3.0           |  ^0.10.2  |
 
 ## License
 
