@@ -27,6 +27,12 @@ set(${PROJECT_NAME}_VERSION
     ${XTENSOR_BLAS_VERSION_MAJOR}.${XTENSOR_BLAS_VERSION_MINOR}.${XTENSOR_BLAS_VERSION_PATCH})
 message(STATUS "xtensor-blas v${${PROJECT_NAME}_VERSION}")
 
+# Dependencies
+# ============
+
+find_package(xtensor REQUIRED)
+message(STATUS "Found xtensor: ${xtensor_INCLUDE_DIRS}/xensor")
+
 # Build
 # =====
 
@@ -58,7 +64,6 @@ endif()
 
 if(BUILD_TESTS)
     include_directories(${XTENSOR_BLAS_INCLUDE_DIR})
-    find_package(xtensor REQUIRED)
     include_directories(${xtensor_INCLUDE_DIRS})
     add_subdirectory(test)
 endif()
