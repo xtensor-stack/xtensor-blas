@@ -11,6 +11,8 @@
 
 #include <algorithm>
 
+#include "xtl/xcomplex.hpp"
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xio.hpp"
@@ -202,7 +204,7 @@ namespace lapack
         return info;
     }
 
-    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto gesdd(E& A, char jobz = 'A')
     {
         using value_type = typename E::value_type;
@@ -283,7 +285,7 @@ namespace lapack
     }
 
     // TODO merge with above function to reduce code bloat
-    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto gesdd(E& A, char jobz = 'A')
     {
         using value_type = typename E::value_type;
@@ -674,7 +676,7 @@ namespace lapack
         return info;
     }
 
-    template <class E, class F, class S, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, class F, class S, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     int gelsd(E& A, F& b, S& s, XBLAS_INDEX& rank, double rcond)
     {
         using value_type = typename E::value_type;
@@ -728,7 +730,7 @@ namespace lapack
         return info;
     }
 
-    template <class E, class F, class S, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, class F, class S, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     int gelsd(E& A, F& b, S& s, XBLAS_INDEX& rank, double rcond = -1)
     {
         using value_type = typename E::value_type;
