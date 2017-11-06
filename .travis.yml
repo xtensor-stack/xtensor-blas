@@ -124,12 +124,12 @@ install:
     - conda info -a
     - conda install gtest cmake -c conda-forge
     # Install xtensor and BLAS
-    - conda install xtensor=0.12.0 -c conda-forge
+    - conda install xtensor=0.13.0 -c conda-forge
     - if [[ "$BLAS" == "OpenBLAS" ]]; then
         conda install openblas -c conda-forge;
       elif [[ "$BLAS" == "mkl" ]]; then
         conda install mkl;
-      fi 
+      fi
     # Testing
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;

@@ -14,6 +14,8 @@
 #include <sstream>
 #include <chrono>
 
+#include "xtl/xcomplex.hpp"
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xeval.hpp"
@@ -53,7 +55,7 @@ namespace linalg
     auto norm(const xexpression<E>& vec, int ord)
     {
         using value_type = typename E::value_type;
-        using underlying_value_type = complex_value_type_t<value_type>;
+        using underlying_value_type = xtl::complex_value_type_t<value_type>;
 
         const auto& v = vec.derived_cast();
 
@@ -62,7 +64,7 @@ namespace linalg
         {
             if (ord == 1)
             {
-                if (is_complex<value_type>::value)
+                if (xtl::is_complex<value_type>::value)
                 {
                     for (std::size_t i = 0; i < v.size(); ++i)
                     {
@@ -140,7 +142,7 @@ namespace linalg
     template <class E>
     auto norm(const xexpression<E>& vec, normorder ord)
     {
-        using value_type = complex_value_type_t<typename E::value_type>;
+        using value_type = xtl::complex_value_type_t<typename E::value_type>;
 
         const auto& v = vec.derived_cast();
         if (v.dimension() == 2)
@@ -285,7 +287,7 @@ namespace linalg
      *         ordered. The second (1) element are the normalized (unit “length”) eigenvectors,
      *         such that the column v[:, i] corresponds to the eigenvalue w[i].
      */
-    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eig(const xexpression<E>& A)
     {
         using underlying_type = typename E::value_type;
@@ -337,7 +339,7 @@ namespace linalg
         return std::make_tuple(eig_vals, eig_vecs);
     }
 
-    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eig(const xexpression<E>& A)
     {
         using value_type = typename E::value_type;
@@ -371,7 +373,7 @@ namespace linalg
      * @param A Matrix for which the eigenvalues and right eigenvectors are computed
      * @return xtensor containing the eigenvalues.
      */
-    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eigh(const xexpression<E>& A, char UPLO = 'L')
     {
         using value_type = typename E::value_type;
@@ -391,7 +393,7 @@ namespace linalg
         return std::make_tuple(w, M);
     }
 
-    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eigh(const xexpression<E>& A, char UPLO = 'L')
     {
         using value_type = typename E::value_type;
@@ -418,7 +420,7 @@ namespace linalg
      * @param A Matrix for which the eigenvalues are computed
      * @return xtensor containing the eigenvalues.
      */
-    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eigvals(const xexpression<E>& A)
     {
         using value_type = typename E::value_type;
@@ -446,7 +448,7 @@ namespace linalg
         return eig_vals;
     }
 
-    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eigvals(const xexpression<E>& A)
     {
         using value_type = typename E::value_type;
@@ -475,7 +477,7 @@ namespace linalg
      * @param Matrix for which the eigenvalues are computed
      * @return xtensor containing the eigenvalues.
      */
-    template <class E, std::enable_if_t<!is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eigvalsh(const xexpression<E>& A, char UPLO = 'L')
     {
         using value_type = typename E::value_type;
@@ -495,7 +497,7 @@ namespace linalg
         return w;
     }
 
-    template <class E, std::enable_if_t<is_complex<typename E::value_type>::value>* = nullptr>
+    template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto eigvalsh(const xexpression<E>& A, char UPLO = 'L')
     {
         using value_type = typename E::value_type;
@@ -601,7 +603,7 @@ namespace linalg
         if (t.dimension() == 1 && o.dimension() == 1)
         {
             result.reshape(std::vector<std::size_t>{1});
-            if (is_complex<typename T::value_type>::value)
+            if (xtl::is_complex<typename T::value_type>::value)
             {
                 blas::dotu(t, o, result(0));
             }
@@ -716,7 +718,7 @@ namespace linalg
         XTENSOR_ASSERT(db.dimension() == 1);
 
         common_type result = 0;
-        if (is_complex<typename T::value_type>::value)
+        if (xtl::is_complex<typename T::value_type>::value)
         {
             blas::dot(da, db, result);
         }
@@ -797,7 +799,7 @@ namespace linalg
      * @param A matrix for which determinant is to be computed
      * @returns tuple containing (sign, determinant)
      */
-    template <class T, std::enable_if_t<is_complex<typename T::value_type>::value, int> = 0>
+    template <class T, std::enable_if_t<xtl::is_complex<typename T::value_type>::value, int> = 0>
     auto slogdet(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
@@ -831,7 +833,7 @@ namespace linalg
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-    template <class T, std::enable_if_t<!is_complex<typename T::value_type>::value, int> = 0>
+    template <class T, std::enable_if_t<!xtl::is_complex<typename T::value_type>::value, int> = 0>
     auto slogdet(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
@@ -874,7 +876,7 @@ namespace linalg
     {
         template <class E, class T>
         inline auto call_gqr(E& A, T& tau, XBLAS_INDEX n)
-            -> std::enable_if_t<!is_complex<typename E::value_type>::value>
+            -> std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>
         {
             int info = lapack::orgqr(A, tau, n);
             if (info > 0)
@@ -885,7 +887,7 @@ namespace linalg
 
         template <class E, class T>
         inline auto call_gqr(E& A, T& tau, XBLAS_INDEX n)
-            -> std::enable_if_t<is_complex<typename E::value_type>::value>
+            -> std::enable_if_t<xtl::is_complex<typename E::value_type>::value>
         {
             int info = lapack::ungqr(A, tau, n);
             if (info > 0)
@@ -1254,7 +1256,7 @@ namespace linalg
     auto lstsq(const xexpression<T>& A, const xexpression<E>& b, double rcond = -1)
     {
         using value_type = typename T::value_type;
-        using underlying_value_type = complex_value_type_t<typename T::value_type>;
+        using underlying_value_type = xtl::complex_value_type_t<typename T::value_type>;
 
         xtensor<value_type, 2, layout_type::column_major> dA = A.derived_cast();
         xtensor<value_type, 2, layout_type::column_major> db;

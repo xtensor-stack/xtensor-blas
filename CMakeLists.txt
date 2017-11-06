@@ -23,7 +23,7 @@ foreach(ver ${xtensor_blas_version_defines})
         set(XTENSOR_BLAS_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
     endif()
 endforeach()
-set(${PROJECT_NAME}_VERSION 
+set(${PROJECT_NAME}_VERSION
     ${XTENSOR_BLAS_VERSION_MAJOR}.${XTENSOR_BLAS_VERSION_MINOR}.${XTENSOR_BLAS_VERSION_PATCH})
 message(STATUS "xtensor-blas v${${PROJECT_NAME}_VERSION}")
 
