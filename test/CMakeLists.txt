@@ -97,6 +97,7 @@ set(XTENSOR_BLAS_TESTS
     test_blas.cpp
     test_lapack.cpp
     test_linalg.cpp
+    test_dot.cpp
 )
 
 set(XTENSOR_BLAS_TARGET test_xtensor_blas)
