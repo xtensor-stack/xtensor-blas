@@ -85,13 +85,13 @@ namespace xt
     template <class A, std::enable_if_t<A::static_layout == layout_type::column_major>* = nullptr>
     inline BLAS_IDX get_leading_stride(const A& a)
     {
-        return (BLAS_IDX) a.strides().back();
+        return (BLAS_IDX) (a.strides().back() == 0 ? a.shape().front() : a.strides().back());
     }
 
     template <class A, std::enable_if_t<A::static_layout == layout_type::row_major>* = nullptr>
     inline BLAS_IDX get_leading_stride(const A& a)
     {
-        return (BLAS_IDX) a.strides().front();
+        return (BLAS_IDX) (a.strides().front() == 0 ? a.shape().back() : a.strides().front());
     }
 
     template <class A, std::enable_if_t<A::static_layout != layout_type::row_major && A::static_layout != layout_type::column_major>* = nullptr>
@@ -99,11 +99,11 @@ namespace xt
     {
         if (a.layout() == layout_type::row_major)
         {
-            return (BLAS_IDX) a.strides().front();
+            return (BLAS_IDX) (a.strides().front() == 0 ? a.shape().back() : a.strides().front());
         }
         else if (a.layout() == layout_type::column_major)
         {
-            return (BLAS_IDX) a.strides().back();
+            return (BLAS_IDX) (a.strides().back() == 0 ? a.shape().front() : a.strides().back());
         }
         else
         {

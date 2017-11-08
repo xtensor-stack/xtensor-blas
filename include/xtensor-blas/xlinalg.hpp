@@ -595,14 +595,20 @@ namespace linalg
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
         using return_type = xarray<common_type, T::static_layout>;
 
-        auto&& t = view_eval<layout_type::row_major>(xt.derived_cast());
-        auto&& o = view_eval<layout_type::row_major>(xo.derived_cast());
+
+        auto&& t = view_eval<T::static_layout>(xt.derived_cast());
+        auto&& o = view_eval<T::static_layout>(xo.derived_cast());
 
         return_type result;
 
         if (t.dimension() == 1 && o.dimension() == 1)
         {
             result.reshape(std::vector<std::size_t>{1});
+            if (t.shape()[0] != o.shape()[0])
+            {
+                throw std::runtime_error("Dot: shape mismatch.");
+            }
+
             if (xtl::is_complex<typename T::value_type>::value)
             {
                 blas::dotu(t, o, result(0));
@@ -617,16 +623,30 @@ namespace linalg
         {
             if (t.dimension() == 2 && o.dimension() == 1)
             {
+                if (t.shape()[1] != o.shape()[0])
+                {
+                    throw std::runtime_error("Dot: shape mismatch.");
+                }
+
                 result.reshape({t.shape()[0]});
                 blas::gemv(t, o, result);
             }
             else if (t.dimension() == 1 && o.dimension() == 2)
             {
+                if (t.shape()[0] != o.shape()[0])
+                {
+                    throw std::runtime_error("Dot: shape mismatch.");
+                }
+
                 result.reshape({o.shape()[1]});
                 blas::gemv(o, t, result, true);
             }
             else if (t.dimension() == 2 && o.dimension() == 2)
             {
+                if (t.shape()[1] != o.shape()[0])
+                {
+                    throw std::runtime_error("Dot: shape mismatch.");
+                }
                 result.reshape({t.shape()[0], o.shape()[1]});
                 blas::gemm(t, o, result);
             }
@@ -641,7 +661,7 @@ namespace linalg
                 }
                 if (o.shape()[match_dim] != l)
                 {
-                    throw std::runtime_error("Dot alignment error.");
+                    throw std::runtime_error("Dot: shape mismatch.");
                 }
 
                 int a_dim = (int) t.dimension();
@@ -1092,7 +1112,7 @@ namespace linalg
         xtype mat = A.derived_cast();
 
         XTENSOR_ASSERT(mat.dimension() == 2);
-        XTENSOR_ASSERT(mat.shape()[0] == mat_inp.shape()[1]);
+        XTENSOR_ASSERT(mat.shape()[0] == mat.shape()[1]);
 
         xtype res(mat.shape());
         if (n == 0)
