@@ -595,8 +595,9 @@ namespace linalg
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
         using return_type = xarray<common_type, T::static_layout>;
 
-        auto&& t = view_eval<layout_type::row_major>(xt.derived_cast());
-        auto&& o = view_eval<layout_type::row_major>(xo.derived_cast());
+
+        auto&& t = view_eval<T::static_layout>(xt.derived_cast());
+        auto&& o = view_eval<T::static_layout>(xo.derived_cast());
 
         return_type result;
 
