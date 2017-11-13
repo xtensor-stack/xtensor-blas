@@ -591,15 +591,16 @@ namespace linalg
      * @return resulting array
      */
     template <class T, class O>
-    auto dot(const xexpression<T>& xt, const xexpression<O>& xo) {
-        using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
-        using return_type = xarray<common_type, T::static_layout>;
-
+    auto dot(const xexpression<T>& xt, const xexpression<O>& xo)
+    {
+        using value_type = std::common_type_t<typename T::value_type, typename O::value_type>;
+        using return_type = std::conditional_t<(T::static_layout == O::static_layout) && (T::static_layout != layout_type::dynamic),
+                                               xarray<value_type, T::static_layout>,
+                                               xarray<value_type, DEFAULT_LAYOUT>>;
+        return_type result;
 
         auto&& t = view_eval<T::static_layout>(xt.derived_cast());
-        auto&& o = view_eval<T::static_layout>(xo.derived_cast());
-
-        return_type result;
+        auto&& o = view_eval<O::static_layout>(xo.derived_cast());
 
         if (t.dimension() == 1 && o.dimension() == 1)
         {
@@ -623,35 +624,166 @@ namespace linalg
         {
             if (t.dimension() == 2 && o.dimension() == 1)
             {
+                XTENSOR_ASSERT(t.layout() == layout_type::row_major || t.layout() == layout_type::column_major);
+                XTENSOR_ASSERT(std::min(t.strides()[0], t.strides()[1]) <= 1);
+
                 if (t.shape()[1] != o.shape()[0])
                 {
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
                 result.reshape({t.shape()[0]});
-                blas::gemv(t, o, result);
+
+                BLAS_IDX shape_x, shape_y;
+                cxxblas::Transpose trans;
+                if (result.layout() != t.layout())
+                {
+                    shape_x = (BLAS_IDX) t.shape()[1];
+                    shape_y = (BLAS_IDX) t.shape()[0];
+                    trans = cxxblas::Transpose::Trans;
+                }
+                else
+                {
+                    shape_x = (BLAS_IDX) t.shape()[0];
+                    shape_y = (BLAS_IDX) t.shape()[1];
+                    trans = cxxblas::Transpose::NoTrans;
+                }
+
+                cxxblas::gemv<BLAS_IDX>(
+                    get_blas_storage_order(result),
+                    trans,
+                    shape_x,
+                    shape_y,
+                    value_type(1.0),
+                    t.raw_data() + t.raw_data_offset(),
+                    get_leading_stride(t),
+                    o.raw_data() + o.raw_data_offset(),
+                    get_leading_stride(o),
+                    value_type(0.0),
+                    result.raw_data(),
+                    get_leading_stride(result)
+                );
             }
             else if (t.dimension() == 1 && o.dimension() == 2)
             {
+                XTENSOR_ASSERT(o.layout() == layout_type::row_major || o.layout() == layout_type::column_major);
+                XTENSOR_ASSERT(std::min(o.strides()[0], o.strides()[1]) <= 1);
+
                 if (t.shape()[0] != o.shape()[0])
                 {
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
                 result.reshape({o.shape()[1]});
-                blas::gemv(o, t, result, true);
+
+                BLAS_IDX shape_x, shape_y;
+                cxxblas::Transpose trans;
+                if (result.layout() != o.layout())
+                {
+                    shape_x = (BLAS_IDX) o.shape()[1];
+                    shape_y = (BLAS_IDX) o.shape()[0];
+                    trans = cxxblas::Transpose::NoTrans;
+                }
+                else
+                {
+                    shape_x = (BLAS_IDX) o.shape()[0];
+                    shape_y = (BLAS_IDX) o.shape()[1];
+                    trans = cxxblas::Transpose::Trans;
+                }
+
+                cxxblas::gemv<BLAS_IDX>(
+                    get_blas_storage_order(result),
+                    trans,
+                    shape_x,
+                    shape_y,
+                    value_type(1.0),
+                    o.raw_data() + o.raw_data_offset(),
+                    get_leading_stride(o),
+                    t.raw_data() + t.raw_data_offset(),
+                    get_leading_stride(t),
+                    value_type(0.0),
+                    result.raw_data(),
+                    get_leading_stride(result)
+                );
             }
             else if (t.dimension() == 2 && o.dimension() == 2)
             {
+                XTENSOR_ASSERT(o.layout() == layout_type::row_major || o.layout() == layout_type::column_major);
+                XTENSOR_ASSERT(std::min(o.strides()[0], o.strides()[1]) <= 1);
+                XTENSOR_ASSERT(t.layout() == layout_type::row_major || t.layout() == layout_type::column_major);
+                XTENSOR_ASSERT(std::min(t.strides()[0], t.strides()[1]) <= 1);
+
                 if (t.shape()[1] != o.shape()[0])
                 {
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
+
+                cxxblas::Transpose transpose_A = cxxblas::Transpose::NoTrans,
+                                   transpose_B = cxxblas::Transpose::NoTrans;
+
+                if (result.layout() != t.layout())
+                {
+                    transpose_A = cxxblas::Transpose::Trans;
+                }
+                if (result.layout() != o.layout())
+                {
+                    transpose_B = cxxblas::Transpose::Trans;
+                }
+
+                if ((t.raw_data() + t.raw_data_offset()) == (o.raw_data() + o.raw_data_offset()) &&
+                    ((transpose_A == cxxblas::Transpose::Trans && transpose_B == cxxblas::Transpose::NoTrans) ||
+                     (transpose_A == cxxblas::Transpose::NoTrans && transpose_B == cxxblas::Transpose::Trans)))
+                {
+                    BLAS_IDX shape_x, shape_y;
+                    cxxblas::Transpose trans;
+                    result.reshape({t.shape()[0], t.shape()[0]});
+
+                    cxxblas::syrk<BLAS_IDX>(
+                        get_blas_storage_order(result),
+                        cxxblas::StorageUpLo::Upper,
+                        transpose_A,
+                        (BLAS_IDX) t.shape()[0],
+                        (BLAS_IDX) t.shape()[1],
+                        value_type(1.0),
+                        t.raw_data() + t.raw_data_offset(),
+                        get_leading_stride(t),
+                        value_type(0.0),
+                        result.raw_data(),
+                        get_leading_stride(result)
+                    );
+
+                    for (std::size_t i = 0; i < t.shape()[0]; ++i)
+                    {
+                        for (std::size_t j = i + 1; j < t.shape()[0]; ++j)
+                        {
+                            result(j, i) = result(i, j);
+                        }
+                    }
+                    return result;
+                }
+
                 result.reshape({t.shape()[0], o.shape()[1]});
-                blas::gemm(t, o, result);
+
+                cxxblas::gemm<BLAS_IDX>(
+                    get_blas_storage_order(result),
+                    transpose_A,
+                    transpose_B,
+                    (BLAS_IDX) t.shape()[0],
+                    (BLAS_IDX) o.shape()[1],
+                    (BLAS_IDX) o.shape()[0],
+                    value_type(1.0),
+                    t.raw_data() + t.raw_data_offset(),
+                    get_leading_stride(t),
+                    o.raw_data() + o.raw_data_offset(),
+                    get_leading_stride(o),
+                    value_type(0.0),
+                    result.raw_data(),
+                    get_leading_stride(result)
+                );
             }
             else
             {
+                // TODO more testing for different layouts!
                 std::size_t l = t.shape().back();
                 std::size_t match_dim = 0;
 
@@ -664,19 +796,19 @@ namespace linalg
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
-                int a_dim = (int) t.dimension();
-                int b_dim = (int) o.dimension();
+                BLAS_IDX a_dim = (BLAS_IDX) t.dimension();
+                BLAS_IDX b_dim = (BLAS_IDX) o.dimension();
 
-                int nd = a_dim + b_dim - 2;
+                BLAS_IDX nd = a_dim + b_dim - 2;
 
                 std::size_t j = 0;
                 std::vector<std::size_t> dimensions((std::size_t) nd);
 
-                for (int i = 0; i < a_dim - 1; ++i)
+                for (BLAS_IDX i = 0; i < a_dim - 1; ++i)
                 {
                     dimensions[j++] = t.shape()[i];
                 }
-                for (int i = 0; i < b_dim - 2; ++i)
+                for (BLAS_IDX i = 0; i < b_dim - 2; ++i)
                 {
                     dimensions[j++] = o.shape()[i];
                 }
@@ -687,20 +819,27 @@ namespace linalg
 
                 result.reshape(dimensions);
 
-                int a_stride = (int) t.strides().back();
-                int b_stride = (int) o.strides()[match_dim];
+                BLAS_IDX a_stride = (BLAS_IDX) t.strides().back();
+                BLAS_IDX b_stride = (BLAS_IDX) o.strides()[match_dim];
 
                 auto a_iter = detail::offset_iter_without_axis<std::decay_t<decltype(t)>>(t, t.dimension() - 1);
                 auto b_iter = detail::offset_iter_without_axis<std::decay_t<decltype(o)>>(o, match_dim);
 
-                common_type temp;
+                value_type temp;
                 auto result_it = result.begin();
 
                 do
                 {
                     do
                     {
-                        cxxblas::dot<int>((int) l, t.raw_data() + a_iter.offset(), a_stride, o.raw_data() + b_iter.offset(), b_stride, temp);
+                        cxxblas::dot<BLAS_IDX>(
+                            (BLAS_IDX) l,
+                            t.raw_data() + a_iter.offset(),
+                            a_stride,
+                            o.raw_data() + b_iter.offset(),
+                            b_stride,
+                            temp
+                        );
                         *(result_it++) = temp;
 
                     } while (b_iter.next());
