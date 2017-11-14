@@ -18,7 +18,7 @@ namespace xt
     inline auto view_eval(T&& t)
         -> std::enable_if_t<has_raw_data_interface<T>::value && std::decay_t<T>::static_layout == L, T&&>
     {
-        return t;
+        return std::forward<T>(t);
     }
 
     template <layout_type L = layout_type::row_major, class T, class I = std::decay_t<T>>
@@ -82,16 +82,16 @@ namespace xt
      * Get leading stride
      */
 
-    template <class A, std::enable_if_t<A::static_layout == layout_type::column_major>* = nullptr>
-    inline BLAS_IDX get_leading_stride(const A& a)
-    {
-        return (BLAS_IDX) (a.strides().back() == 0 ? a.shape().front() : a.strides().back());
-    }
-
     template <class A, std::enable_if_t<A::static_layout == layout_type::row_major>* = nullptr>
     inline BLAS_IDX get_leading_stride(const A& a)
     {
         return (BLAS_IDX) (a.strides().front() == 0 ? a.shape().back() : a.strides().front());
+    }
+
+    template <class A, std::enable_if_t<A::static_layout == layout_type::column_major>* = nullptr>
+    inline BLAS_IDX get_leading_stride(const A& a)
+    {
+        return (BLAS_IDX) (a.strides().back() == 0 ? a.shape().front() : a.strides().back());
     }
 
     template <class A, std::enable_if_t<A::static_layout != layout_type::row_major && A::static_layout != layout_type::column_major>* = nullptr>

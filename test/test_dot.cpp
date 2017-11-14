@@ -29,6 +29,23 @@ namespace xt
         EXPECT_THROW(linalg::dot(c, b), std::runtime_error);
     }
 
+    TEST(xdot, matrix_transpose_times_column)
+    {
+        xarray<double, layout_type::row_major> a = xt::ones<double>({2, 4});
+        xarray<double, layout_type::row_major> b = xt::ones<double>({2, 1});
+        auto r1 = linalg::dot(xt::transpose(a), b);
+        EXPECT_TRUE(all(equal(r1, 2.0)));
+    }
+
+    TEST(xdot, matrix_transpose_times_column_cm)
+    {
+        xarray<double, layout_type::column_major> a = xt::ones<double>({2, 4});
+        xarray<double, layout_type::column_major> b = xt::ones<double>({2, 1});
+
+        auto r1 = linalg::dot(xt::transpose(a), b);
+        EXPECT_TRUE(all(equal(r1, 2.0)));
+    }
+
     TEST(xdot, square_matrix_times_vector)
     {
         xarray<float> a = {{1, 1, 1}};
@@ -67,6 +84,36 @@ namespace xt
 
         auto r3 = linalg::dot(b, e1);
         EXPECT_EQ(b * 3, r3);
+    }
+
+    TEST(xdot, matrix_times_1d)
+    {
+        xarray<float> a = xt::ones<float>({5, 3});
+        xarray<float> b = xt::ones<float>({5});
+        xarray<float> c = xt::ones<float>({3});
+        auto r1 = linalg::dot(xt::transpose(a), b);
+
+        EXPECT_TRUE(all(equal(r1, 5.0)));
+
+        auto r2 = linalg::dot(c, xt::transpose(a));
+        EXPECT_TRUE(all(equal(r2, 3.0)));
+
+        auto r3 = linalg::dot(a, c);
+        EXPECT_TRUE(all(equal(r3, 3.0)));
+
+        auto r4 = linalg::dot(c, xt::ones<float>({3, 5}));
+        EXPECT_TRUE(all(equal(r3, 3.0)));
+    }
+
+    TEST(xdot, A_times_A_T)
+    {
+        xarray<float> a = xt::ones<float>({5, 3});
+
+        auto r1 = linalg::dot(a, xt::transpose(a));
+        EXPECT_TRUE(all(equal(r1, 3.0)));
+
+        auto r2 = linalg::dot(xt::transpose(a), a);
+        EXPECT_TRUE(all(equal(r2, 5.0)));
     }
 
     TEST(xdot, matrix_times_vector_cm)
