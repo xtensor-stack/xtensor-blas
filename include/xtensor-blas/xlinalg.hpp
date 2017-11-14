@@ -730,7 +730,9 @@ namespace linalg
                     transpose_B = cxxblas::Transpose::Trans;
                 }
 
-                if ((t.raw_data() + t.raw_data_offset()) == (o.raw_data() + o.raw_data_offset()) &&
+                // TODO add check to compare strides & shape
+                if (std::is_same<typename T::value_type, typename O::value_type>::value &&
+                    (static_cast<const void*>(t.raw_data() + t.raw_data_offset()) == static_cast<const void*>(o.raw_data() + o.raw_data_offset())) &&
                     ((transpose_A == cxxblas::Transpose::Trans && transpose_B == cxxblas::Transpose::NoTrans) ||
                      (transpose_A == cxxblas::Transpose::NoTrans && transpose_B == cxxblas::Transpose::Trans)))
                 {
