@@ -43,7 +43,7 @@ namespace xt
 
     template <layout_type L = layout_type::row_major, class T>
     inline auto copy_to_layout(T&& t)
-        -> std::enable_if_t<std::decay_t<T>::static_layout == L, T&&>
+        -> std::enable_if_t<std::decay_t<T>::static_layout == L, T>
     {
         return t;
     }
