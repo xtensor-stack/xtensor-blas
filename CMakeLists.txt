@@ -13,6 +13,19 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(FLENS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/xtensor-blas/flens)
 set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR} ${FLENS_INCLUDE_DIR})
 
+# Configuration
+# =============
+
+# TODO: use the library directory of the found BLAS implementation instead of CMAKE_INSTALL_LIBDIR
+set(XTENSOR_BLAS_CLING_LIBRARY_DIR_64 "\"${CMAKE_INSTALL_PREFIX}/lib64\"")
+set(XTENSOR_BLAS_CLING_LIBRARY_DIR_32 "\"${CMAKE_INSTALL_PREFIX}/lib32\"")
+set(XTENSOR_BLAS_CLING_LIBRARY_DIR "\"${CMAKE_INSTALL_PREFIX}/lib\"")
+
+configure_file (
+    "${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp.in"
+    "${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp"
+)
+
 # Versionning
 # ===========
 
