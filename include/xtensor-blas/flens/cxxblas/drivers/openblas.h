@@ -33,8 +33,6 @@
 #ifndef CXXBLAS_DRIVERS_OPENBLAS_H
 #define CXXBLAS_DRIVERS_OPENBLAS_H 1
 
-#include <cxxstd/cstdlib.h>
-
 #   define HAVE_CBLAS           1
 #   ifdef BLASINT
 #      define CBLAS_INT         BLASINT
@@ -51,5 +49,35 @@
 #    define HAVE_CBLAS_AXPBY
 #    define BLAS_EXT(x)         cblas_##x
 #endif
+
+extern "C" {
+	/* Assume C declarations for C++ */
+
+	/*Set the number of threads on runtime.*/
+	void openblas_set_num_threads(int num_threads);
+	void goto_set_num_threads(int num_threads);
+
+	/*Get the number of threads on runtime.*/
+	int openblas_get_num_threads(void);
+
+	/*Get the number of physical processors (cores).*/
+	int openblas_get_num_procs(void);
+
+	/*Get the build configure on runtime.*/
+	char* openblas_get_config(void);
+
+	/*Get the CPU corename on runtime.*/
+	char* openblas_get_corename(void);
+
+	/* Get the parallelization type which is used by OpenBLAS */
+	int openblas_get_parallel(void);
+}
+
+/* OpenBLAS is compiled for sequential use  */
+#define OPENBLAS_SEQUENTIAL  0
+/* OpenBLAS is compiled using normal threading model */
+#define OPENBLAS_THREAD  1
+/* OpenBLAS is compiled using OpenMP threading model */
+#define OPENBLAS_OPENMP 2
 
 #endif // CXXBLAS_DRIVERS_OPENBLAS_H
