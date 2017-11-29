@@ -20,7 +20,7 @@
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xeval.hpp"
 #include "xtensor/xio.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
 

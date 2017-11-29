@@ -2,7 +2,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 
 #include "xtensor-blas/xlinalg.hpp"
 
