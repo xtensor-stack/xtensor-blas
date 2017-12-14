@@ -39,7 +39,7 @@ cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
 
-To build the tests or actually use `xtensor-blas` you will also binaries for
+To build the tests or actually use `xtensor-blas`, you will need binaries for
 
  - `openblas`
  - `lapack`
