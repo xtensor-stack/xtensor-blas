@@ -23,7 +23,7 @@ namespace xt
 
     namespace detail
     {
-        constexpr layout_type layout_remove_any(const layout_type& layout)
+        constexpr layout_type layout_remove_any(const layout_type layout)
         {
             return layout == layout_type::any ? DEFAULT_LAYOUT : layout;
         }
