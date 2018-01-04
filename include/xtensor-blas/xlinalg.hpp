@@ -594,7 +594,9 @@ namespace linalg
     auto dot(const xexpression<T>& xt, const xexpression<O>& xo)
     {
         using value_type = std::common_type_t<typename T::value_type, typename O::value_type>;
-        using return_type = std::conditional_t<(T::static_layout == O::static_layout) && (T::static_layout != layout_type::dynamic),
+
+        using return_type = std::conditional_t<(T::static_layout == O::static_layout) &&
+                                               (T::static_layout != layout_type::dynamic && T::static_layout != layout_type::any),
                                                xarray<value_type, T::static_layout>,
                                                xarray<value_type, DEFAULT_LAYOUT>>;
         return_type result;
