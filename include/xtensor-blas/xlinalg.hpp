@@ -736,8 +736,6 @@ namespace linalg
                     ((transpose_A == cxxblas::Transpose::Trans && transpose_B == cxxblas::Transpose::NoTrans) ||
                      (transpose_A == cxxblas::Transpose::NoTrans && transpose_B == cxxblas::Transpose::Trans)))
                 {
-                    BLAS_IDX shape_x, shape_y;
-                    cxxblas::Transpose trans;
                     result.reshape({t.shape()[0], t.shape()[0]});
 
                     cxxblas::syrk<BLAS_IDX>(

@@ -21,12 +21,16 @@
 #define BLAS_IDX int
 #endif
 
+#ifdef __CLING__
+
 #pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_64@)
 #pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_32@)
 #pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR@)
 
 #pragma cling load("libblas")
 #pragma cling load("liblapack")
+
+#endif
 
 namespace xt
 {
