@@ -220,22 +220,22 @@ namespace lapack
         std::size_t n = A.shape()[1];
 
         xtype1 s;
-        s.reshape({ std::max(std::size_t(1), std::min(m, n)) });
+        s.resize({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
         XBLAS_INDEX u_stride = 1, vt_stride = 1;
 
         if (jobz == 'A' || (jobz == 'O' && m < n))
         {
-            u.reshape({m, m});
-            vt.reshape({m, m});
+            u.resize({m, m});
+            vt.resize({m, m});
             u_stride = (XBLAS_INDEX) u.strides().back();
             vt_stride = (XBLAS_INDEX) vt.strides().back();
         }
         if (jobz == 'S')
         {
-            u.reshape({m, std::min(m, n)});
-            vt.reshape({n, std::min(m, n)});
+            u.resize({m, std::min(m, n)});
+            vt.resize({n, std::min(m, n)});
             u_stride = (XBLAS_INDEX) u.strides().back();
             vt_stride = (XBLAS_INDEX) vt.strides().back();
         }
@@ -321,22 +321,22 @@ namespace lapack
         }
 
         xtype1 s;
-        s.reshape({ std::max(std::size_t(1), std::min(m, n)) });
+        s.resize({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
         XBLAS_INDEX u_stride = 1, vt_stride = 1;
 
         if (jobz == 'A' || (jobz == 'O' && m < n))
         {
-            u.reshape({m, m});
-            vt.reshape({m, m});
+            u.resize({m, m});
+            vt.resize({m, m});
             u_stride = (XBLAS_INDEX) u.strides().back();
             vt_stride = (XBLAS_INDEX) vt.strides().back();
         }
         if (jobz == 'S')
         {
-            u.reshape({m, std::min(m, n)});
-            vt.reshape({n, std::min(m, n)});
+            u.resize({m, std::min(m, n)});
+            vt.resize({n, std::min(m, n)});
             u_stride = (XBLAS_INDEX) u.strides().back();
             vt_stride = (XBLAS_INDEX) vt.strides().back();
         }
