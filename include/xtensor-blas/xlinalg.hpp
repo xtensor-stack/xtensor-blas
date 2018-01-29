@@ -440,7 +440,7 @@ namespace linalg
         auto geev_res = lapack::geev(M, 'N', 'N', wr, wi, VL, VR);
 
         xtensor<std::complex<value_type>, 1> eig_vals;
-        eig_vals.reshape({N});
+        eig_vals.resize({N});
 
         xt::real(eig_vals) = wr;
         xt::imag(eig_vals) = wi;
@@ -606,7 +606,7 @@ namespace linalg
 
         if (t.dimension() == 1 && o.dimension() == 1)
         {
-            result.reshape(std::vector<std::size_t>{1});
+            result.resize(std::vector<std::size_t>{1});
             if (t.shape()[0] != o.shape()[0])
             {
                 throw std::runtime_error("Dot: shape mismatch.");
@@ -634,7 +634,7 @@ namespace linalg
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
-                result.reshape({t.shape()[0]});
+                result.resize({t.shape()[0]});
 
                 BLAS_IDX shape_x, shape_y;
                 cxxblas::Transpose trans;
@@ -676,7 +676,7 @@ namespace linalg
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
-                result.reshape({o.shape()[1]});
+                result.resize({o.shape()[1]});
 
                 BLAS_IDX shape_x, shape_y;
                 cxxblas::Transpose trans;
@@ -738,7 +738,7 @@ namespace linalg
                     ((transpose_A == cxxblas::Transpose::Trans && transpose_B == cxxblas::Transpose::NoTrans) ||
                      (transpose_A == cxxblas::Transpose::NoTrans && transpose_B == cxxblas::Transpose::Trans)))
                 {
-                    result.reshape({t.shape()[0], t.shape()[0]});
+                    result.resize({t.shape()[0], t.shape()[0]});
 
                     cxxblas::syrk<BLAS_IDX>(
                         get_blas_storage_order(result),
@@ -764,7 +764,7 @@ namespace linalg
                     return result;
                 }
 
-                result.reshape({t.shape()[0], o.shape()[1]});
+                result.resize({t.shape()[0], o.shape()[1]});
 
                 cxxblas::gemm<BLAS_IDX>(
                     get_blas_storage_order(result),
@@ -819,7 +819,7 @@ namespace linalg
                     dimensions[j++] = o.shape().back();
                 }
 
-                result.reshape(dimensions);
+                result.resize(dimensions);
 
                 BLAS_IDX a_stride = (BLAS_IDX) t.strides().back();
                 BLAS_IDX b_stride = (BLAS_IDX) o.strides()[match_dim];
@@ -1109,7 +1109,7 @@ namespace linalg
         }
         if (mode == qrmode::complete)
         {
-            Q.reshape({M, M});
+            Q.resize({M, M});
             // TODO replace with assignment to view
             for (std::size_t i = 0; i < R.shape()[0]; ++i)
             {
@@ -1426,7 +1426,7 @@ namespace linalg
         if (db_t.dimension() == 1)
         {
             std::size_t sz = db_t.shape()[0];
-            db.reshape({sz, 1});
+            db.resize({sz, 1});
             std::copy(db_t.data().begin(), db_t.data().end(), db.data().begin());
         }
         else
@@ -1448,7 +1448,7 @@ namespace linalg
 
         if (std::size_t(rank) == N && M > N)
         {
-            residuals.reshape({ db.shape()[1] });
+            residuals.resize({ db.shape()[1] });
             for (std::size_t i = 0; i < db.shape()[1]; ++i)
             {
                 underlying_value_type temp = 0;
