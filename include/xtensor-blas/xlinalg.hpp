@@ -1209,13 +1209,13 @@ namespace linalg
         auto vt = std::get<2>(gesdd_res);
 
         using real_value_type = typename decltype(s)::value_type;
-        real_value_type cutoff = rcond * (*std::max_element(s.begin(), s.end()));
+        real_value_type cutoff = static_cast<real_value_type>(rcond) * (*std::max_element(s.begin(), s.end()));
 
         for (std::size_t i = 0; i < s.size(); ++i)
         {
             if (s(i) > cutoff)
             {
-                s(i) = 1. / s(i);
+                s(i) = real_value_type(1.) / s(i);
             }
             else
             {

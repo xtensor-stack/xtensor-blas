@@ -74,7 +74,7 @@ namespace xt
 
         auto br = linalg::inv(b);
         EXPECT_EQ(b, br);
-        xarray<double> t_r_major(std::vector<std::size_t>{3, 3});
+        auto t_r_major = xarray<double>::from_shape({3, 3});
         assign_data(t_r_major, t, true);
         auto almost_eye = linalg::dot(t_r_major, a);
         auto e = xt::eye(3);

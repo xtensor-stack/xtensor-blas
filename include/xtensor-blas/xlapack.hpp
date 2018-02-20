@@ -244,7 +244,7 @@ namespace lapack
             {
                 // u OR vt are unreferenced -- can't use strides().back()...
                 return m >= n ? std::make_pair(1, select_stride(vt.strides().back())) :
-                                std::make_pair(select_stride(u.strides().back()),  1);
+                                std::make_pair(select_stride(u.strides().back()), 1);
             }
             return std::make_pair(select_stride(u.strides().back()), select_stride(vt.strides().back()));
         }
