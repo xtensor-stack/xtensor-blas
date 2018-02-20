@@ -224,12 +224,12 @@ namespace xt
 
     TEST(xlinalg, pinv_small)
     {
-        xt::xtensor<float, 2> d1 {{1, 2}};
+        xt::xtensor<float, 2> d1 {{1.f, 2.f}};
         auto r1 = xt::linalg::pinv(d1);
-        xt::xtensor<float, 2> e1 = {{0.2}, {0.4}};
+        xt::xtensor<float, 2> e1 = {{ 0.2f}, { 0.4f}};
         EXPECT_TRUE(allclose(r1, e1));
 
-        xt::xtensor<float, 2> d2 {{1. }};
+        xt::xtensor<float, 2> d2 {{ 1.f}};
         auto r2 = xt::linalg::pinv(d2);
         EXPECT_EQ(r2(0), 1.f);
     }
