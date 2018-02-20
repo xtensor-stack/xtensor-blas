@@ -204,6 +204,52 @@ namespace lapack
         return info;
     }
 
+    namespace detail
+    {
+        template <class S>
+        inline XBLAS_INDEX select_stride(const S& stride)
+        {
+            return stride == 0 ? 1 : static_cast<XBLAS_INDEX>(stride);
+        }
+
+        template <class U, class VT>
+        inline auto init_u_vt(U& u, VT& vt, char jobz, std::size_t m, std::size_t n)
+        {
+            // rules for sgesdd
+            // u:
+            //   if jobz == 'O' and M >= N, u is not referenced
+            //   if jobz == 'N', u is also not referenced
+            // vt:
+            //   if jobz == 'O' and M < N vt is not referenced
+            //   if jobz == 'N', vt is also not referenced
+            if (jobz == 'A' || (jobz == 'O' && m < n))
+            {
+                u.resize({m, m});
+            }
+            if (jobz == 'A' || (jobz == 'O' && m >= n))
+            {
+                vt.resize({n, n});
+            }
+            if (jobz == 'S')
+            {
+                u.resize({m, std::min(m, n)});
+                vt.resize({std::min(m, n), n});
+            }
+            if (jobz == 'N')
+            {
+                // u AND vt are unreferenced -- can't use strides().back()...
+                return std::make_pair(1, 1);
+            }
+            if (jobz == 'O')
+            {
+                // u OR vt are unreferenced -- can't use strides().back()...
+                return m >= n ? std::make_pair(1, select_stride(vt.strides().back())) :
+                                std::make_pair(select_stride(u.strides().back()), 1);
+            }
+            return std::make_pair(select_stride(u.strides().back()), select_stride(vt.strides().back()));
+        }
+    }
+
     template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto gesdd(E& A, char jobz = 'A')
     {
@@ -223,22 +269,10 @@ namespace lapack
         s.resize({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
-        XBLAS_INDEX u_stride = 1, vt_stride = 1;
-
-        if (jobz == 'A' || (jobz == 'O' && m < n))
-        {
-            u.resize({m, m});
-            vt.resize({m, m});
-            u_stride = (XBLAS_INDEX) u.strides().back();
-            vt_stride = (XBLAS_INDEX) vt.strides().back();
-        }
-        if (jobz == 'S')
-        {
-            u.resize({m, std::min(m, n)});
-            vt.resize({n, std::min(m, n)});
-            u_stride = (XBLAS_INDEX) u.strides().back();
-            vt_stride = (XBLAS_INDEX) vt.strides().back();
-        }
+    
+        XBLAS_INDEX u_stride, vt_stride, A_stride;
+        std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
+        A_stride = detail::select_stride(A.strides().back());
 
         uvector<XBLAS_INDEX> iwork(8 * std::min(m, n));
 
@@ -247,7 +281,7 @@ namespace lapack
             (XBLAS_INDEX) A.shape()[0],
             (XBLAS_INDEX) A.shape()[1],
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            A_stride,
             s.raw_data(),
             u.raw_data(),
             u_stride,
@@ -260,7 +294,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for gesdd.");
+            throw std::runtime_error("Could not find workspace size for real gesdd.");
         }
 
         work.resize((std::size_t) work[0]);
@@ -270,7 +304,7 @@ namespace lapack
             (XBLAS_INDEX) A.shape()[0],
             (XBLAS_INDEX) A.shape()[1],
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            A_stride,
             s.raw_data(),
             u.raw_data(),
             u_stride,
@@ -284,7 +318,7 @@ namespace lapack
         return std::make_tuple(info, u, s, vt);
     }
 
-    // TODO merge with above function to reduce code bloat
+    // Complex variant of gesdd
     template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
     auto gesdd(E& A, char jobz = 'A')
     {
@@ -324,29 +358,17 @@ namespace lapack
         s.resize({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
-        XBLAS_INDEX u_stride = 1, vt_stride = 1;
 
-        if (jobz == 'A' || (jobz == 'O' && m < n))
-        {
-            u.resize({m, m});
-            vt.resize({m, m});
-            u_stride = (XBLAS_INDEX) u.strides().back();
-            vt_stride = (XBLAS_INDEX) vt.strides().back();
-        }
-        if (jobz == 'S')
-        {
-            u.resize({m, std::min(m, n)});
-            vt.resize({n, std::min(m, n)});
-            u_stride = (XBLAS_INDEX) u.strides().back();
-            vt_stride = (XBLAS_INDEX) vt.strides().back();
-        }
+        XBLAS_INDEX u_stride, vt_stride, A_stride;
+        std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
+        A_stride = detail::select_stride(A.strides().back());
 
         int info = cxxlapack::gesdd<XBLAS_INDEX>(
             jobz,
             (XBLAS_INDEX) A.shape()[0],
             (XBLAS_INDEX) A.shape()[1],
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            A_stride,
             s.raw_data(),
             u.raw_data(),
             u_stride,
@@ -360,7 +382,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for gesdd.");
+            throw std::runtime_error("Could not find workspace size for complex gesdd.");
         }
         work.resize((std::size_t) std::real(work[0]));
 
@@ -369,7 +391,7 @@ namespace lapack
             (XBLAS_INDEX) A.shape()[0],
             (XBLAS_INDEX) A.shape()[1],
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            A_stride,
             s.raw_data(),
             u.raw_data(),
             u_stride,

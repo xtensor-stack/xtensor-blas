@@ -222,6 +222,18 @@ namespace xt
         EXPECT_TRUE(allclose(imag(cmpl_expected), imag(cmpl_res)));
     }
 
+    TEST(xlinalg, pinv_small)
+    {
+        xt::xtensor<float, 2> d1 {{1.f, 2.f}};
+        auto r1 = xt::linalg::pinv(d1);
+        xt::xtensor<float, 2> e1 = {{ 0.2f}, { 0.4f}};
+        EXPECT_TRUE(allclose(r1, e1));
+
+        xt::xtensor<float, 2> d2 {{ 1.f}};
+        auto r2 = xt::linalg::pinv(d2);
+        EXPECT_EQ(r2(0), 1.f);
+    }
+
     TEST(xlinalg, mat_norm)
     {
         xarray<double> arg_0 = {{ 0.06817001, 0.50274712,-0.36802027,-0.93123204},

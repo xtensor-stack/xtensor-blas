@@ -13,7 +13,8 @@ Releasing a new version
 From the master branch of xtensor-blas
 
 - Make sure that you are in sync with the master branch of the upstream remote.
-- In file ``xblas_config.hpp``, set the macros for ``XTENSOR_BLAS_VERSION_MAJOR``, ``XTENSOR_BLAS_VERSION_MINOR`` and ``XTENSOR_BLAS_VERSION_PATCH`` to the desired values.
+- In file ``xblas_config.hpp.in``, set the macros for ``XTENSOR_BLAS_VERSION_MAJOR``, ``XTENSOR_BLAS_VERSION_MINOR`` and ``XTENSOR_BLAS_VERSION_PATCH`` to the desired values.
+- Add dependency information in the README.md
 - Stage the changes (``git add``), commit the changes (``git commit``) and add a tag of the form ``Major.minor.patch``. It is important to not add any other content to the tag name.
 - Push the new commit and tag to the main repository. (``git push``, and ``git push --tags``)
 

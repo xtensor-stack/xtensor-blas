@@ -1167,7 +1167,7 @@ namespace linalg
      * @return tuple containing S, V, and D
      */
     template <class T>
-    auto svd(const xexpression<T>& A, bool compute_uv = true)
+    auto svd(const xexpression<T>& A, bool full_matrices = true, bool compute_uv = true)
     {
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
@@ -1175,6 +1175,10 @@ namespace linalg
         if (!compute_uv)
         {
             job_type = 'N';
+        }
+        else if (!full_matrices && compute_uv)
+        {
+            job_type = 'S';
         }
 
         auto result = lapack::gesdd(M, job_type);
@@ -1198,25 +1202,20 @@ namespace linalg
 
         xtensor<value_type, 2, layout_type::column_major> M = xt::conj(dA);
 
-        auto gesdd_res = lapack::gesdd(M, 'S');
+        auto gesdd_res = svd(M, false, true);
 
-        if (std::get<0>(gesdd_res) != 0)
-        {
-            throw std::runtime_error("SVD decomposition failed.");
-        }
-
-        auto u = std::get<1>(gesdd_res);
-        auto s = std::get<2>(gesdd_res);
-        auto vt = std::get<3>(gesdd_res);
+        auto u = std::get<0>(gesdd_res);
+        auto s = std::get<1>(gesdd_res);
+        auto vt = std::get<2>(gesdd_res);
 
         using real_value_type = typename decltype(s)::value_type;
-        real_value_type cutoff = rcond * (*std::max_element(s.begin(), s.end()));
+        real_value_type cutoff = static_cast<real_value_type>(rcond) * (*std::max_element(s.begin(), s.end()));
 
         for (std::size_t i = 0; i < s.size(); ++i)
         {
             if (s(i) > cutoff)
             {
-                s(i) = 1. / s(i);
+                s(i) = real_value_type(1.) / s(i);
             }
             else
             {
@@ -1225,12 +1224,9 @@ namespace linalg
         }
         auto ut = xt::transpose(u);
         auto vww = xt::view(s, xt::all(), xt::newaxis());
-        auto m = vww * ut;
+        auto m = xt::eval(vww * ut);
         auto vtt = xt::transpose(vt);
-
-        std::array<std::size_t, 2> shp = {vtt.shape()[0], m.shape()[1]};
-        xtensor<value_type, 2> result(shp);
-        blas::gemm(vtt, m, result);
+        auto result = dot(vtt, m);
         return result;
     }
 
@@ -1375,7 +1371,7 @@ namespace linalg
         using value_type = typename T::value_type;
         xtensor<value_type, 2, layout_type::column_major> M = m.derived_cast();
 
-        auto svd_res = svd(m, false);
+        auto svd_res = svd(m, true, false);
         auto s = std::get<1>(svd_res);
         auto max_el = std::max_element(s.begin(), s.end());
 
