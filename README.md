@@ -53,12 +53,16 @@ which are also available on conda-forge.
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
 | master          |  ^0.15.4  |
-| 0.8.1           |  ^0.15.4  |
+| 0.9.0           |  ^0.15.4  |
 | 0.8.0           |  ^0.15.0  |
 | 0.7.0           |  ^0.14.0  |
 | 0.6.1           |  ^0.13.2  |
 | 0.5.0           |  ^0.11.0  |
 | 0.3.1           |  ^0.10.2  |
+
+## Changelog
+
+`0.9.0`: BREAKING CHANGE! `svd` signature changed to match NumPy.
 
 ## License
 
