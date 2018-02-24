@@ -35,7 +35,7 @@ which will also install the core `xtensor` package.
 Or you can directly install it from the sources:
 
 ```
-cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
+set cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
 
