@@ -99,8 +99,8 @@ include(CMakePackageConfigHelpers)
 install(FILES ${XTENSOR_BLAS_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas)
 
-install(DIRECTORY ${INCLUDE_DIR}/xtensor-blas/flens/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY ${FLENS_INCLUDE_DIR}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas/flens)
 
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
 set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}" CACHE STRING "install path for xtensor-blasConfig.cmake")
