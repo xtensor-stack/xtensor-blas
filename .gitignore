@@ -49,4 +49,4 @@ docs/build/
 .ipynb_checkpoints/
 
 # Generated header
-include/xtensor-blas/xblas_config.hpp
+include/xtensor-blas/xblas_config_cling.hpp
