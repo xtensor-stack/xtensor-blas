@@ -22,7 +22,7 @@
 #endif
 
 #ifdef __CLING__
-#include "xtensor-blas/xtensor_config_cling.hpp"
+#include "xtensor-blas/xblas_config_cling.hpp"
 #endif
 
 namespace xt
