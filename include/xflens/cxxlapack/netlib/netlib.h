@@ -22,7 +22,7 @@
 namespace cxxlapack {
 
 extern "C" {
-#   include <cxxlapack/netlib/interface/lapack.in.h>
+#   include "xflens/cxxlapack/netlib/interface/lapack.in.h"
 } // extern "C"
 
 }
