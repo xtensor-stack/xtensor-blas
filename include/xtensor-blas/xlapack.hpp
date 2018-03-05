@@ -20,7 +20,7 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
 
-#include "cxxlapack/cxxlapack.cxx"
+#include "xflens/cxxlapack/cxxlapack.cxx"
 
 #include "xtensor-blas/xblas_config.hpp"
 #include "xtensor-blas/xblas_utils.hpp"
@@ -41,16 +41,16 @@ namespace lapack
         XTENSOR_ASSERT(b.dimension() <= 2);
         XTENSOR_ASSERT(b.layout() == layout_type::column_major);
 
-        uvector<XBLAS_INDEX> piv(A.shape()[0]);
+        uvector<blas_index_t> piv(A.shape()[0]);
 
-        XBLAS_INDEX b_dim = b.dimension() > 1 ? (XBLAS_INDEX) b.shape().back() : 1;
-        XBLAS_INDEX b_stride = b_dim == 1 ? (XBLAS_INDEX) b.shape().front() : (XBLAS_INDEX) b.strides().back();
+        blas_index_t b_dim = b.dimension() > 1 ? static_cast<blas_index_t>(b.shape().back()) : 1;
+        blas_index_t b_stride = b_dim == 1 ? static_cast<blas_index_t>(b.shape().front()) : static_cast<blas_index_t>(b.strides().back());
 
-        int info = cxxlapack::gesv<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        int info = cxxlapack::gesv<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             b_dim,
             A.raw_data(),
-            (XBLAS_INDEX) A.strides()[1],
+            static_cast<blas_index_t>(A.strides()[1]),
             piv.data(),
             b.raw_data(),
             b_stride
@@ -65,11 +65,11 @@ namespace lapack
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
 
-        int info = cxxlapack::getrf<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        int info = cxxlapack::getrf<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             piv.data()
         );
 
@@ -77,7 +77,7 @@ namespace lapack
     }
 
     template <class E, class T>
-    inline auto orgqr(E& A, T& tau, XBLAS_INDEX n = -1)
+    inline auto orgqr(E& A, T& tau, blas_index_t n = -1)
     {
         using value_type = typename E::value_type;
 
@@ -85,18 +85,18 @@ namespace lapack
 
         if (n == -1)
         {
-            n = (XBLAS_INDEX) A.shape()[1];
+            n = static_cast<blas_index_t>(A.shape()[1]);
         }
 
-        int info = cxxlapack::orgqr<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        int info = cxxlapack::orgqr<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             n,
-            (XBLAS_INDEX) tau.size(),
+            static_cast<blas_index_t>(tau.size()),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             tau.raw_data(),
             work.data(),
-            (XBLAS_INDEX) -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info != 0)
@@ -106,22 +106,22 @@ namespace lapack
 
         work.resize((std::size_t) work[0]);
 
-        info = cxxlapack::orgqr<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        info = cxxlapack::orgqr<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             n,
-            (XBLAS_INDEX) tau.size(),
+            static_cast<blas_index_t>(tau.size()),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             tau.raw_data(),
             work.data(),
-            (XBLAS_INDEX) work.size()
+            static_cast<blas_index_t>(work.size())
         );
 
         return info;
     }
 
     template <class E, class T>
-    inline auto ungqr(E& A, T& tau, XBLAS_INDEX n = -1)
+    inline auto ungqr(E& A, T& tau, blas_index_t n = -1)
     {
         using value_type = typename E::value_type;
 
@@ -129,18 +129,18 @@ namespace lapack
 
         if (n == -1)
         {
-            n = (XBLAS_INDEX) A.shape()[1];
+            n = static_cast<blas_index_t>(A.shape()[1]);
         }
 
-        int info = cxxlapack::ungqr<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        int info = cxxlapack::ungqr<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             n,
-            (XBLAS_INDEX) tau.size(),
+            static_cast<blas_index_t>(tau.size()),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             tau.raw_data(),
             work.data(),
-            (XBLAS_INDEX) -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info != 0)
@@ -150,15 +150,15 @@ namespace lapack
 
         work.resize((std::size_t) std::real(work[0]));
 
-        info = cxxlapack::ungqr<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        info = cxxlapack::ungqr<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             n,
-            (XBLAS_INDEX) tau.size(),
+            static_cast<blas_index_t>(tau.size()),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             tau.raw_data(),
             work.data(),
-            (XBLAS_INDEX) work.size()
+            static_cast<blas_index_t>(work.size())
         );
 
         return info;
@@ -174,14 +174,14 @@ namespace lapack
 
         uvector<value_type> work(1);
 
-        int info = cxxlapack::geqrf<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        int info = cxxlapack::geqrf<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             tau.raw_data(),
             work.data(),
-            (XBLAS_INDEX) -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info != 0)
@@ -191,14 +191,14 @@ namespace lapack
 
         work.resize((std::size_t) std::real(work[0]));
 
-        info = cxxlapack::geqrf<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        info = cxxlapack::geqrf<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             tau.raw_data(),
             work.data(),
-            (XBLAS_INDEX) work.size()
+            static_cast<blas_index_t>(work.size())
         );
 
         return info;
@@ -207,9 +207,9 @@ namespace lapack
     namespace detail
     {
         template <class S>
-        inline XBLAS_INDEX select_stride(const S& stride)
+        inline blas_index_t select_stride(const S& stride)
         {
-            return stride == 0 ? 1 : static_cast<XBLAS_INDEX>(stride);
+            return stride == 0 ? 1 : static_cast<blas_index_t>(stride);
         }
 
         template <class U, class VT>
@@ -270,16 +270,16 @@ namespace lapack
 
         xtype2 u, vt;
     
-        XBLAS_INDEX u_stride, vt_stride, A_stride;
+        blas_index_t u_stride, vt_stride, A_stride;
         std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
         A_stride = detail::select_stride(A.strides().back());
 
-        uvector<XBLAS_INDEX> iwork(8 * std::min(m, n));
+        uvector<blas_index_t> iwork(8 * std::min(m, n));
 
-        int info = cxxlapack::gesdd<XBLAS_INDEX>(
+        int info = cxxlapack::gesdd<blas_index_t>(
             jobz,
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
             A_stride,
             s.raw_data(),
@@ -288,7 +288,7 @@ namespace lapack
             vt.raw_data(),
             vt_stride,
             work.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             iwork.data()
         );
 
@@ -299,10 +299,10 @@ namespace lapack
 
         work.resize((std::size_t) work[0]);
 
-        info = cxxlapack::gesdd<XBLAS_INDEX>(
+        info = cxxlapack::gesdd<blas_index_t>(
             jobz,
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
             A_stride,
             s.raw_data(),
@@ -311,7 +311,7 @@ namespace lapack
             vt.raw_data(),
             vt_stride,
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             iwork.data()
         );
 
@@ -335,7 +335,7 @@ namespace lapack
 
         uvector<value_type> work(1);
         uvector<underlying_value_type> rwork(1);
-        uvector<XBLAS_INDEX> iwork(8 * std::min(m, n));
+        uvector<blas_index_t> iwork(8 * std::min(m, n));
 
         std::size_t mx = std::max(m, n);
         std::size_t mn = std::min(m, n);
@@ -359,14 +359,14 @@ namespace lapack
 
         xtype2 u, vt;
 
-        XBLAS_INDEX u_stride, vt_stride, A_stride;
+        blas_index_t u_stride, vt_stride, A_stride;
         std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
         A_stride = detail::select_stride(A.strides().back());
 
-        int info = cxxlapack::gesdd<XBLAS_INDEX>(
+        int info = cxxlapack::gesdd<blas_index_t>(
             jobz,
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
             A_stride,
             s.raw_data(),
@@ -375,7 +375,7 @@ namespace lapack
             vt.raw_data(),
             vt_stride,
             work.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             rwork.data(),
             iwork.data()
         );
@@ -386,10 +386,10 @@ namespace lapack
         }
         work.resize((std::size_t) std::real(work[0]));
 
-        info = cxxlapack::gesdd<XBLAS_INDEX>(
+        info = cxxlapack::gesdd<blas_index_t>(
             jobz,
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             A.raw_data(),
             A_stride,
             s.raw_data(),
@@ -398,7 +398,7 @@ namespace lapack
             vt.raw_data(),
             vt_stride,
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             rwork.data(),
             iwork.data()
         );
@@ -413,11 +413,11 @@ namespace lapack
         XTENSOR_ASSERT(A.dimension() == 2);
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
 
-        int info = cxxlapack::potrf<XBLAS_INDEX>(
+        int info = cxxlapack::potrf<blas_index_t>(
             uplo,
-            (XBLAS_INDEX) A.shape()[0],
+            static_cast<blas_index_t>(A.shape()[0]),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back()
+            static_cast<blas_index_t>(A.strides().back())
         );
 
         return info;
@@ -430,7 +430,7 @@ namespace lapack
      * @return inverse of A
      */
     template <class E>
-    int getri(E& A, uvector<XBLAS_INDEX>& piv)
+    int getri(E& A, uvector<blas_index_t>& piv)
     {
         using value_type = typename E::value_type;
 
@@ -440,13 +440,13 @@ namespace lapack
         uvector<value_type> work(1);
 
         // get work size
-        int info = cxxlapack::getri<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        int info = cxxlapack::getri<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             piv.data(),
             work.data(),
-            -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info > 0)
@@ -456,13 +456,13 @@ namespace lapack
 
         work.resize(std::size_t(work[0]));
 
-        info = cxxlapack::getri<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
+        info = cxxlapack::getri<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             piv.data(),
             work.data(),
-            (XBLAS_INDEX) work.size()
+            static_cast<blas_index_t>(work.size())
         );
 
         return info;
@@ -484,20 +484,20 @@ namespace lapack
         const auto N = A.shape()[0];
         uvector<value_type> work(1);
 
-        int info = cxxlapack::geev<XBLAS_INDEX>(
+        int info = cxxlapack::geev<blas_index_t>(
             jobvl,
             jobvr,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             wr.raw_data(),
             wi.raw_data(),
             VL.raw_data(),
-            (XBLAS_INDEX) VL.strides().back(),
+            static_cast<blas_index_t>(VL.strides().back()),
             VR.raw_data(),
-            (XBLAS_INDEX) VR.strides().back(),
+            static_cast<blas_index_t>(VR.strides().back()),
             work.data(),
-            -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info != 0)
@@ -507,20 +507,20 @@ namespace lapack
 
         work.resize(std::size_t(work[0]));
 
-        info = cxxlapack::geev<XBLAS_INDEX>(
+        info = cxxlapack::geev<blas_index_t>(
             jobvl,
             jobvr,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             wr.raw_data(),
             wi.raw_data(),
             VL.raw_data(),
-            (XBLAS_INDEX) VL.strides().back(),
+            static_cast<blas_index_t>(VL.strides().back()),
             VR.raw_data(),
-            (XBLAS_INDEX) VR.strides().back(),
+            static_cast<blas_index_t>(VR.strides().back()),
             work.data(),
-            (XBLAS_INDEX) work.size()
+            static_cast<blas_index_t>(work.size())
         );
 
         return info;
@@ -541,19 +541,19 @@ namespace lapack
 
         auto N = A.shape()[0];
         uvector<value_type> work(1);
-        uvector<XBLAS_INDEX> iwork(1);
+        uvector<blas_index_t> iwork(1);
 
-        int info = cxxlapack::syevd<XBLAS_INDEX>(
+        int info = cxxlapack::syevd<blas_index_t>(
             jobz,
             uplo,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             w.raw_data(),
             work.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             iwork.data(),
-            (XBLAS_INDEX) -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info != 0)
@@ -564,17 +564,17 @@ namespace lapack
         work.resize(std::size_t(work[0]));
         iwork.resize(std::size_t(iwork[0]));
 
-        info = cxxlapack::syevd<XBLAS_INDEX>(
+        info = cxxlapack::syevd<blas_index_t>(
             jobz,
             uplo,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             w.raw_data(),
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             iwork.data(),
-            (XBLAS_INDEX) iwork.size()
+            static_cast<blas_index_t>(iwork.size())
         );
 
         return info;
@@ -599,17 +599,17 @@ namespace lapack
         uvector<value_type> work(1);
         uvector<underlying_value_type> rwork(2 * N);
 
-        int info = cxxlapack::geev<XBLAS_INDEX>(
+        int info = cxxlapack::geev<blas_index_t>(
             jobvl,
             jobvr,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             w.raw_data(),
             VL.raw_data(),
-            (XBLAS_INDEX) VL.strides().back(),
+            static_cast<blas_index_t>(VL.strides().back()),
             VR.raw_data(),
-            (XBLAS_INDEX) VR.strides().back(),
+            static_cast<blas_index_t>(VR.strides().back()),
             work.data(),
             -1,
             rwork.data()
@@ -622,19 +622,19 @@ namespace lapack
 
         work.resize(std::size_t(std::real(work[0])));
 
-        info = cxxlapack::geev<XBLAS_INDEX>(
+        info = cxxlapack::geev<blas_index_t>(
             jobvl,
             jobvr,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             w.raw_data(),
             VL.raw_data(),
-            (XBLAS_INDEX) VL.strides().back(),
+            static_cast<blas_index_t>(VL.strides().back()),
             VR.raw_data(),
-            (XBLAS_INDEX) VR.strides().back(),
+            static_cast<blas_index_t>(VR.strides().back()),
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             rwork.data()
         );
 
@@ -654,21 +654,21 @@ namespace lapack
         auto N = A.shape()[0];
         uvector<value_type> work(1);
         uvector<underlying_value_type> rwork(1);
-        uvector<XBLAS_INDEX> iwork(1);
+        uvector<blas_index_t> iwork(1);
 
-        int info = cxxlapack::heevd<XBLAS_INDEX>(
+        int info = cxxlapack::heevd<blas_index_t>(
             jobz,
             uplo,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             w.raw_data(),
             work.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             rwork.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             iwork.data(),
-            (XBLAS_INDEX) -1
+            static_cast<blas_index_t>(-1)
         );
 
         if (info != 0)
@@ -680,48 +680,48 @@ namespace lapack
         rwork.resize(std::size_t(rwork[0]));
         iwork.resize(std::size_t(iwork[0]));
 
-        info = cxxlapack::heevd<XBLAS_INDEX>(
+        info = cxxlapack::heevd<blas_index_t>(
             jobz,
             uplo,
-            (XBLAS_INDEX) N,
+            static_cast<blas_index_t>(N),
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             w.raw_data(),
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             rwork.data(),
-            (XBLAS_INDEX) rwork.size(),
+            static_cast<blas_index_t>(rwork.size()),
             iwork.data(),
-            (XBLAS_INDEX) iwork.size()
+            static_cast<blas_index_t>(iwork.size())
         );
 
         return info;
     }
 
     template <class E, class F, class S, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
-    int gelsd(E& A, F& b, S& s, XBLAS_INDEX& rank, double rcond)
+    int gelsd(E& A, F& b, S& s, blas_index_t& rank, double rcond)
     {
         using value_type = typename E::value_type;
 
         uvector<value_type> work(1);
-        uvector<XBLAS_INDEX> iwork(1);
+        uvector<blas_index_t> iwork(1);
 
-        XBLAS_INDEX b_dim = b.dimension() > 1 ? (XBLAS_INDEX) b.shape().back() : 1;
-        XBLAS_INDEX b_stride = b_dim == 1 ? (XBLAS_INDEX) b.shape().front() : (XBLAS_INDEX) b.strides().back();
+        blas_index_t b_dim = b.dimension() > 1 ? static_cast<blas_index_t>(b.shape().back()) : 1;
+        blas_index_t b_stride = b_dim == 1 ? static_cast<blas_index_t>(b.shape().front()) : static_cast<blas_index_t>(b.strides().back());
 
-        int info = cxxlapack::gelsd<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        int info = cxxlapack::gelsd<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             b_dim,
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             b.raw_data(),
             b_stride,
             s.raw_data(),
             rcond,
             rank,
             work.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             iwork.data()
         );
 
@@ -733,19 +733,19 @@ namespace lapack
         work.resize(std::size_t(work[0]));
         iwork.resize(std::size_t(iwork[0]));
 
-        info = cxxlapack::gelsd<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        info = cxxlapack::gelsd<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             b_dim,
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             b.raw_data(),
             b_stride,
             s.raw_data(),
             rcond,
             rank,
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             iwork.data()
         );
 
@@ -753,31 +753,31 @@ namespace lapack
     }
 
     template <class E, class F, class S, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
-    int gelsd(E& A, F& b, S& s, XBLAS_INDEX& rank, double rcond = -1)
+    int gelsd(E& A, F& b, S& s, blas_index_t& rank, double rcond = -1)
     {
         using value_type = typename E::value_type;
         using underlying_value_type = typename value_type::value_type;
 
         uvector<value_type> work(1);
         uvector<underlying_value_type> rwork(1);
-        uvector<XBLAS_INDEX> iwork(1);
+        uvector<blas_index_t> iwork(1);
 
-        XBLAS_INDEX b_dim = b.dimension() > 1 ? (XBLAS_INDEX) b.shape().back() : 1;
-        XBLAS_INDEX b_stride = b_dim == 1 ? (XBLAS_INDEX) b.shape().front() : (XBLAS_INDEX) b.strides().back();
+        blas_index_t b_dim = b.dimension() > 1 ? static_cast<blas_index_t>(b.shape().back()) : 1;
+        blas_index_t b_stride = b_dim == 1 ? static_cast<blas_index_t>(b.shape().front()) : static_cast<blas_index_t>(b.strides().back());
 
-        int info = cxxlapack::gelsd<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        int info = cxxlapack::gelsd<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             b_dim,
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             b.raw_data(),
             b_stride,
             s.raw_data(),
             rcond,
             rank,
             work.data(),
-            (XBLAS_INDEX) -1,
+            static_cast<blas_index_t>(-1),
             rwork.data(),
             iwork.data()
         );
@@ -791,19 +791,19 @@ namespace lapack
         rwork.resize(std::size_t(rwork[0]));
         iwork.resize(std::size_t(iwork[0]));
 
-        info = cxxlapack::gelsd<XBLAS_INDEX>(
-            (XBLAS_INDEX) A.shape()[0],
-            (XBLAS_INDEX) A.shape()[1],
+        info = cxxlapack::gelsd<blas_index_t>(
+            static_cast<blas_index_t>(A.shape()[0]),
+            static_cast<blas_index_t>(A.shape()[1]),
             b_dim,
             A.raw_data(),
-            (XBLAS_INDEX) A.strides().back(),
+            static_cast<blas_index_t>(A.strides().back()),
             b.raw_data(),
             b_stride,
             s.raw_data(),
             rcond,
             rank,
             work.data(),
-            (XBLAS_INDEX) work.size(),
+            static_cast<blas_index_t>(work.size()),
             rwork.data(),
             iwork.data()
         );

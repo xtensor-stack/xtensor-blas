@@ -9,7 +9,7 @@
 #ifndef XBLAS_UTILS_HPP
 #define XBLAS_UTILS_HPP
 
-#include "cxxblas/typedefs.h"
+#include "xflens/cxxblas/typedefs.h"
 #include "xtensor/xutils.hpp"
 
 namespace xt

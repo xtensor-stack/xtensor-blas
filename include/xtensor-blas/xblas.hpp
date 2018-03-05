@@ -20,7 +20,7 @@
 #include "xtensor-blas/xblas_config.hpp"
 #include "xtensor-blas/xblas_utils.hpp"
 
-#include "cxxblas/cxxblas.cxx"
+#include "xflens/cxxblas/cxxblas.cxx"
 
 namespace xt
 {
@@ -39,10 +39,10 @@ namespace blas
         auto&& ad = view_eval<E::static_layout>(a.derived_cast());
         XTENSOR_ASSERT(ad.dimension() == 1);
 
-        cxxblas::asum<BLAS_IDX>(
-            (BLAS_IDX) ad.shape()[0],
+        cxxblas::asum<blas_index_t>(
+            static_cast<blas_index_t>(ad.shape()[0]),
             ad.raw_data() + ad.raw_data_offset(),
-            (BLAS_IDX) ad.strides().front(),
+            static_cast<blas_index_t>(ad.strides().front()),
             result
         );
     }
@@ -59,10 +59,10 @@ namespace blas
         auto&& ad = view_eval<E::static_layout>(a.derived_cast());
         XTENSOR_ASSERT(ad.dimension() == 1);
 
-        cxxblas::nrm2<BLAS_IDX>(
-            (BLAS_IDX) ad.shape()[0],
+        cxxblas::nrm2<blas_index_t>(
+            static_cast<blas_index_t>(ad.shape()[0]),
             ad.raw_data() + ad.raw_data_offset(),
-            (BLAS_IDX) ad.strides().front(),
+            static_cast<blas_index_t>(ad.strides().front()),
             result
         );
     }
@@ -83,12 +83,12 @@ namespace blas
         auto&& bd = view_eval<E2::static_layout>(b.derived_cast());
         XTENSOR_ASSERT(ad.dimension() == 1);
 
-        cxxblas::dot<BLAS_IDX>(
-            (BLAS_IDX) ad.shape()[0],
+        cxxblas::dot<blas_index_t>(
+            static_cast<blas_index_t>(ad.shape()[0]),
             ad.raw_data() + ad.raw_data_offset(),
-            (BLAS_IDX) ad.strides().front(),
+            static_cast<blas_index_t>(ad.strides().front()),
             bd.raw_data() + bd.raw_data_offset(),
-            (BLAS_IDX) bd.strides().front(),
+            static_cast<blas_index_t>(bd.strides().front()),
             result
         );
     }
@@ -108,12 +108,12 @@ namespace blas
         auto&& bd = view_eval<E2::static_layout>(b.derived_cast());
         XTENSOR_ASSERT(ad.dimension() == 1);
 
-        cxxblas::dotu<BLAS_IDX>(
-            (BLAS_IDX) ad.shape()[0],
+        cxxblas::dotu<blas_index_t>(
+            static_cast<blas_index_t>(ad.shape()[0]),
             ad.raw_data() + ad.raw_data_offset(),
-            (BLAS_IDX) ad.strides().front(),
+            static_cast<blas_index_t>(ad.strides().front()),
             bd.raw_data() + bd.raw_data_offset(),
-            (BLAS_IDX) bd.strides().front(),
+            static_cast<blas_index_t>(bd.strides().front()),
             result
         );
     }
@@ -138,11 +138,11 @@ namespace blas
         auto&& dA = view_eval<E1::static_layout>(A.derived_cast());
         auto&& dx = view_eval<E2::static_layout>(x.derived_cast());
 
-        cxxblas::gemv<BLAS_IDX>(
+        cxxblas::gemv<blas_index_t>(
             get_blas_storage_order(result),
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
-            (BLAS_IDX) dA.shape()[0],
-            (BLAS_IDX) dA.shape()[1],
+            static_cast<blas_index_t>(dA.shape()[0]),
+            static_cast<blas_index_t>(dA.shape()[1]),
             alpha,
             dA.raw_data() + dA.raw_data_offset(),
             get_leading_stride(dA),
@@ -182,13 +182,13 @@ namespace blas
         XTENSOR_ASSERT(dA.dimension() == 2);
         XTENSOR_ASSERT(dB.dimension() == 2);
 
-        cxxblas::gemm<BLAS_IDX>(
+        cxxblas::gemm<blas_index_t>(
             get_blas_storage_order(result),
             transpose_A ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
             transpose_B ? cxxblas::Transpose::Trans : cxxblas::Transpose::NoTrans,
-            (BLAS_IDX) (transpose_A ? dA.shape()[1] : dA.shape()[0]),
-            (BLAS_IDX) (transpose_B ? dB.shape()[0] : dB.shape()[1]),
-            (BLAS_IDX) (transpose_B ? dB.shape()[1] : dB.shape()[0]),
+            static_cast<blas_index_t>(transpose_A ? dA.shape()[1] : dA.shape()[0]),
+            static_cast<blas_index_t>(transpose_B ? dB.shape()[0] : dB.shape()[1]),
+            static_cast<blas_index_t>(transpose_B ? dB.shape()[1] : dB.shape()[0]),
             alpha,
             dA.raw_data() + dA.raw_data_offset(),
             get_leading_stride(dA),
@@ -220,17 +220,17 @@ namespace blas
         XTENSOR_ASSERT(dx.dimension() == 1);
         XTENSOR_ASSERT(dy.dimension() == 1);
 
-        cxxblas::ger<BLAS_IDX>(
+        cxxblas::ger<blas_index_t>(
             get_blas_storage_order(result),
-            (BLAS_IDX) dx.shape()[0],
-            (BLAS_IDX) dy.shape()[0],
+            static_cast<blas_index_t>(dx.shape()[0]),
+            static_cast<blas_index_t>(dy.shape()[0]),
             alpha,
             dx.raw_data() + dx.raw_data_offset(),
-            (BLAS_IDX) dx.strides().front(),
+            static_cast<blas_index_t>(dx.strides().front()),
             dy.raw_data() + dy.raw_data_offset(),
-            (BLAS_IDX) dy.strides().front(),
+            static_cast<blas_index_t>(dy.strides().front()),
             result.raw_data() + result.raw_data_offset(),
-            (BLAS_IDX) result.strides().front()
+            static_cast<blas_index_t>(result.strides().front())
         );
     }
 }
