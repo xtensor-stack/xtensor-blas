@@ -10,8 +10,7 @@ cmake_minimum_required(VERSION 3.1)
 project(xtensor-blas)
 
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set(FLENS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/xtensor-blas/flens)
-set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR} ${FLENS_INCLUDE_DIR})
+set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR})
 
 # Configuration
 # =============
@@ -22,8 +21,8 @@ set(XTENSOR_BLAS_CLING_LIBRARY_DIR_32 "\"${CMAKE_INSTALL_PREFIX}/lib32\"")
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR "\"${CMAKE_INSTALL_PREFIX}/lib\"")
 
 configure_file (
-    "${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp.in"
-    "${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp"
+    "${INCLUDE_DIR}/xtensor-blas/xblas_config_cling.hpp.in"
+    "${INCLUDE_DIR}/xtensor-blas/xblas_config_cling.hpp"
 )
 
 # Versionning
@@ -53,6 +52,7 @@ set(XTENSOR_BLAS_HEADERS
     ${INCLUDE_DIR}/xtensor-blas/xblas.hpp
     ${INCLUDE_DIR}/xtensor-blas/xblas_utils.hpp
     ${INCLUDE_DIR}/xtensor-blas/xblas_config.hpp
+    ${INCLUDE_DIR}/xtensor-blas/xblas_config_cling.hpp
     ${INCLUDE_DIR}/xtensor-blas/xlapack.hpp
     ${INCLUDE_DIR}/xtensor-blas/xlinalg.hpp
 )
@@ -99,8 +99,8 @@ include(CMakePackageConfigHelpers)
 install(FILES ${XTENSOR_BLAS_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas)
 
-install(DIRECTORY ${FLENS_INCLUDE_DIR}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas/flens)
+install(DIRECTORY ${INCLUDE_DIR}/xflens
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xflens)
 
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
 set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}" CACHE STRING "install path for xtensor-blasConfig.cmake")

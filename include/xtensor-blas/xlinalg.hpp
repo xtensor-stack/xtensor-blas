@@ -247,7 +247,7 @@ namespace linalg
     {
         auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
-        uvector<XBLAS_INDEX> piv(std::min(dA.shape()[0], dA.shape()[1]));
+        uvector<blas_index_t> piv(std::min(dA.shape()[0], dA.shape()[1]));
 
         int info = lapack::getrf(dA, piv);
         if (info != 0)
@@ -636,22 +636,22 @@ namespace linalg
 
                 result.resize({t.shape()[0]});
 
-                BLAS_IDX shape_x, shape_y;
+                blas_index_t shape_x, shape_y;
                 cxxblas::Transpose trans;
                 if (result.layout() != t.layout())
                 {
-                    shape_x = (BLAS_IDX) t.shape()[1];
-                    shape_y = (BLAS_IDX) t.shape()[0];
+                    shape_x = static_cast<blas_index_t>(t.shape()[1]);
+                    shape_y = static_cast<blas_index_t>(t.shape()[0]);
                     trans = cxxblas::Transpose::Trans;
                 }
                 else
                 {
-                    shape_x = (BLAS_IDX) t.shape()[0];
-                    shape_y = (BLAS_IDX) t.shape()[1];
+                    shape_x = static_cast<blas_index_t>(t.shape()[0]);
+                    shape_y = static_cast<blas_index_t>(t.shape()[1]);
                     trans = cxxblas::Transpose::NoTrans;
                 }
 
-                cxxblas::gemv<BLAS_IDX>(
+                cxxblas::gemv<blas_index_t>(
                     get_blas_storage_order(result),
                     trans,
                     shape_x,
@@ -678,22 +678,22 @@ namespace linalg
 
                 result.resize({o.shape()[1]});
 
-                BLAS_IDX shape_x, shape_y;
+                blas_index_t shape_x, shape_y;
                 cxxblas::Transpose trans;
                 if (result.layout() != o.layout())
                 {
-                    shape_x = (BLAS_IDX) o.shape()[1];
-                    shape_y = (BLAS_IDX) o.shape()[0];
+                    shape_x = static_cast<blas_index_t>(o.shape()[1]);
+                    shape_y = static_cast<blas_index_t>(o.shape()[0]);
                     trans = cxxblas::Transpose::NoTrans;
                 }
                 else
                 {
-                    shape_x = (BLAS_IDX) o.shape()[0];
-                    shape_y = (BLAS_IDX) o.shape()[1];
+                    shape_x = static_cast<blas_index_t>(o.shape()[0]);
+                    shape_y = static_cast<blas_index_t>(o.shape()[1]);
                     trans = cxxblas::Transpose::Trans;
                 }
 
-                cxxblas::gemv<BLAS_IDX>(
+                cxxblas::gemv<blas_index_t>(
                     get_blas_storage_order(result),
                     trans,
                     shape_x,
@@ -740,12 +740,12 @@ namespace linalg
                 {
                     result.resize({t.shape()[0], t.shape()[0]});
 
-                    cxxblas::syrk<BLAS_IDX>(
+                    cxxblas::syrk<blas_index_t>(
                         get_blas_storage_order(result),
                         cxxblas::StorageUpLo::Upper,
                         transpose_A,
-                        (BLAS_IDX) t.shape()[0],
-                        (BLAS_IDX) t.shape()[1],
+                        static_cast<blas_index_t>(t.shape()[0]),
+                        static_cast<blas_index_t>(t.shape()[1]),
                         value_type(1.0),
                         t.raw_data() + t.raw_data_offset(),
                         get_leading_stride(t),
@@ -766,13 +766,13 @@ namespace linalg
 
                 result.resize({t.shape()[0], o.shape()[1]});
 
-                cxxblas::gemm<BLAS_IDX>(
+                cxxblas::gemm<blas_index_t>(
                     get_blas_storage_order(result),
                     transpose_A,
                     transpose_B,
-                    (BLAS_IDX) t.shape()[0],
-                    (BLAS_IDX) o.shape()[1],
-                    (BLAS_IDX) o.shape()[0],
+                    static_cast<blas_index_t>(t.shape()[0]),
+                    static_cast<blas_index_t>(o.shape()[1]),
+                    static_cast<blas_index_t>(o.shape()[0]),
                     value_type(1.0),
                     t.raw_data() + t.raw_data_offset(),
                     get_leading_stride(t),
@@ -798,19 +798,19 @@ namespace linalg
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
-                BLAS_IDX a_dim = (BLAS_IDX) t.dimension();
-                BLAS_IDX b_dim = (BLAS_IDX) o.dimension();
+                blas_index_t a_dim = static_cast<blas_index_t>(t.dimension());
+                blas_index_t b_dim = static_cast<blas_index_t>(o.dimension());
 
-                BLAS_IDX nd = a_dim + b_dim - 2;
+                blas_index_t nd = a_dim + b_dim - 2;
 
                 std::size_t j = 0;
                 std::vector<std::size_t> dimensions((std::size_t) nd);
 
-                for (BLAS_IDX i = 0; i < a_dim - 1; ++i)
+                for (blas_index_t i = 0; i < a_dim - 1; ++i)
                 {
                     dimensions[j++] = t.shape()[i];
                 }
-                for (BLAS_IDX i = 0; i < b_dim - 2; ++i)
+                for (blas_index_t i = 0; i < b_dim - 2; ++i)
                 {
                     dimensions[j++] = o.shape()[i];
                 }
@@ -821,8 +821,8 @@ namespace linalg
 
                 result.resize(dimensions);
 
-                BLAS_IDX a_stride = (BLAS_IDX) t.strides().back();
-                BLAS_IDX b_stride = (BLAS_IDX) o.strides()[match_dim];
+                blas_index_t a_stride = static_cast<blas_index_t>(t.strides().back());
+                blas_index_t b_stride = static_cast<blas_index_t>(o.strides()[match_dim]);
 
                 auto a_iter = detail::offset_iter_without_axis<std::decay_t<decltype(t)>>(t, t.dimension() - 1);
                 auto b_iter = detail::offset_iter_without_axis<std::decay_t<decltype(o)>>(o, match_dim);
@@ -834,8 +834,8 @@ namespace linalg
                 {
                     do
                     {
-                        cxxblas::dot<BLAS_IDX>(
-                            (BLAS_IDX) l,
+                        cxxblas::dot<blas_index_t>(
+                            static_cast<blas_index_t>(l),
                             t.raw_data() + a_iter.offset(),
                             a_stride,
                             o.raw_data() + b_iter.offset(),
@@ -930,7 +930,7 @@ namespace linalg
         using value_type = typename T::value_type;
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
 
-        uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
+        uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
         int res = lapack::getrf(LU, piv);
 
@@ -966,7 +966,7 @@ namespace linalg
         using value_type = typename T::value_type;
 
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
-        uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
+        uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
         int info = lapack::getrf(LU, piv);
 
@@ -999,7 +999,7 @@ namespace linalg
     {
         using value_type = typename T::value_type;
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
-        uvector<XBLAS_INDEX> piv(std::min(LU.shape()[0], LU.shape()[1]));
+        uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
         int info = lapack::getrf(LU, piv);
 
@@ -1036,7 +1036,7 @@ namespace linalg
     namespace detail
     {
         template <class E, class T>
-        inline auto call_gqr(E& A, T& tau, XBLAS_INDEX n)
+        inline auto call_gqr(E& A, T& tau, blas_index_t n)
             -> std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>
         {
             int info = lapack::orgqr(A, tau, n);
@@ -1047,7 +1047,7 @@ namespace linalg
         }
 
         template <class E, class T>
-        inline auto call_gqr(E& A, T& tau, XBLAS_INDEX n)
+        inline auto call_gqr(E& A, T& tau, blas_index_t n)
             -> std::enable_if_t<xtl::is_complex<typename E::value_type>::value>
         {
             int info = lapack::ungqr(A, tau, n);
@@ -1103,7 +1103,7 @@ namespace linalg
         if (mode == qrmode::reduced)
         {
             Q = R;
-            detail::call_gqr(Q, tau, (XBLAS_INDEX) K);
+            detail::call_gqr(Q, tau, static_cast<blas_index_t>(K));
             auto vR = view(R, range(std::size_t(0), K), all());
             R = vR;
         }
@@ -1118,7 +1118,7 @@ namespace linalg
                     Q(i, j) = R(i, j);
                 }
             }
-            detail::call_gqr(Q, tau, (XBLAS_INDEX) M);
+            detail::call_gqr(Q, tau, static_cast<blas_index_t>(M));
         }
 
         for (std::size_t i = 0; i < R.shape()[0]; ++i)
@@ -1435,7 +1435,7 @@ namespace linalg
 
         auto s = xtensor<underlying_value_type, 1, layout_type::column_major>::from_shape({ std::min(M, N) });
 
-        XBLAS_INDEX rank;
+        blas_index_t rank;
 
         int info = lapack::gelsd(dA, db, s, rank, rcond);
 
