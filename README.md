@@ -2,20 +2,19 @@
 
 [![Travis](https://travis-ci.org/QuantStack/xtensor-blas.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor-blas)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor-blas)
-[![Documentation Status](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
+[![Documentation](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.4?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Introduction
 
 **xtensor-blas is an early developer preview, and is not suitable for general usage yet. Features and implementation are subject to change.**
 
-`xtensor-blas` is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries 
-through cxxblas and cxxlapack from the [FLENS](https://github.com/michael-lehn/FLENS) project.
+`xtensor-blas` is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the [FLENS](https://github.com/michael-lehn/FLENS) project.
 
 `xtensor-blas` currently provides non-broadcasting `dot`, `norm` (1- and 2-norm for vectors), `inverse`, `solve`,
 `eig`, `cross`, `det`, `slogdet`, `matrix_rank`, `inv`, `cholesky`, `qr`, `svd` in the `xt::linalg` namespace (check the corresponding `xlinalg.hpp` header for the function signatures). The functions, and signatures, are trying to be 1-to-1 equivalent to NumPy.
-Low-level functions to interface with BLAS or LAPACK with xtensor containers are also offered 
-in the `blas` and `lapack` namespace.
+Low-level functions to interface with BLAS or LAPACK with xtensor containers are also offered in the `blas` and `lapack` namespace.
 
 `xtensor` and `xtensor-blas` require a modern C++ compiler supporting C++14. The following C++ compilers are supported:
 
@@ -53,8 +52,9 @@ which are also available on conda-forge.
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
 | master          |  ^0.15.4  |
+| 0.10.0          |  ^0.15.4  |
 | 0.9.0           |  ^0.15.4  |
-| 0.8.0           |  ^0.15.0  |
+| 0.8.x           |  ^0.15.0  |
 | 0.7.0           |  ^0.14.0  |
 | 0.6.1           |  ^0.13.2  |
 | 0.5.0           |  ^0.11.0  |
