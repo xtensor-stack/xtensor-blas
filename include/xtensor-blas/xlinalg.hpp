@@ -101,7 +101,7 @@ namespace linalg
         {
             if (ord == 1 || ord == -1)
             {
-                xtensor<underlying_value_type, 1> s = xt::sum(xt::abs(v), {0});
+                xtensor<underlying_value_type, 1> s = sum(abs(v), {0});
                 if (ord == 1)
                 {
                     return *std::max_element(s.begin(), s.end());
@@ -297,12 +297,10 @@ namespace linalg
 
         std::size_t N = M.shape()[0];
         std::array<std::size_t, 1> vN = {N};
-        xtensor<value_type, 1, layout_type::column_major> wr(vN);
-        xtensor<value_type, 1, layout_type::column_major> wi(vN);
+        xtensor<value_type, 1, layout_type::column_major> wr(vN), wi(vN);
 
         std::array<std::size_t, 2> shp = {N, N};
-        xtensor<value_type, 2, layout_type::column_major> VL(shp);
-        xtensor<value_type, 2, layout_type::column_major> VR(shp);
+        xtensor<value_type, 2, layout_type::column_major> VL(shp), VR(shp);
 
         // jobvl N: left eigenvectors of A are not computed
         // jobvr V: then right eigenvectors of A are computed
@@ -352,8 +350,7 @@ namespace linalg
         xtensor<value_type, 1, layout_type::column_major> w(vN);
 
         std::array<std::size_t, 2> shp({N, N});
-        xtensor<value_type, 2, layout_type::column_major> VL(shp);
-        xtensor<value_type, 2, layout_type::column_major> VR(shp);
+        xtensor<value_type, 2, layout_type::column_major> VL(shp), VR(shp);
 
         // jobvl N: left eigenvectors of A are not computed
         // jobvr V: then right eigenvectors of A are computed
@@ -732,12 +729,15 @@ namespace linalg
                     transpose_B = cxxblas::Transpose::Trans;
                 }
 
-                // TODO add check to compare strides & shape
+                // This adds a fast path for A * A' by calling SYRK and only computing
+                // the upper triangle
                 if (std::is_same<typename T::value_type, typename O::value_type>::value &&
                     (static_cast<const void*>(t.raw_data() + t.raw_data_offset()) == static_cast<const void*>(o.raw_data() + o.raw_data_offset())) &&
                     ((transpose_A == cxxblas::Transpose::Trans && transpose_B == cxxblas::Transpose::NoTrans) ||
                      (transpose_A == cxxblas::Transpose::NoTrans && transpose_B == cxxblas::Transpose::Trans)))
                 {
+                    // TODO add check to compare strides & shape
+
                     result.resize({t.shape()[0], t.shape()[0]});
 
                     cxxblas::syrk<blas_index_t>(
@@ -1366,7 +1366,7 @@ namespace linalg
      * @param tol tolerance for finding rank
      */
     template <class T>
-    int matrix_rank(const xexpression<T>& m, double tol = -1)
+    int matrix_rank(const xexpression<T>& m, double tol = -1.0)
     {
         using value_type = typename T::value_type;
         xtensor<value_type, 2, layout_type::column_major> M = m.derived_cast();
@@ -1375,9 +1375,9 @@ namespace linalg
         auto s = std::get<1>(svd_res);
         auto max_el = std::max_element(s.begin(), s.end());
 
-        if (tol == -1)
+        if (tol == -1.0)
         {
-            tol = (*max_el) * (double) std::max(M.shape()[0], M.shape()[1]) * std::numeric_limits<value_type>::epsilon();
+            tol = (*max_el) * static_cast<double>(std::max(M.shape()[0], M.shape()[1])) * std::numeric_limits<value_type>::epsilon();
         }
 
         int sm = 0;
@@ -1410,7 +1410,7 @@ namespace linalg
      *         \em s singular values of \em A
      */
     template <class T, class E>
-    auto lstsq(const xexpression<T>& A, const xexpression<E>& b, double rcond = -1)
+    auto lstsq(const xexpression<T>& A, const xexpression<E>& b, double rcond = -1.0)
     {
         using value_type = typename T::value_type;
         using underlying_value_type = xtl::complex_value_type_t<typename T::value_type>;
