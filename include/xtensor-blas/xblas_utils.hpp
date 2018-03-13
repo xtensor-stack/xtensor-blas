@@ -115,7 +115,7 @@ namespace xt
         }
         else
         {
-            throw std::runtime_error("No valid layout chosen.");
+            return static_cast<int>(*std::min_element(a.strides().begin(), a.strides().end()));
         }
     }
 
