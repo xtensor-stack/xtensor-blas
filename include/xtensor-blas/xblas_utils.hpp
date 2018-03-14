@@ -12,6 +12,14 @@
 #include "xflens/cxxblas/typedefs.h"
 #include "xtensor/xutils.hpp"
 
+#ifndef DEFAULT_LEADING_STRIDE_BEHAVIOR
+#define DEFAULT_LEADING_STRIDE_BEHAVIOR throw std::runtime_error("No valid layout chosen.");
+#endif
+
+#ifndef DEFAULT_STORAGE_ORDER_BEHAVIOR
+#define DEFAULT_STORAGE_ORDER_BEHAVIOR throw std::runtime_error("Cannot handle layout_type of e.");
+#endif
+
 namespace xt
 {
     template <layout_type L = layout_type::row_major, class T>
@@ -83,7 +91,7 @@ namespace xt
         {
             return cxxblas::StorageOrder::ColMajor;
         }
-        throw std::runtime_error("Cannot handle layout_type of e.");
+        DEFAULT_STORAGE_ORDER_BEHAVIOR;
     }
 
     /**
@@ -113,10 +121,7 @@ namespace xt
         {
             return static_cast<BLAS_IDX>(a.strides().back() == 0 ? a.shape().front() : a.strides().back());
         }
-        else
-        {
-            return static_cast<BLAS_IDX>(*std::min_element(a.strides().begin(), a.strides().end()));
-        }
+        DEFAULT_LEADING_STRIDE_BEHAVIOR;
     }
 
     /*******************************
