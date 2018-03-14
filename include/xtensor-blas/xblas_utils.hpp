@@ -12,6 +12,14 @@
 #include "xflens/cxxblas/typedefs.h"
 #include "xtensor/xutils.hpp"
 
+#ifndef DEFAULT_LEADING_STRIDE_BEHAVIOR
+#define DEFAULT_LEADING_STRIDE_BEHAVIOR throw std::runtime_error("No valid layout chosen.");
+#endif
+
+#ifndef DEFAULT_STORAGE_ORDER_BEHAVIOR
+#define DEFAULT_STORAGE_ORDER_BEHAVIOR throw std::runtime_error("Cannot handle layout_type of e.");
+#endif
+
 namespace xt
 {
     template <layout_type L = layout_type::row_major, class T>
@@ -83,7 +91,7 @@ namespace xt
         {
             return cxxblas::StorageOrder::ColMajor;
         }
-        throw std::runtime_error("Cannot handle layout_type of e.");
+        DEFAULT_STORAGE_ORDER_BEHAVIOR;
     }
 
     /**
@@ -93,13 +101,13 @@ namespace xt
     template <class A, std::enable_if_t<A::static_layout == layout_type::row_major>* = nullptr>
     inline BLAS_IDX get_leading_stride(const A& a)
     {
-        return (BLAS_IDX) (a.strides().front() == 0 ? a.shape().back() : a.strides().front());
+        return static_cast<BLAS_IDX>(a.strides().front() == 0 ? a.shape().back() : a.strides().front());
     }
 
     template <class A, std::enable_if_t<A::static_layout == layout_type::column_major>* = nullptr>
     inline BLAS_IDX get_leading_stride(const A& a)
     {
-        return (BLAS_IDX) (a.strides().back() == 0 ? a.shape().front() : a.strides().back());
+        return static_cast<BLAS_IDX>(a.strides().back() == 0 ? a.shape().front() : a.strides().back());
     }
 
     template <class A, std::enable_if_t<A::static_layout != layout_type::row_major && A::static_layout != layout_type::column_major>* = nullptr>
@@ -107,16 +115,13 @@ namespace xt
     {
         if (a.layout() == layout_type::row_major)
         {
-            return (BLAS_IDX) (a.strides().front() == 0 ? a.shape().back() : a.strides().front());
+            return static_cast<BLAS_IDX>(a.strides().front() == 0 ? a.shape().back() : a.strides().front());
         }
         else if (a.layout() == layout_type::column_major)
         {
-            return (BLAS_IDX) (a.strides().back() == 0 ? a.shape().front() : a.strides().back());
+            return static_cast<BLAS_IDX>(a.strides().back() == 0 ? a.shape().front() : a.strides().back());
         }
-        else
-        {
-            throw std::runtime_error("No valid layout chosen.");
-        }
+        DEFAULT_LEADING_STRIDE_BEHAVIOR;
     }
 
     /*******************************
