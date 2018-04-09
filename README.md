@@ -8,8 +8,6 @@
 
 ## Introduction
 
-**xtensor-blas is an early developer preview, and is not suitable for general usage yet. Features and implementation are subject to change.**
-
 `xtensor-blas` is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the [FLENS](https://github.com/michael-lehn/FLENS) project.
 
 `xtensor-blas` currently provides non-broadcasting `dot`, `norm` (1- and 2-norm for vectors), `inverse`, `solve`,
@@ -52,6 +50,7 @@ which are also available on conda-forge.
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
 | master          |  ^0.15.4  |
+| 0.10.1          |  ^0.15.4  |
 | 0.10.0          |  ^0.15.4  |
 | 0.9.0           |  ^0.15.4  |
 | 0.8.x           |  ^0.15.0  |
