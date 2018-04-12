@@ -9,10 +9,13 @@
 Performance and Linking
 =======================
 
-For optimal performance, the target program **has** to  be linked against
-a BLAS implementation. The BLAS implementation that we install by default
+For optimal performance, the target program **has** to be linked against
+a `BLAS <https://en.wikipedia.org/wiki/Basic_Linear_Algebra_Subprograms>`_
+implementation. The BLAS implementation that we install by default
 with conda is ``OpenBLAS``, but other options, such as ``MKL`` are available
-on conda, too.
+on conda, too. If xtensor-blas was not installed from conda, the user has
+to manually verify that a BLAS and `LAPACK <https://en.wikipedia.org/wiki/LAPACK>`_
+implementation is available.
 Additionally, the compile time define ``-DHAVE_CBLAS`` should be enabled,
 otherwise FLENS will use the slower internal implementation.
 
