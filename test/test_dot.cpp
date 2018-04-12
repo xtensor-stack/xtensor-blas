@@ -3,6 +3,7 @@
 #include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xstrided_view.hpp"
+#include "xtensor/xio.hpp"
 
 #include "xtensor-blas/xlinalg.hpp"
 
@@ -177,4 +178,11 @@ namespace xt
         EXPECT_EQ(b * 3, r3);
     }
 
+    TEST(xdot, xview)
+    {
+        xarray<double> a = xt::ones<double>({3, 3, 3});
+        xarray<double> b = xt::ones<double>({3, 3, 3}) * 2;
+        auto res = xt::linalg::dot(xt::view(a, 0), xt::view(b, 1));
+
+    }
 }
