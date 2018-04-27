@@ -43,6 +43,19 @@ To build the tests or actually use `xtensor-blas`, you will need binaries for
 
 which are also available on conda-forge.
 
+## Trying it online
+
+To try out xtensor-blas interactively in your web browser, just click on the binder
+link:
+
+[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.6?filepath=notebooks/xtensor.ipynb)
+
+## Documentation
+
+To get started with using `xtensor-blas`, check out the full documentation
+
+http://xtensor-blas.readthedocs.io/
+
 ## Dependency on `xtensor`
 
 `xtensor-blas` depends on the `xtensor` package
