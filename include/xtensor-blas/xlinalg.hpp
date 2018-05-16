@@ -595,7 +595,7 @@ namespace linalg
         using return_type = std::conditional_t<(T::static_layout == O::static_layout) &&
                                                (T::static_layout != layout_type::dynamic && T::static_layout != layout_type::any),
                                                xarray<value_type, T::static_layout>,
-                                               xarray<value_type, DEFAULT_LAYOUT>>;
+                                               xarray<value_type, XTENSOR_DEFAULT_LAYOUT>>;
         return_type result;
 
         auto&& t = view_eval<T::static_layout>(xt.derived_cast());
@@ -654,12 +654,12 @@ namespace linalg
                     shape_x,
                     shape_y,
                     value_type(1.0),
-                    t.raw_data() + t.raw_data_offset(),
+                    t.data() + t.data_offset(),
                     get_leading_stride(t),
-                    o.raw_data() + o.raw_data_offset(),
+                    o.data() + o.data_offset(),
                     get_leading_stride(o),
                     value_type(0.0),
-                    result.raw_data(),
+                    result.data(),
                     get_leading_stride(result)
                 );
             }
@@ -696,12 +696,12 @@ namespace linalg
                     shape_x,
                     shape_y,
                     value_type(1.0),
-                    o.raw_data() + o.raw_data_offset(),
+                    o.data() + o.data_offset(),
                     get_leading_stride(o),
-                    t.raw_data() + t.raw_data_offset(),
+                    t.data() + t.data_offset(),
                     get_leading_stride(t),
                     value_type(0.0),
-                    result.raw_data(),
+                    result.data(),
                     get_leading_stride(result)
                 );
             }
@@ -732,7 +732,7 @@ namespace linalg
                 // This adds a fast path for A * A' by calling SYRK and only computing
                 // the upper triangle
                 if (std::is_same<typename T::value_type, typename O::value_type>::value &&
-                    (static_cast<const void*>(t.raw_data() + t.raw_data_offset()) == static_cast<const void*>(o.raw_data() + o.raw_data_offset())) &&
+                    (static_cast<const void*>(t.data() + t.data_offset()) == static_cast<const void*>(o.data() + o.data_offset())) &&
                     ((transpose_A == cxxblas::Transpose::Trans && transpose_B == cxxblas::Transpose::NoTrans) ||
                      (transpose_A == cxxblas::Transpose::NoTrans && transpose_B == cxxblas::Transpose::Trans)))
                 {
@@ -747,10 +747,10 @@ namespace linalg
                         static_cast<blas_index_t>(t.shape()[0]),
                         static_cast<blas_index_t>(t.shape()[1]),
                         value_type(1.0),
-                        t.raw_data() + t.raw_data_offset(),
+                        t.data() + t.data_offset(),
                         get_leading_stride(t),
                         value_type(0.0),
-                        result.raw_data(),
+                        result.data(),
                         get_leading_stride(result)
                     );
 
@@ -774,12 +774,12 @@ namespace linalg
                     static_cast<blas_index_t>(o.shape()[1]),
                     static_cast<blas_index_t>(o.shape()[0]),
                     value_type(1.0),
-                    t.raw_data() + t.raw_data_offset(),
+                    t.data() + t.data_offset(),
                     get_leading_stride(t),
-                    o.raw_data() + o.raw_data_offset(),
+                    o.data() + o.data_offset(),
                     get_leading_stride(o),
                     value_type(0.0),
-                    result.raw_data(),
+                    result.data(),
                     get_leading_stride(result)
                 );
             }
@@ -836,9 +836,9 @@ namespace linalg
                     {
                         cxxblas::dot<blas_index_t>(
                             static_cast<blas_index_t>(l),
-                            t.raw_data() + a_iter.offset(),
+                            t.data() + a_iter.offset(),
                             a_stride,
-                            o.raw_data() + b_iter.offset(),
+                            o.data() + b_iter.offset(),
                             b_stride,
                             temp
                         );
@@ -1423,7 +1423,7 @@ namespace linalg
         {
             std::size_t sz = db_t.shape()[0];
             db.resize({sz, 1});
-            std::copy(db_t.data().begin(), db_t.data().end(), db.data().begin());
+            std::copy(db_t.storage().begin(), db_t.storage().end(), db.storage().begin());
         }
         else
         {
