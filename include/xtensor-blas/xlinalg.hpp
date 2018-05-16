@@ -23,6 +23,7 @@
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
+#include "xtensor/xview.hpp"
 
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlapack.hpp"
