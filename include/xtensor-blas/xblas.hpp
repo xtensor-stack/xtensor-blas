@@ -41,7 +41,7 @@ namespace blas
 
         cxxblas::asum<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
-            ad.raw_data() + ad.raw_data_offset(),
+            ad.data() + ad.data_offset(),
             static_cast<blas_index_t>(ad.strides().front()),
             result
         );
@@ -61,7 +61,7 @@ namespace blas
 
         cxxblas::nrm2<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
-            ad.raw_data() + ad.raw_data_offset(),
+            ad.data() + ad.data_offset(),
             static_cast<blas_index_t>(ad.strides().front()),
             result
         );
@@ -85,9 +85,9 @@ namespace blas
 
         cxxblas::dot<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
-            ad.raw_data() + ad.raw_data_offset(),
+            ad.data() + ad.data_offset(),
             static_cast<blas_index_t>(ad.strides().front()),
-            bd.raw_data() + bd.raw_data_offset(),
+            bd.data() + bd.data_offset(),
             static_cast<blas_index_t>(bd.strides().front()),
             result
         );
@@ -110,9 +110,9 @@ namespace blas
 
         cxxblas::dotu<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
-            ad.raw_data() + ad.raw_data_offset(),
+            ad.data() + ad.data_offset(),
             static_cast<blas_index_t>(ad.strides().front()),
-            bd.raw_data() + bd.raw_data_offset(),
+            bd.data() + bd.data_offset(),
             static_cast<blas_index_t>(bd.strides().front()),
             result
         );
@@ -144,12 +144,12 @@ namespace blas
             static_cast<blas_index_t>(dA.shape()[0]),
             static_cast<blas_index_t>(dA.shape()[1]),
             alpha,
-            dA.raw_data() + dA.raw_data_offset(),
+            dA.data() + dA.data_offset(),
             get_leading_stride(dA),
-            dx.raw_data() + dx.raw_data_offset(),
+            dx.data() + dx.data_offset(),
             get_leading_stride(dx),
             beta,
-            result.raw_data() + result.raw_data_offset(),
+            result.data() + result.data_offset(),
             get_leading_stride(result)
         );
     }
@@ -190,12 +190,12 @@ namespace blas
             static_cast<blas_index_t>(transpose_B ? dB.shape()[0] : dB.shape()[1]),
             static_cast<blas_index_t>(transpose_B ? dB.shape()[1] : dB.shape()[0]),
             alpha,
-            dA.raw_data() + dA.raw_data_offset(),
+            dA.data() + dA.data_offset(),
             get_leading_stride(dA),
-            dB.raw_data() + dB.raw_data_offset(),
+            dB.data() + dB.data_offset(),
             get_leading_stride(dB),
             beta,
-            result.raw_data() + result.raw_data_offset(),
+            result.data() + result.data_offset(),
             get_leading_stride(result)
         );
     }
@@ -225,11 +225,11 @@ namespace blas
             static_cast<blas_index_t>(dx.shape()[0]),
             static_cast<blas_index_t>(dy.shape()[0]),
             alpha,
-            dx.raw_data() + dx.raw_data_offset(),
+            dx.data() + dx.data_offset(),
             static_cast<blas_index_t>(dx.strides().front()),
-            dy.raw_data() + dy.raw_data_offset(),
+            dy.data() + dy.data_offset(),
             static_cast<blas_index_t>(dy.strides().front()),
-            result.raw_data() + result.raw_data_offset(),
+            result.data() + result.data_offset(),
             static_cast<blas_index_t>(result.strides().front())
         );
     }
