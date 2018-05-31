@@ -102,8 +102,8 @@ install(FILES ${XTENSOR_BLAS_HEADERS}
 install(DIRECTORY ${INCLUDE_DIR}/xflens
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-# GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "share/cmake/${PROJECT_NAME}" CACHE STRING "install path for xtensor-blasConfig.cmake")
+set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
+    STRING "install path for xtensor-blasConfig.cmake")
 
 configure_package_config_file(${PROJECT_NAME}Config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
