@@ -3,7 +3,7 @@
 [![Travis](https://travis-ci.org/QuantStack/xtensor-blas.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor-blas)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor-blas)
 [![Documentation](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.4?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.16.1?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Introduction
@@ -63,6 +63,7 @@ http://xtensor-blas.readthedocs.io/
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
 | master          |  ^0.16.0  |
+| 0.11.1          |  ^0.16.0  |
 | 0.11.0          |  ^0.16.0  |
 | 0.10.1          |  ^0.15.4  |
 | 0.10.0          |  ^0.15.4  |
