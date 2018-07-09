@@ -454,7 +454,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for getri.");
         }
 
-        work.resize(std::size_t(work[0]));
+        work.resize(std::size_t(std::real(work[0])));
 
         info = cxxlapack::getri<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),
