@@ -57,7 +57,7 @@ symm_generic(StorageOrder order, Side sideA, StorageUpLo upLoA,
                      C, ldC);
         return;
     }
-    gescal(order, m, n, beta, C, ldC);
+    gescal_init(order, m, n, beta, C, ldC);
     if (sideA==Right) {
         for (IndexType i=0; i<m; ++i) {
             symv(order, upLoA, n, alpha, A, ldA, B+i*ldB, IndexType(1),

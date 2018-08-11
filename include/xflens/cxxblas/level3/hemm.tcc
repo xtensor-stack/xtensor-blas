@@ -58,7 +58,7 @@ hemm_generic(StorageOrder order,
                      C, ldC);
         return;
     }
-    gescal(order, m, n, beta, C, ldC);
+    gescal_init(order, m, n, beta, C, ldC);
     if (sideA==Right) {
         for (IndexType i=0; i<m; ++i) {
             hemv(order, upLoA, Conj, n, alpha, A, ldA, B+i*ldB, IndexType(1),

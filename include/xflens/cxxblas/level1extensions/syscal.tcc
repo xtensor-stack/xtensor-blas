@@ -63,6 +63,31 @@ syscal(StorageOrder order, StorageUpLo upLo,
     }
 }
 
+template <typename IndexType, typename ALPHA, typename MA>
+void
+syscal_init(StorageOrder order, StorageUpLo upLo,
+       IndexType n,
+       const ALPHA &alpha, MA *A, IndexType ldA)
+{
+    CXXBLAS_DEBUG_OUT("syscal_generic");
+
+    if (alpha==ALPHA(1)) {
+        return;
+    }
+    if (order==ColMajor) {
+        upLo = (upLo==Upper) ? Lower : Upper;
+    }
+    if (upLo==Upper) {
+        for (IndexType i=0; i<n; ++i) {
+            scal_init(n-i, alpha, A+i*(ldA+1), IndexType(1));
+        }
+    } else {
+        for (IndexType i=0; i<n; ++i) {
+            scal_init(i+1, alpha, A+i*ldA, IndexType(1));
+        }
+    }
+}
+
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL1EXTENSIONS_SYSCAL_TCC
