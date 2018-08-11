@@ -42,7 +42,7 @@ namespace blas
         cxxblas::asum<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
             ad.data() + ad.data_offset(),
-            static_cast<blas_index_t>(ad.strides().front()),
+            stride_front(ad),
             result
         );
     }
@@ -62,7 +62,7 @@ namespace blas
         cxxblas::nrm2<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
             ad.data() + ad.data_offset(),
-            static_cast<blas_index_t>(ad.strides().front()),
+            stride_front(ad),
             result
         );
     }
@@ -86,9 +86,9 @@ namespace blas
         cxxblas::dot<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
             ad.data() + ad.data_offset(),
-            static_cast<blas_index_t>(ad.strides().front()),
+            stride_front(ad),
             bd.data() + bd.data_offset(),
-            static_cast<blas_index_t>(bd.strides().front()),
+            stride_front(bd),
             result
         );
     }
@@ -111,9 +111,9 @@ namespace blas
         cxxblas::dotu<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
             ad.data() + ad.data_offset(),
-            static_cast<blas_index_t>(ad.strides().front()),
+            stride_front(ad),
             bd.data() + bd.data_offset(),
-            static_cast<blas_index_t>(bd.strides().front()),
+            stride_front(bd),
             result
         );
     }

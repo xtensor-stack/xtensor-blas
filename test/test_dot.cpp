@@ -177,4 +177,32 @@ namespace xt
         EXPECT_EQ(b * 3, r3);
     }
 
+    TEST(xdot, on_view)
+    {
+        xt::xarray<int> a = xt::reshape_view(xt::arange<int>(10 * 10 * 10), {10, 10, 10});
+        xt::xarray<int> b = xt::reshape_view(xt::arange<int>(10 * 10 * 10), {10, 10, 10});
+
+        auto res = xt::linalg::dot(view(a, 0, 0), view(b, 0, 0));
+        auto res1 = xt::linalg::dot(view(a, 0, range(0, 3)), transpose(view(b, 0, range(0, 3))));
+
+        EXPECT_EQ(res(0), 285.);
+        EXPECT_EQ(res1(0, 0), 285.);
+        EXPECT_EQ(res1(1, 2), 3635.);
+
+        EXPECT_EQ(res1.dimension(), 2);
+        EXPECT_EQ(res1.shape()[0], 3);
+        EXPECT_EQ(res1.shape()[1], 3);
+
+        auto res2 = xt::linalg::dot(strided_view(a, {0, 0}), strided_view(b, {0, 0}));
+        auto res3 = xt::linalg::dot(strided_view(a, {0, range(0, 3)}), transpose(strided_view(b, {0, range(0, 3)})));
+        EXPECT_EQ(res2(0), 285.);
+        EXPECT_EQ(res3(0, 0), 285.);
+        EXPECT_EQ(res3(1, 2), 3635.);
+
+        EXPECT_EQ(res3.dimension(), 2);
+        EXPECT_EQ(res3.shape()[0], 3);
+        EXPECT_EQ(res3.shape()[1], 3);
+
+    }
+
 }
