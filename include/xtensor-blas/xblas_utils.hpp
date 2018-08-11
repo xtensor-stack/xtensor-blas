@@ -128,6 +128,40 @@ namespace xt
         DEFAULT_LEADING_STRIDE_BEHAVIOR;
     }
 
+    /********************
+     * Get front stride *
+     ********************/
+
+    template <class E>
+    inline blas_index_t stride_front(const E& e)
+    {
+        if (E::static_layout == layout_type::column_major)
+        {
+            return blas_index_t(1);
+        }
+        else
+        {
+            return static_cast<blas_index_t>(e.strides().front() == 0 ? 1 : e.strides().front());
+        }
+    }
+
+    /*******************
+     * Get back stride *
+     *******************/
+
+    template <class E>
+    inline blas_index_t stride_back(const E& e)
+    {
+        if (E::static_layout == layout_type::row_major)
+        {
+            return blas_index_t(1);
+        }
+        else
+        {
+            return static_cast<blas_index_t>(e.strides().back() == 0 ? 1 : e.strides().back());
+        }
+    }
+
     /*******************************
      * is_xfunction implementation *
      *******************************/

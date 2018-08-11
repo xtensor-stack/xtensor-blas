@@ -83,6 +83,13 @@ namespace xt
         EXPECT_NEAR(min(), 0.0, 1e-6);
     }
 
+    TEST(xlapack, single_element_inverse)
+    {
+        xtensor<double, 2> a = xt::ones<double>({1, 1});
+        auto res = linalg::inv(a);
+        EXPECT_EQ(res(), 1.);
+    }
+
     TEST(xlapack, solve)
     {
         xarray<double> a = {{ 2, 1, 1},

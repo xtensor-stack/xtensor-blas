@@ -250,10 +250,13 @@ namespace linalg
 
         uvector<blas_index_t> piv(std::min(dA.shape()[0], dA.shape()[1]));
 
+        // DEV note: numpy uses gesv here, instead of getrf and getri. Might
+        //           be interesting to investigate if there is a perf or accuracy
+        //           difference.
         int info = lapack::getrf(dA, piv);
-        if (info != 0)
+        if (info > 0)
         {
-            throw std::runtime_error("getrf failed");
+            throw std::runtime_error("Singular matrix not invertible (getrf).");
         }
 
         info = lapack::getri(dA, piv);
