@@ -63,7 +63,7 @@ gemm_generic(StorageOrder order,
         return;
     }
 
-    gescal(order, m, n, beta, C, ldC);
+    gescal_init(order, m, n, beta, C, ldC);
     if (alpha==ALPHA(0)) {
         return;
     }

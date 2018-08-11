@@ -62,8 +62,7 @@ gemv_generic(StorageOrder order, Transpose transA, Transpose conjX,
         if (incY<0) {
             y -= incY*(m-1);
         }
-
-        scal_generic(m, beta, y, incY);
+        scal_init_generic(m, beta, y, incY);
         if (conjX==NoTrans) {
             if (transA==Conj) {
                 for (IndexType i=0, iY=0; i<m; ++i, iY+=incY) {
@@ -101,7 +100,7 @@ gemv_generic(StorageOrder order, Transpose transA, Transpose conjX,
             y -= incY*(n-1);
         }
 
-        scal_generic(n, beta, y, incY);
+        scal_init_generic(n, beta, y, incY);
         if (conjX==NoTrans) {
             if (transA==ConjTrans) {
                 for (IndexType i=0, iY=0; i<n; ++i, iY+=incY) {

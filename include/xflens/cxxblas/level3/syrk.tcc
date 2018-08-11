@@ -55,7 +55,7 @@ syrk_generic(StorageOrder order, StorageUpLo upLoC,
                      alpha, A, ldA, beta, C, ldC);
         return;
     }
-    syscal(order, upLoC, n, beta, C, ldC);
+    syscal_init(order, upLoC, n, beta, C, ldC);
     if (k==0) {
         return;
     }

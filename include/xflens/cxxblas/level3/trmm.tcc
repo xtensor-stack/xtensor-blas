@@ -64,7 +64,7 @@ trmm_generic(StorageOrder order, Side sideA, StorageUpLo upLoA,
             trmv(order, upLoA, transA, diagA, m, A, ldA, B+j, ldB);
         }
     }
-    gescal(order, m, n, alpha, B, ldB);
+    gescal_init(order, m, n, alpha, B, ldB);
 }
 
 template <typename IndexType, typename ALPHA, typename MA, typename MB>

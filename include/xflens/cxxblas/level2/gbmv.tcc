@@ -63,7 +63,7 @@ gbmv_generic(StorageOrder order, Transpose trans, Transpose conjX,
         if (incY<0) {
             y -= incY*(m-1);
         }
-        scal_generic(m, beta, y, incY);
+        scal_init_generic(m, beta, y, incY);
         if (trans==NoTrans) {
             if (conjX==NoTrans) {
                 for (IndexType i=0, iY=0; i<m; ++i, iY+=incY) {
@@ -122,7 +122,7 @@ gbmv_generic(StorageOrder order, Transpose trans, Transpose conjX,
         if (incY<0) {
             y -= incY*(n-1);
         }
-        scal_generic(n, beta, y, incY);
+        scal_init_generic(n, beta, y, incY);
         if (trans==Trans) {
             if (conjX == NoTrans) {
                 for (IndexType i=0, iX=0; i<m; ++i, iX+=incX) {

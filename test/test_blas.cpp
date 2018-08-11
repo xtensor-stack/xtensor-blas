@@ -111,6 +111,21 @@ namespace xt
         EXPECT_TRUE(all(equal(expected, t3)));
     }
 
+    TEST(xblas, nan_result)
+    {
+        xt::xarray<double> X = {{1, 2, 3},
+                                {1, 2, 3}};
+
+        auto M = xt::xarray<double>::from_shape({3, 3});
+        M(0, 0) = std::numeric_limits<double>::quiet_NaN();
+        M(0, 1) = std::numeric_limits<double>::quiet_NaN();
+        xt::blas::gemm(X, X, M, true, false, 1.0, 0.0);
+        for (std::size_t i = 0; i < M.size(); ++i)
+        {
+            EXPECT_FALSE(std::isnan(M.storage()[i]));
+        }
+    }
+
     TEST(xblas, gemm_transpose)
     {
         xt::xarray<double> X = {{1, 2, 3},

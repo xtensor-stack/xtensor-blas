@@ -56,7 +56,7 @@ symv_generic(StorageOrder order, StorageUpLo upLo,
     if (order==ColMajor) {
         upLo = (upLo==Upper) ? Lower : Upper;
     }
-    scal_generic(n, beta, y, incY);
+    scal_init_generic(n, beta, y, incY);
     if (upLo==Upper) {
         for (IndexType i=0, iY=0; i<n; ++i, iY+=incY) {
             VY y_ = VY(0);

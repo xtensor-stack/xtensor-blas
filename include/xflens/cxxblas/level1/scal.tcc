@@ -50,12 +50,38 @@ scal_generic(IndexType n, const ALPHA &alpha, Y *y, IndexType incY)
 
 template <typename IndexType, typename ALPHA, typename Y>
 void
+scal_init_generic(IndexType n, const ALPHA &alpha, Y *y, IndexType incY)
+{
+    CXXBLAS_DEBUG_OUT("scal_init_generic");
+
+    if (alpha == ALPHA(0)) {
+        for (IndexType i=0, iY=0; i<n; ++i, iY+=incY) {
+            y[iY] = 0;
+        }
+    }
+    else {
+        scal_generic(n, alpha, y, incY);
+    }
+}
+
+template <typename IndexType, typename ALPHA, typename Y>
+void
 scal(IndexType n, const ALPHA &alpha, Y *y, IndexType incY)
 {
     if (incY<0) {
         y -= incY*(n-1);
     }
     scal_generic(n, alpha, y, incY);
+}
+
+template <typename IndexType, typename ALPHA, typename Y>
+void
+scal_init(IndexType n, const ALPHA &alpha, Y *y, IndexType incY)
+{
+    if (incY<0) {
+        y -= incY*(n-1);
+    }
+    scal_init_generic(n, alpha, y, incY);
 }
 
 #ifdef HAVE_CBLAS

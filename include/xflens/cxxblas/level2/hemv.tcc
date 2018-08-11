@@ -52,7 +52,7 @@ hemv_generic(StorageOrder order, StorageUpLo upLo, Transpose conjugateA,
         upLo = (upLo==Upper) ? Lower : Upper;
         conjugateA = Transpose(conjugateA^Conj);
     }
-    scal_generic(n, beta, y, incY);
+    scal_init_generic(n, beta, y, incY);
     if (upLo==Upper) {
         if (conjugateA==Conj) {
             for (IndexType i=0, iX=0, iY=0; i<n; ++i, iX+=incX, iY+=incY) {

@@ -41,6 +41,12 @@ namespace cxxblas {
 
 template <typename IndexType, typename ALPHA, typename MA>
     void
+    gescal_init(StorageOrder order,
+           IndexType m, IndexType n,
+           const ALPHA &alpha, MA *A, IndexType ldA);
+
+template <typename IndexType, typename ALPHA, typename MA>
+    void
     gescal(StorageOrder order,
            IndexType m, IndexType n,
            const ALPHA &alpha, MA *A, IndexType ldA);

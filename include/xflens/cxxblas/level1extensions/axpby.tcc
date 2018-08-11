@@ -46,7 +46,7 @@ axpby(IndexType n, const ALPHA &alpha, const X *x, IndexType incX,
 {
     CXXBLAS_DEBUG_OUT("axpby_generic");
 
-    scal(n, beta, y, incY);
+    scal_init(n, beta, y, incY);
     axpy(n, alpha, x, incX, y, incY);
 }
 

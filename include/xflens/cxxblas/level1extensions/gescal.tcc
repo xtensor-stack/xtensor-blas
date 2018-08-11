@@ -40,6 +40,29 @@ namespace cxxblas {
 
 template <typename IndexType, typename ALPHA, typename MA>
 void
+gescal_init(StorageOrder order,
+       IndexType m, IndexType n,
+       const ALPHA &alpha, MA *A, IndexType ldA)
+{
+    CXXBLAS_DEBUG_OUT("gescal_generic");
+
+    if (order==ColMajor) {
+        std::swap(m,n);
+    }
+    if (ldA==n) {
+        scal_init(m*n, alpha, A, IndexType(1));
+        return;
+    } else {
+        for (IndexType i=0; i<m; ++i) {
+            scal_init(n, alpha, A+i*ldA, IndexType(1));
+        }
+        return;
+    }
+}
+
+
+template <typename IndexType, typename ALPHA, typename MA>
+void
 gescal(StorageOrder order,
        IndexType m, IndexType n,
        const ALPHA &alpha, MA *A, IndexType ldA)
