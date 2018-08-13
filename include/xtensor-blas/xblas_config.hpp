@@ -13,6 +13,10 @@
 #define XTENSOR_BLAS_VERSION_MINOR 12
 #define XTENSOR_BLAS_VERSION_PATCH 0
 
+#ifndef USE_FLENS_BLAS
+#define HAVE_CBLAS 1
+#endif
+
 #ifndef USE_CXXLAPACK
 #define USE_CXXLAPACK
 #endif
