@@ -44,7 +44,9 @@ A package for xtensor-blas is available on the conda package manager.
 From source with cmake
 ----------------------
 
-You can install ``xtensor-blas`` from source with cmake. On Unix platforms, from the source directory:
+You can install ``xtensor-blas`` from source with cmake.
+Note that you need to have a BLAS installation available (e.g. OpenBLAS, MKL ...).
+On Unix platforms, from the source directory:
 
 .. code::
 

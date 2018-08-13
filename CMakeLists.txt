@@ -58,10 +58,10 @@ set(XTENSOR_BLAS_HEADERS
 )
 
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
-OPTION(HAVE_CBLAS "use cblas" ON)
+OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
 
-if(HAVE_CBLAS)
-  add_definitions(-DHAVE_CBLAS=1)
+if(XTENSOR_USE_FLENS_BLAS)
+  add_definitions(-DXTENSOR_USE_FLENS_BLAS=1)
 endif()
 
 if (CXXBLAS_DEBUG)
