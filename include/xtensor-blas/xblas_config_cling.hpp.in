@@ -13,7 +13,13 @@
 #pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_32@)
 #pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR@)
 
+#if !defined(XCLING_DISABLE_BLAS)
+
+#define HAVE_CBLAS 1
+
 #pragma cling load("libblas")
 #pragma cling load("liblapack")
+
+#endif
 
 #endif
