@@ -17,7 +17,7 @@ on conda, too. If xtensor-blas was not installed from conda, the user has
 to manually verify that a BLAS and `LAPACK <https://en.wikipedia.org/wiki/LAPACK>`_
 implementation is available.
 If you want to fallback to a slower, more generic BLAS implementation, you can use
-the compile time define ``-DUSE_FLENS_BLAS``.
+the compile time define ``-DXTENSOR_USE_FLENS_BLAS``.
 
 In order to link against ``OpenBLAS`` from CMake, the following lines have
 to be added to the ``CMakeLists.txt`` file.
