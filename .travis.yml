@@ -89,6 +89,10 @@ matrix:
       osx_image: xcode8
       compiler: clang
       env: BLAS=OpenBLAS
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
+      env: BLAS=mkl
 env:
   global:
     - MINCONDA_VERSION="latest"

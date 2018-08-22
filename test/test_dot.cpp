@@ -29,6 +29,21 @@ namespace xt
         EXPECT_THROW(linalg::dot(c, b), std::runtime_error);
     }
 
+    TEST(xdot, float_gemm)
+    {
+        xt::xarray<float> im2col = {{ 2.,  3.,  3.,  4.},
+                                    { 2.,  1.,  3.,  2.}};
+        xt::xarray<float> f = {{ 2.,  3.,  3.},
+                               { 1.,  4.,  5.},
+                               { 1.,  3.,  5.},
+                               { 2.,  2.,  2.}};
+
+        auto result = xt::linalg::dot(im2col, f);
+        xt::xarray<float> exp_res = {{18, 35, 44}, {12, 23, 30}};
+
+        EXPECT_EQ(result, exp_res);
+    }
+
     TEST(xdot, matrix_transpose_times_column)
     {
         xarray<double, layout_type::row_major> a = xt::ones<double>({2, 4});
