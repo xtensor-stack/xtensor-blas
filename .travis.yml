@@ -1,5 +1,5 @@
 language: cpp
-dist: precise
+dist: trusty
 matrix:
   include:
     - os: linux
@@ -63,8 +63,8 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
           packages:
+            - g++-4.9
             - clang-3.6
       env: COMPILER=clang CLANG=3.6 BLAS=OpenBLAS
     - os: linux
@@ -72,19 +72,40 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-trusty-3.9
           packages:
-            - clang-3.7
-      env: COMPILER=clang CLANG=3.7 BLAS=OpenBLAS
+            - g++-4.9
+            - clang-3.9
+      env: COMPILER=clang CLANG=3.9 BLAS=OpenBLAS
     - os: linux
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
+            - llvm-toolchain-trusty-4.0
           packages:
-            - clang-3.8
-      env: COMPILER=clang CLANG=3.8 BLAS=OpenBLAS
+            - g++-4.9
+            - clang-4.0
+      env: COMPILER=clang CLANG=4.0 BLAS=OpenBLAS
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - g++-4.9
+            - clang-5.0
+      env: COMPILER=clang CLANG=5.0 BLAS=OpenBLAS
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-6.0
+          packages:
+            - clang-6.0
+      env: COMPILER=clang CLANG=6.0 BLAS=OpenBLAS
     - os: osx
       osx_image: xcode8
       compiler: clang
@@ -124,7 +145,7 @@ install:
     - conda info -a
     - conda install gtest cmake -c conda-forge
     # Install xtensor and BLAS
-    - conda install xtensor=0.17.0 -c quantstack
+    - conda install xtensor=0.17.3 -c quantstack
     - if [[ "$BLAS" == "OpenBLAS" ]]; then
         conda install openblas -c conda-forge;
       elif [[ "$BLAS" == "mkl" ]]; then
