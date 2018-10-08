@@ -1514,6 +1514,169 @@ namespace linalg
         }
         return res;
     }
+
+    /**
+     * @brief Compute tensor dot product along specified axes for arrays
+     *
+     * Compute the sum of products along the last \em naxes axes of a and first
+     * \em naxes axes of b.
+     *
+     * @param xa input array
+     * @param xb input array
+     * @param naxes the number of axes to sum over
+     * @return resulting array
+     */
+    template <class T, class O>
+    auto tensordot(const xexpression<T>& xa, const xexpression<O>& xb, std::size_t naxes = 2)
+    {
+        using value_type = std::common_type_t<typename T::value_type, typename O::value_type>;
+        using result_type = std::conditional_t<T::static_layout == O::static_layout &&
+                                               (T::static_layout != layout_type::dynamic && T::static_layout != layout_type::any),
+                                               xarray<value_type, T::static_layout>,
+                                               xarray<value_type, XTENSOR_DEFAULT_LAYOUT>>;
+
+        result_type result;
+        const auto& a = xa.derived_cast();
+        const auto& b = xb.derived_cast();
+        if (naxes == 0)
+        {
+            // special case tensor outer product product
+            xt::dynamic_shape<std::size_t> result_shape(a.dimension() + b.dimension());
+            std::size_t j = 0;
+            for (std::size_t i = 0; i < a.dimension(); ++i)
+            {
+                result_shape[j++] = a.shape()[i];
+            }
+
+            for (std::size_t i = 0; i < b.dimension(); ++i)
+            {
+                result_shape[j++] = b.shape()[i];
+            }
+            // flatten a/b
+            auto vec_a = xt::ravel<T::static_layout>(a);
+            auto vec_b = xt::ravel<O::static_layout>(b);
+            // take the outer product of the two vectors
+            result = outer(vec_a, vec_b);
+            // reshape the result
+            result.reshape(result_shape);
+        }
+        else
+        {
+          // Sum of products over last n axes of A and the first n axis of b
+            XTENSOR_ASSERT(a.dimension() >= axes);
+            XTENSOR_ASSERT(b.dimension() >= axes);
+
+            auto as_it = a.shape().begin() + (a.dimension() - naxes);
+            auto bs_it = b.shape().begin();
+            std::size_t sum_len = 1;
+            for (std::size_t i = 0; i < naxes; ++i)
+            {
+                auto a_val = *as_it;
+                auto b_val = *bs_it;
+                // check for axes size match
+                if (a_val != b_val)
+                {
+                    throw std::runtime_error("Shape mismatch for sum");
+                }
+                else
+                {
+                    sum_len *= a_val;
+                }
+                ++as_it;
+                ++bs_it;
+            }
+            xt::dynamic_shape<std::size_t> result_shape;
+            std::size_t keep_a_len = 1;
+            for (auto it = a.shape().begin(); it != a.shape().begin() + (a.dimension() - naxes); ++it)
+            {
+                std::size_t len = *it;
+                keep_a_len *= len;
+                result_shape.push_back(len);
+            }
+            std::size_t keep_b_len = 1;
+            for (auto it = b.shape().begin() + naxes; it != b.shape().end(); ++it)
+            {
+                std::size_t len = *it;
+                keep_b_len *= len;
+                result_shape.push_back(len);
+            }
+            auto a_mat = result_type::from_shape({keep_a_len, sum_len});
+            std::copy(a.storage().begin(), a.storage().end(), a_mat.storage().begin());
+            auto b_mat = result_type::from_shape({sum_len, keep_b_len});
+            std::copy(b.storage().begin(), b.storage().end(), b_mat.storage().begin());
+
+            result = dot(a_mat, b_mat);
+            result.reshape(result_shape);
+        }
+        return result;
+    }
+
+    /**
+     * @brief Compute tensor dot product along specified axes for arrays
+     *
+     * Compute the sum of products along the axes \em ax_a for a and \em ax_b for b
+     *
+     * @param xa input array
+     * @param xb input array
+     * @param ax_a axes to sum over for \em a
+     * @param ax_b axes to sum over for \em b
+     * @return resulting array
+     */
+    template <class T, class O>
+    auto tensordot(const xexpression<T>& xa, const xexpression<O>& xb, const std::vector<std::size_t>& ax_a,
+                   const std::vector<std::size_t>& ax_b)
+    {
+        const auto& a = xa.derived_cast();
+        const auto& b = xb.derived_cast();
+        XTENSOR_ASSERT(ax_a.size() == ax_b.size());
+        XTENSOR_ASSERT(ax_a.size() < a.dimension());
+        XTENSOR_ASSERT(ax_b.size() < b.dimension());
+        std::size_t n_ax = ax_a.size();
+        for (std::size_t i = 0; i < n_ax; ++i)
+        {
+            XTENSOR_ASSERT(ax_a[i] < a.dimension());
+            XTENSOR_ASSERT(ax_b[i] < b.dimension());
+        }
+
+        // Move the axes to sum over to the end of a
+        xt::dynamic_shape<std::size_t> newaxes_a;
+        xt::dynamic_shape<std::size_t> result_shape;
+        for (std::size_t i = 0; i < a.dimension(); ++i)
+        {
+            auto a_ax_it = std::find(ax_a.begin(), ax_a.end(), i);
+            // first pass if i is not in ax_a, add to newaxes_a
+            if (a_ax_it == ax_a.end())
+            {
+               newaxes_a.push_back(i);
+            }
+        }
+        for (auto& a_ax_it : ax_a)
+        {
+          newaxes_a.push_back(a_ax_it);
+
+        }
+
+        // Move the axes to sum over to the start of b
+        xt::dynamic_shape<std::size_t> newaxes_b;
+        for(auto& b_ax_it : ax_b)
+        {
+          newaxes_b.push_back(b_ax_it);
+        }
+        for (std::size_t i = 0; i < b.dimension(); ++i)
+        {
+            auto b_ax_it = std::find(ax_b.begin(), ax_b.end(), i);
+            // seccond pass if i is not in ax_b add to newaxes_b
+            if (b_ax_it == ax_b.end())
+            {
+              newaxes_b.push_back(i);
+            }
+        }
+        // not 100% sure why, but If I don't eval this I get the wrong result.
+        auto a_t = xt::eval(xt::transpose(a, newaxes_a));
+        auto b_t = xt::eval(xt::transpose(b, newaxes_b));
+        // the integer arg form of tensordot will handle the reshape of output for us
+        return tensordot(a_t, b_t, n_ax);
+    }
 }
 }
 #endif
