@@ -181,9 +181,74 @@ namespace xt
                            {210,210,210},
                            {354, 354, 354}};
       EXPECT_EQ(r1, e1);
+
       auto r2 = linalg::tensordot(a, b, {1, 3, 2, 0}, {0, 2, 1, 3});
-      xarray<double, layout_type::column_major> e2 = xarray<double>::from_shape({1,1});
-      e2(0,0) = 630;
-      EXPECT_EQ(r2(0,0), e2(0,0));
+      xarray<double, layout_type::column_major> e2 = {630};
+
+      EXPECT_EQ(r2, e2);
     }
+
+    TEST(xtensordot, view)
+    {
+
+      xarray<int> a = reshape_view(arange<int>(3*2*3*2), {3,2,3,2});
+      xarray<int> b = reshape_view(arange<int>(3*3*2*2), {3,3,2,2});
+
+      xarray<int> e1 = {{ 34,  90, 146},
+                            { 46, 134, 222},
+                            { 58, 178, 298}};
+
+      auto res1 = linalg::tensordot(view(a, 0, all(), all(), all()),
+                                    view(b, 0, all(), all(), all()), {0, 2}, {1,2});
+
+      EXPECT_EQ(res1, e1);
+      EXPECT_EQ(res1.dimension(), 2);
+      EXPECT_EQ(res1.shape()[0], 3);
+      EXPECT_EQ(res1.shape()[1], 3);
+    }
+
+    TEST(xtensordot, strided_view_range)
+    {
+      xarray<int> a = reshape_view(arange<int>(3*2*3*2), {3,2,3,2});
+      xarray<int> b = reshape_view(arange<int>(3*3*2*2), {3,3,2,2});
+
+      xarray<int> e1 = {{1064, 1144}, {1136, 1224}};
+
+      auto res1 = linalg::tensordot(strided_view(a, {range(0, 2), all(), range(0, 2), all()}),
+                                    strided_view(b, {range(0, 2), range(0,2), all(), all()}),
+                                    {0, 1, 2}, {0, 1, 2});
+      EXPECT_EQ(res1, e1);
+      EXPECT_EQ(res1.dimension(), 2);
+      EXPECT_EQ(res1.shape()[0], 2);
+      EXPECT_EQ(res1.shape()[1], 2);
+
+    }
+
+    TEST(xtensordot, reducing_dim_view)
+    {
+      xarray<int> a = reshape_view(arange<int>(3*2*3*2), {3,2,3,2});
+      xarray<int> b = reshape_view(arange<int>(3*3*2*2), {3,3,2,2});
+
+
+      xarray<int> e = {1589};
+      auto r = linalg::tensordot(view(a, 0, 1, all(), all()),
+                                 view(b, 2, all(), 1, all()));
+      EXPECT_EQ(r, e);
+
+    }
+
+    TEST(xtensordot, reducing_dim_strided_view)
+    {
+      xarray<int> a = reshape_view(arange<int>(3*2*3*2), {3,2,3,2});
+      xarray<int> b = reshape_view(arange<int>(3*3*2*2), {3,3,2,2});
+
+
+      xarray<int> e = {1589};
+      auto r = linalg::tensordot(strided_view(a, {0, 1, all(), all()}),
+                                    strided_view(b, {2, all(), 1, all()}));
+      EXPECT_EQ(r, e);
+
+    }
+
+
 }

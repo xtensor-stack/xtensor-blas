@@ -1536,8 +1536,8 @@ namespace linalg
                                                xarray<value_type, XTENSOR_DEFAULT_LAYOUT>>;
 
         result_type result;
-        const auto& a = xa.derived_cast();
-        const auto& b = xb.derived_cast();
+        auto&& a = view_eval<T::static_layout>(xa.derived_cast());
+        auto&& b = view_eval<O::static_layout>(xb.derived_cast());
         if (naxes == 0)
         {
             // special case tensor outer product product
@@ -1563,8 +1563,8 @@ namespace linalg
         else
         {
           // Sum of products over last n axes of A and the first n axis of b
-            XTENSOR_ASSERT(a.dimension() >= axes);
-            XTENSOR_ASSERT(b.dimension() >= axes);
+            XTENSOR_ASSERT(a.dimension() >= naxes);
+            XTENSOR_ASSERT(b.dimension() >= naxes);
 
             auto as_it = a.shape().begin() + (a.dimension() - naxes);
             auto bs_it = b.shape().begin();
@@ -1600,13 +1600,18 @@ namespace linalg
                 keep_b_len *= len;
                 result_shape.push_back(len);
             }
-            auto a_mat = result_type::from_shape({keep_a_len, sum_len});
-            std::copy(a.storage().begin(), a.storage().end(), a_mat.storage().begin());
-            auto b_mat = result_type::from_shape({sum_len, keep_b_len});
-            std::copy(b.storage().begin(), b.storage().end(), b_mat.storage().begin());
-
+            xarray<value_type, T::static_layout> a_mat = a;
+            a_mat.reshape({keep_a_len, sum_len});
+            xarray<value_type, O::static_layout> b_mat = b;
+            b_mat.reshape({sum_len, keep_b_len});
             result = dot(a_mat, b_mat);
-            result.reshape(result_shape);
+            if(result_shape.empty()){
+              result.reshape({1});
+            }
+            else{
+              result.reshape(result_shape);
+            }
+
         }
         return result;
     }
@@ -1626,8 +1631,8 @@ namespace linalg
     auto tensordot(const xexpression<T>& xa, const xexpression<O>& xb, const std::vector<std::size_t>& ax_a,
                    const std::vector<std::size_t>& ax_b)
     {
-        const auto& a = xa.derived_cast();
-        const auto& b = xb.derived_cast();
+        auto&& a = view_eval<T::static_layout>(xa.derived_cast());
+        auto&& b = view_eval<O::static_layout>(xb.derived_cast());
         XTENSOR_ASSERT(ax_a.size() == ax_b.size());
         XTENSOR_ASSERT(ax_a.size() < a.dimension());
         XTENSOR_ASSERT(ax_b.size() < b.dimension());
@@ -1671,9 +1676,9 @@ namespace linalg
               newaxes_b.push_back(i);
             }
         }
-        // not 100% sure why, but If I don't eval this I get the wrong result.
-        auto a_t = xt::eval(xt::transpose(a, newaxes_a));
-        auto b_t = xt::eval(xt::transpose(b, newaxes_b));
+        auto a_t = xt::transpose(a, newaxes_a);
+        auto b_t = xt::transpose(b, newaxes_b);
+
         // the integer arg form of tensordot will handle the reshape of output for us
         return tensordot(a_t, b_t, n_ax);
     }
