@@ -12,7 +12,7 @@ Defined in ``xtensor-blas/xlinalg.hpp``
 
 The functions here are closely modeled after NumPy's linalg package.
 
-Matrix and vector products
+Matrix, vector and tensor products
 --------------------------
 
 .. doxygenfunction:: xt::linalg::dot
@@ -28,6 +28,12 @@ Matrix and vector products
     :project: xtensor-blas
 
 .. doxygenfunction:: xt::linalg::kron
+    :project: xtensor-blas
+
+.. doxygenfunction:: xt::linalg::tensordot(const xexpression<T>&, const xexpression<O>&, std::size_t)
+    :project: xtensor-blas
+
+.. doxygenfunction:: xt::linalg::tensordot(const xexpression<T>&, const xexpression<O>&, const std::vector<std::size_t>&, const std::vector<std::size_t>&)
     :project: xtensor-blas
 
 Decompositions

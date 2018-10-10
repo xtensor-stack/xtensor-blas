@@ -1562,7 +1562,7 @@ namespace linalg
         }
         else
         {
-          // Sum of products over last n axes of A and the first n axis of b
+            // Sum of products over last n axes of A and the first n axis of b
             XTENSOR_ASSERT(a.dimension() >= naxes);
             XTENSOR_ASSERT(b.dimension() >= naxes);
 
@@ -1605,11 +1605,13 @@ namespace linalg
             xarray<value_type, O::static_layout> b_mat = b;
             b_mat.reshape({sum_len, keep_b_len});
             result = dot(a_mat, b_mat);
-            if(result_shape.empty()){
-              result.reshape({1});
+            if(result_shape.empty())
+            {
+                result.reshape({1});
             }
-            else{
-              result.reshape(result_shape);
+            else
+            {
+                result.reshape(result_shape);
             }
 
         }
@@ -1652,20 +1654,19 @@ namespace linalg
             // first pass if i is not in ax_a, add to newaxes_a
             if (a_ax_it == ax_a.end())
             {
-               newaxes_a.push_back(i);
+                newaxes_a.push_back(i);
             }
         }
         for (auto& a_ax_it : ax_a)
         {
-          newaxes_a.push_back(a_ax_it);
-
+            newaxes_a.push_back(a_ax_it);
         }
 
         // Move the axes to sum over to the start of b
         xt::dynamic_shape<std::size_t> newaxes_b;
         for(auto& b_ax_it : ax_b)
         {
-          newaxes_b.push_back(b_ax_it);
+            newaxes_b.push_back(b_ax_it);
         }
         for (std::size_t i = 0; i < b.dimension(); ++i)
         {
@@ -1673,7 +1674,7 @@ namespace linalg
             // seccond pass if i is not in ax_b add to newaxes_b
             if (b_ax_it == ax_b.end())
             {
-              newaxes_b.push_back(i);
+                newaxes_b.push_back(i);
             }
         }
         auto a_t = xt::transpose(a, newaxes_a);
