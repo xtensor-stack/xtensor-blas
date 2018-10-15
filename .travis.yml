@@ -145,7 +145,7 @@ install:
     - conda info -a
     - conda install gtest cmake -c conda-forge
     # Install xtensor and BLAS
-    - conda install xtensor=0.17.3 -c quantstack
+    - conda install xtensor=0.18.0 -c quantstack
     - if [[ "$BLAS" == "OpenBLAS" ]]; then
         conda install openblas -c conda-forge;
       elif [[ "$BLAS" == "mkl" ]]; then

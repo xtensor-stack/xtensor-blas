@@ -388,7 +388,7 @@ namespace xt
         auto nearaf = xt::linalg::dot(qf, rf);
         EXPECT_TRUE(allclose(nearaf, a));
         EXPECT_EQ(std::get<1>(resr), rf);
-        EXPECT_EQ(std::get<0>(resr).size(), 1);
+        EXPECT_EQ(std::get<0>(resr).size(), 0);
         EXPECT_EQ(std::get<0>(resr).dimension(), 2);
 
         // the stuff below tests fine on Fedora 25, but apparently not on Ubuntu?
