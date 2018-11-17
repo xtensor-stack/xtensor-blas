@@ -1062,6 +1062,21 @@ namespace linalg
         }
     }
 
+    namespace xblas_detail
+    {
+        template <class T>
+        inline void triu_inplace(T& R)
+        {
+            for (std::size_t i = 0; i < R.shape()[0]; ++i)
+            {
+                for (std::size_t j = 0; j < i && j < R.shape()[1]; j++)
+                {
+                    R(i, j) = 0;
+                }
+            }
+        }
+    }
+
     /// Select the mode for the qr decomposition ``K = min(M, K)``
     enum class qrmode {
         reduced,  ///< return Q, R with dimensions (M, K), (K, N) (default)
@@ -1079,8 +1094,7 @@ namespace linalg
     auto qr(const xexpression<T>& A, qrmode mode = qrmode::reduced)
     {
         using value_type = typename T::value_type;
-        using xtype = xtensor<value_type, 2, layout_type::column_major>;
-        using result_xtype = xtensor<value_type, 2>;
+        using xtype = xarray<value_type, layout_type::column_major>;
 
         xtype R = A.derived_cast();
 
@@ -1088,8 +1102,7 @@ namespace linalg
         std::size_t N = R.shape()[1];
         std::size_t K = std::min(M, N);
 
-        std::array<std::size_t, 2> tau_shp = {K, 1};
-        xtype tau(tau_shp);
+        auto tau = xarray<value_type, layout_type::column_major>::from_shape({K});
         int info = lapack::geqrf(R, tau);
 
         if (info != 0)
@@ -1097,41 +1110,42 @@ namespace linalg
             throw std::runtime_error("QR decomposition failed.");
         }
 
-        xtype Q;
+        // explicitly set shape/size == 0!
+        auto Q = xtype::from_shape({0});
+
+        if (mode == qrmode::r)
+        {
+            R = xt::view(R, range(0, K), all());
+            xblas_detail::triu_inplace(R);
+            return std::make_tuple(Q, R);
+        }
 
         if (mode == qrmode::raw)
         {
+            R = transpose(R);
             return std::make_tuple(R, tau);
         }
 
-        if (mode == qrmode::reduced)
+        blas_index_t mc;
+
+        if (mode == qrmode::complete && M > N)
         {
-            Q = R;
-            detail::call_gqr(Q, tau, static_cast<blas_index_t>(K));
-            auto vR = view(R, range(std::size_t(0), K), all());
-            R = vR;
-        }
-        if (mode == qrmode::complete)
-        {
+            mc = (blas_index_t) M;
             Q.resize({M, M});
-            // TODO replace with assignment to view
-            for (std::size_t i = 0; i < R.shape()[0]; ++i)
-            {
-                for (std::size_t j = 0; j < R.shape()[1]; ++j)
-                {
-                    Q(i, j) = R(i, j);
-                }
-            }
-            detail::call_gqr(Q, tau, static_cast<blas_index_t>(M));
+        }
+        else
+        {
+            mc = (blas_index_t) K;
+            Q.resize({M, N});
         }
 
-        for (std::size_t i = 0; i < R.shape()[0]; ++i)
-        {
-            for (std::size_t j = 0; j < i && j < R.shape()[1]; j++)
-            {
-                R(i, j) = 0;
-            }
-        }
+        xt::view(Q, all(), range(0, N)) = R;
+        detail::call_gqr(Q, tau, mc);
+
+        Q = xt::view(Q, all(), range(0, mc));
+        R = xt::view(R, range(0, mc), all());
+
+        xblas_detail::triu_inplace(R);
 
         return std::make_tuple(Q, R);
     }
@@ -1420,22 +1434,44 @@ namespace linalg
         using underlying_value_type = xtl::complex_value_type_t<typename T::value_type>;
 
         xtensor<value_type, 2, layout_type::column_major> dA = A.derived_cast();
-        xtensor<value_type, 2, layout_type::column_major> db;
-
-        const auto& db_t = b.derived_cast();
-        if (db_t.dimension() == 1)
-        {
-            std::size_t sz = db_t.shape()[0];
-            db.resize({sz, 1});
-            std::copy(db_t.storage().begin(), db_t.storage().end(), db.storage().begin());
-        }
-        else
-        {
-            db = db_t;
-        }
 
         std::size_t M = dA.shape()[0];
         std::size_t N = dA.shape()[1];
+
+        auto& b_ref = b.derived_cast();
+
+        if (dA.dimension() != 2)
+        {
+            throw std::runtime_error("Expected 2D expression for A");
+        }
+
+        if (!(b_ref.dimension() <= 2))
+        {
+            throw std::runtime_error("Expected 1- or 2D expression for A.");
+        }
+
+        if (b_ref.shape()[0] != M)
+        {
+            throw std::runtime_error("Shape of 'b' for lstsq does not match.");
+        }
+
+        // find number of rhs
+        std::size_t nrhs = (b_ref.dimension() == 1) ? 1 : b_ref.shape()[1];
+
+        // as the dgelsd docs say, on entry it's M-by-nrhs, then result N-by-nrhs
+        // that is why we need to allocate *MORE* space than just b here for M > N
+        auto db = xarray<value_type, layout_type::column_major>::from_shape({ std::max(M, N), nrhs });
+
+        bool is_1d = false;
+        if (b_ref.dimension() == 1)
+        {
+            is_1d = true;
+            xt::view(db, range(0, M), xt::all()) = xt::view(b_ref, xt::all(), xt::newaxis());
+        }
+        else
+        {
+            xt::view(db, range(0, M), xt::all()) = b_ref;
+        }
 
         auto s = xtensor<underlying_value_type, 1, layout_type::column_major>::from_shape({ std::min(M, N) });
 
@@ -1460,8 +1496,12 @@ namespace linalg
             }
         }
 
-        auto vdb = view(db, range(std::size_t(0), N));
+        auto vdb = view(db, range(std::size_t(0), N), xt::all());
         db = vdb;
+        if (is_1d)
+        {
+            db = xt::squeeze(db);
+        }
 
         return std::make_tuple(db, residuals, rank, s);
     }
