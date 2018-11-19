@@ -699,7 +699,11 @@ namespace lapack
         uvector<blas_index_t> iwork(1);
 
         blas_index_t b_dim = b.dimension() > 1 ? static_cast<blas_index_t>(b.shape().back()) : 1;
-        blas_index_t b_stride = b_dim == 1 ? static_cast<blas_index_t>(b.shape().front()) : stride_back(b);
+
+        std::size_t m = A.shape()[0];
+        std::size_t n = A.shape()[1];
+
+        blas_index_t b_stride = (blas_index_t) std::max(std::max(std::size_t(1), m), n);
 
         int info = cxxlapack::gelsd<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),

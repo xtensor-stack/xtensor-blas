@@ -387,41 +387,28 @@ namespace xt
         EXPECT_TRUE(allclose(neara, a));
         auto nearaf = xt::linalg::dot(qf, rf);
         EXPECT_TRUE(allclose(nearaf, a));
-        EXPECT_EQ(std::get<1>(resr), rf);
+
+        EXPECT_EQ(std::get<1>(resr), xt::view(rf, xt::range(0, 6), xt::all()));
         EXPECT_EQ(std::get<0>(resr).size(), 0);
-        EXPECT_EQ(std::get<0>(resr).dimension(), 2);
+        EXPECT_EQ(std::get<0>(resr).dimension(), 1);
 
-        // the stuff below tests fine on Fedora 25, but apparently not on Ubuntu?
-        // xarray<double, layout_type::column_major> erawR = {{ -1.12249722e+01, -1.28285396e+01, -1.44321071e+01},
-        //                                                     {  2.67261242e-01, -1.19522861e+00, -2.39045722e+00},
-        //                                                     {  5.34522484e-01, -2.61215421e-01,  3.48440273e-15},
-        //                                                     {  8.01783726e-01, -7.25290754e-01,  2.74044353e-01}};
+        xarray<double, layout_type::column_major> erawR = {{-1.00444014e+01,  0.00000000e+00,  6.74440143e-01, 2.24813381e-01},
+                                                           {-9.58743044e+00, -1.25730337e+01, -6.22814365e-03, 3.37562246e-01},
+                                                           {-1.29027101e+01, -7.34080303e+00, -4.07831856e+00, -5.76331089e-01}};
 
-        // xarray<double, layout_type::column_major> eTau = {{ 1.        , 1.25448465, 1.86029153}};
+        xarray<double, layout_type::column_major> eTau = { 1.32854123, 1.79535299, 1.50132395};
 
-        // xarray<double, layout_type::column_major> AA = {{  0.,  1.,  2.},
-        //                                                 {  3.,  4.,  5.},
-        //                                                 {  6.,  7.,  8.},
-        //                                                 {  9., 10., 11.}};
+        xarray<double, layout_type::column_major> AA = {{ 3.3,  1.,  2.},
+                                                        { 0. , 10.,  8.},
+                                                        { 9. ,  7., 12.},
+                                                        { 3. , 10.,  5.}};
 
-        // Ubuntu 16.04 evaluates this to ...
-        // {{ 1.      },
-        //  { 1.254485},
-        //  { 1.242536}}
+        auto resraw = xt::linalg::qr(AA, linalg::qrmode::raw);
+        auto tau = std::get<1>(resraw);
+        auto rawR = std::get<0>(resraw);
 
-        // {{-1.122497e+01, -1.282854e+01, -1.443211e+01},
-        //  { 2.672612e-01, -1.195229e+00, -2.390457e+00},
-        //  { 5.345225e-01, -2.612154e-01,  2.288783e-15},
-        //  { 8.017837e-01, -7.252908e-01, -7.807764e-01}}
-
-
-        // auto resraw = xt::linalg::qr(AA, linalg::qrmode::raw);
-        // auto tau = std::get<1>(resraw);
-        // auto rawR = std::get<0>(resraw);
-        // std::cout << tau << std::endl;
-        // std::cout << rawR << std::endl;   
-        // EXPECT_TRUE(allclose(tau, eTau));
-        // EXPECT_TRUE(allclose(erawR, rawR));
+        EXPECT_TRUE(allclose(tau, eTau));
+        EXPECT_TRUE(allclose(erawR, rawR));
     }
 
     TEST(xlinalg, lstsq)
