@@ -392,17 +392,16 @@ namespace xt
         EXPECT_EQ(std::get<0>(resr).size(), 0);
         EXPECT_EQ(std::get<0>(resr).dimension(), 1);
 
-        // the stuff below tests fine on Fedora 25, but apparently not on Ubuntu?
-        xarray<double, layout_type::column_major> erawR = {{-1.12249722e+01,  2.67261242e-01,  5.34522484e-01,  8.01783726e-01},
-                                                           {-1.28285396e+01, -1.19522861e+00, -2.61215421e-01, -7.25290754e-01},
-                                                           {-1.44321071e+01, -2.39045722e+00,  3.48440273e-15,  2.74044353e-01}};
+        xarray<double, layout_type::column_major> erawR = {{-1.00444014e+01,  0.00000000e+00,  6.74440143e-01, 2.24813381e-01},
+                                                           {-9.58743044e+00, -1.25730337e+01, -6.22814365e-03, 3.37562246e-01},
+                                                           {-1.29027101e+01, -7.34080303e+00, -4.07831856e+00, -5.76331089e-01}};
 
-        xarray<double, layout_type::column_major> eTau = { 1., 1.25448465, 1.86029153};
+        xarray<double, layout_type::column_major> eTau = { 1.32854123, 1.79535299, 1.50132395};
 
-        xarray<double, layout_type::column_major> AA = {{  0.,  1.,  2.},
-                                                        {  3.,  4.,  5.},
-                                                        {  6.,  7.,  8.},
-                                                        {  9., 10., 11.}};
+        xarray<double, layout_type::column_major> AA = {{ 3.3,  1.,  2.},
+                                                        { 0. , 10.,  8.},
+                                                        { 9. ,  7., 12.},
+                                                        { 3. , 10.,  5.}};
 
         auto resraw = xt::linalg::qr(AA, linalg::qrmode::raw);
         auto tau = std::get<1>(resraw);
