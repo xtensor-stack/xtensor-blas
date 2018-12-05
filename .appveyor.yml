@@ -20,7 +20,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda install xtensor=0.18.3 -c conda-forge
+  - conda install xtensor=0.19.0 -c conda-forge
   - conda install gtest cmake -c conda-forge
   - conda install m2w64-openblas -c msys2
   # Patch OpenBLASConfig.cmake

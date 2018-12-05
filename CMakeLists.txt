@@ -15,7 +15,8 @@ set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR})
 # Configuration
 # =============
 
-# TODO: use the library directory of the found BLAS implementation instead of CMAKE_INSTALL_LIBDIR
+# TODO: use the library directory of the found BLAS implementation instead of
+# CMAKE_INSTALL_LIBDIR
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR_64 "\"${CMAKE_INSTALL_PREFIX}/lib64\"")
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR_32 "\"${CMAKE_INSTALL_PREFIX}/lib32\"")
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR "\"${CMAKE_INSTALL_PREFIX}/lib\"")
@@ -42,7 +43,7 @@ message(STATUS "xtensor-blas v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-find_package(xtensor REQUIRED)
+find_package(xtensor 0.19 REQUIRED)
 message(STATUS "Found xtensor: ${xtensor_INCLUDE_DIRS}/xensor")
 
 # Build
