@@ -880,14 +880,7 @@ namespace linalg
         XTENSOR_ASSERT(db.derived_cast().dimension() == 1);
 
         common_type result = 0;
-        if (xtl::is_complex<typename T::value_type>::value)
-        {
-            blas::dot(a, b, result);
-        }
-        else
-        {
-            blas::dotu(a, b, result);
-        }
+        blas::dot(a, b, result);
 
         return result;
     }
