@@ -338,7 +338,7 @@ namespace linalg
             }
         }
 
-        return std::make_tuple(eig_vals, eig_vecs);
+        return std::make_tuple(std::move(eig_vals), std::move(eig_vecs));
     }
 
     template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
@@ -365,7 +365,7 @@ namespace linalg
             throw std::runtime_error("Eigenvalue calculation did not converge.");
         }
 
-        return std::make_tuple(w, VR);
+        return std::make_tuple(std::move(w), std::move(VR));
     }
 
     /**
@@ -391,7 +391,7 @@ namespace linalg
             throw std::runtime_error("Eigenvalue computation did not converge.");
         }
 
-        return std::make_tuple(w, M);
+        return std::make_tuple(std::move(w), std::move(M));
     }
 
     template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
@@ -412,7 +412,7 @@ namespace linalg
             throw std::runtime_error("Eigenvalue computation did not converge.");
         }
 
-        return std::make_tuple(w, M);
+        return std::make_tuple(std::move(w), std::move(M));
     }
 
     /**
@@ -876,14 +876,11 @@ namespace linalg
 
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
 
-        const auto da = a.derived_cast();
-        const auto db = b.derived_cast();
-
-        XTENSOR_ASSERT(da.dimension() == 1);
-        XTENSOR_ASSERT(db.dimension() == 1);
+        XTENSOR_ASSERT(da.derived_cast().dimension() == 1);
+        XTENSOR_ASSERT(db.derived_cast().dimension() == 1);
 
         common_type result = 0;
-        blas::dot(da, db, result);
+        blas::dot(a, b, result);
 
         return result;
     }
@@ -901,16 +898,13 @@ namespace linalg
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
         using return_type = xtensor<common_type, 2>;
 
-        const auto da = a.derived_cast();
-        const auto db = b.derived_cast();
+        XTENSOR_ASSERT(a.derived_cast().dimension() == 1);
+        XTENSOR_ASSERT(b.derived_cast().dimension() == 1);
 
-        XTENSOR_ASSERT(da.dimension() == 1);
-        XTENSOR_ASSERT(db.dimension() == 1);
+        typename return_type::shape_type s = {a.derived_cast().shape()[0], b.derived_cast().shape()[0]};
+        return_type result(s, common_type(0));
 
-        typename return_type::shape_type s = {da.shape()[0], db.shape()[0]};
-        return_type result(s, 0);
-
-        blas::ger(da, db, result);
+        blas::ger(a, b, result);
 
         return result;
     }
@@ -987,7 +981,7 @@ namespace linalg
             v_sign *= (LU(i, i) / abs_elem);
             result += std::log(abs_elem);
         }
-        return std::make_tuple(v_sign, result);
+        return std::make_tuple(std::move(v_sign), std::move(result));
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
@@ -1026,7 +1020,7 @@ namespace linalg
         }
 
         value_type v_sign = (sign % 2) ? -1 : 1;
-        return std::make_tuple(v_sign, result);
+        return std::make_tuple(std::move(v_sign), std::move(result));
     }
     /// @endcond
 
@@ -1110,13 +1104,13 @@ namespace linalg
         {
             R = xt::view(R, range(0, K), all());
             xblas_detail::triu_inplace(R);
-            return std::make_tuple(Q, R);
+            return std::make_tuple(std::move(Q), std::move(R));
         }
 
         if (mode == qrmode::raw)
         {
             R = transpose(R);
-            return std::make_tuple(R, tau);
+            return std::make_tuple(std::move(R), std::move(tau));
         }
 
         blas_index_t mc;
@@ -1140,7 +1134,7 @@ namespace linalg
 
         xblas_detail::triu_inplace(R);
 
-        return std::make_tuple(Q, R);
+        return std::make_tuple(std::move(Q), std::move(R));
     }
 
     /**
@@ -1199,7 +1193,7 @@ namespace linalg
             throw std::runtime_error("SVD decomposition failed.");
         }
 
-        return std::make_tuple(std::get<1>(result), std::get<2>(result), std::get<3>(result));
+        return std::make_tuple(std::move(std::get<1>(result)), std::move(std::get<2>(result)), std::move(std::get<3>(result)));
     }
 
     /**
@@ -1215,9 +1209,9 @@ namespace linalg
 
         auto gesdd_res = svd(M, false, true);
 
-        auto u = std::get<0>(gesdd_res);
-        auto s = std::get<1>(gesdd_res);
-        auto vt = std::get<2>(gesdd_res);
+        auto u = std::move(std::get<0>(gesdd_res));
+        auto s = std::move(std::get<1>(gesdd_res));
+        auto vt = std::move(std::get<2>(gesdd_res));
 
         using real_value_type = typename decltype(s)::value_type;
         real_value_type cutoff = static_cast<real_value_type>(rcond) * (*std::max_element(s.begin(), s.end()));
@@ -1496,7 +1490,7 @@ namespace linalg
             db = xt::squeeze(db);
         }
 
-        return std::make_tuple(db, residuals, rank, s);
+        return std::make_tuple(std::move(db), std::move(residuals), std::move(rank), std::move(s));
     }
 
     /**

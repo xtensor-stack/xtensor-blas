@@ -13,6 +13,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include "xtensor-blas/xblas_config.hpp"
 #include "xflens/cxxblas/typedefs.h"
 #include "xtensor/xutils.hpp"
 

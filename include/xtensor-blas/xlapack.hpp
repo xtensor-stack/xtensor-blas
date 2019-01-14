@@ -308,7 +308,7 @@ namespace lapack
             iwork.data()
         );
 
-        return std::make_tuple(info, u, s, vt);
+        return std::make_tuple(std::move(info), std::move(u), std::move(s), std::move(vt));
     }
 
     // Complex variant of gesdd
@@ -395,7 +395,7 @@ namespace lapack
             iwork.data()
         );
 
-        return std::make_tuple(info, u, s, vt);
+        return std::make_tuple(std::move(info), std::move(u), std::move(s), std::move(vt));
     }
 
 
