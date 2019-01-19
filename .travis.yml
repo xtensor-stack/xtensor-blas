@@ -143,7 +143,7 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda info -a
-    - conda install gtest cmake -c conda-forge
+    - conda install cmake -c conda-forge
     # Install xtensor and BLAS
     - conda install xtensor=0.19.0 -c conda-forge
     - if [[ "$BLAS" == "OpenBLAS" ]]; then
@@ -153,9 +153,9 @@ install:
       fi
     # Testing
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
-        cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;
+        cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;
       else
-        cmake -DBUILD_TESTS=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;
+        cmake -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib .;
       fi
     - make -j2 test_xtensor_blas
 script:
