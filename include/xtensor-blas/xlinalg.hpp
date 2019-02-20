@@ -876,8 +876,8 @@ namespace linalg
 
         using common_type = std::common_type_t<typename T::value_type, typename O::value_type>;
 
-        XTENSOR_ASSERT(da.derived_cast().dimension() == 1);
-        XTENSOR_ASSERT(db.derived_cast().dimension() == 1);
+        XTENSOR_ASSERT(a.derived_cast().dimension() == 1);
+        XTENSOR_ASSERT(b.derived_cast().dimension() == 1);
 
         common_type result = 0;
         blas::dot(a, b, result);
