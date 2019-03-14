@@ -202,7 +202,6 @@ namespace xt
         EXPECT_EQ(res3.dimension(), 2);
         EXPECT_EQ(res3.shape()[0], 3);
         EXPECT_EQ(res3.shape()[1], 3);
-
     }
 
 }
