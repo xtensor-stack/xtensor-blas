@@ -63,6 +63,7 @@ http://xtensor-blas.readthedocs.io/
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
 | master          |  ^0.19.0  |
+| 0.15.2          |  ^0.19.0  |
 | 0.15.1          |  ^0.19.0  |
 | 0.15.0          |  ^0.19.0  |
 | 0.14.0          |  ^0.18.0  |
@@ -73,10 +74,6 @@ http://xtensor-blas.readthedocs.io/
 | 0.9.x           |  ^0.15.4  |
 | 0.8.x           |  ^0.15.0  |
 | 0.7.x           |  ^0.14.0  |
-
-## Changelog
-
-`0.9.0`: BREAKING CHANGE! `svd` signature changed to match NumPy.
 
 ## License
 
