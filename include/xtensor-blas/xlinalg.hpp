@@ -345,7 +345,6 @@ namespace linalg
     auto eig(const xexpression<E>& A)
     {
         using value_type = typename E::value_type;
-        using underlying_type = typename value_type::value_type;
 
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
@@ -923,7 +922,7 @@ namespace linalg
 
         uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
-        int res = lapack::getrf(LU, piv);
+        lapack::getrf(LU, piv);
 
         value_type result(1);
         for (std::size_t i = 0; i < piv.size(); ++i)
@@ -1464,9 +1463,7 @@ namespace linalg
 
         blas_index_t rank;
 
-        int info = lapack::gelsd(dA, db, s, rank, rcond);
-
-        std::array<std::size_t, 1> residuals_shp = {0};
+        lapack::gelsd(dA, db, s, rank, rcond);
         auto residuals = xtensor<underlying_value_type, 1>::from_shape({0});
 
         if (std::size_t(rank) == N && M > N)
