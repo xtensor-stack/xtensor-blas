@@ -263,7 +263,7 @@ namespace lapack
         s.resize({ std::max(std::size_t(1), std::min(m, n)) });
 
         xtype2 u, vt;
-    
+
         blas_index_t u_stride, vt_stride;
         std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
 
@@ -471,7 +471,6 @@ namespace lapack
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
 
         using value_type = typename E::value_type;
-        using xtype = xtensor<value_type, 2, layout_type::column_major>;
 
         const auto N = A.shape()[0];
         uvector<value_type> work(1);
@@ -529,7 +528,6 @@ namespace lapack
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
 
         using value_type = typename E::value_type;
-        using xtype = xtensor<value_type, 2, layout_type::column_major>;
 
         auto N = A.shape()[0];
         uvector<value_type> work(1);
@@ -585,7 +583,6 @@ namespace lapack
 
         using value_type = typename E::value_type;
         using underlying_value_type = typename value_type::value_type;
-        using xtype = xtensor<value_type, 2, layout_type::column_major>;
 
         const auto N = A.shape()[0];
         uvector<value_type> work(1);
@@ -641,7 +638,6 @@ namespace lapack
 
         using value_type = typename E::value_type;
         using underlying_value_type = typename value_type::value_type;
-        using xtype = xtensor<value_type, 2, layout_type::column_major>;
 
         auto N = A.shape()[0];
         uvector<value_type> work(1);
