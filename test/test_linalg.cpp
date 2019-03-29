@@ -579,4 +579,18 @@ namespace xt
 
         EXPECT_TRUE(allclose(expected4, res4));
     }
+
+    TEST(xlinalg, negative_strides)
+    {
+        xt::xarray<double> A = {{2, 3}, {5, 7}, {11, 13}};
+
+        auto A1 = xt::view(A, xt::range(0, 3), 0);
+        auto A2 = xt::view(A, xt::range(-1, -4, -1), 1);
+
+        auto res = xt::linalg::dot(A1, A2);
+        EXPECT_EQ(res(), 94);
+
+        
+    }
+
 }

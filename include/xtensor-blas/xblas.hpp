@@ -83,12 +83,27 @@ namespace blas
         auto&& bd = view_eval<E2::static_layout>(b.derived_cast());
         XTENSOR_ASSERT(ad.dimension() == 1);
 
+        blas_index_t stride_a = stride_front(ad);
+        blas_index_t stride_b = stride_front(bd);
+
+        auto* adt = ad.data() + ad.data_offset();
+        auto* bdt = bd.data() + bd.data_offset();
+
+        // we need to have a pointer that points to the "real" start of the memory
+        // not to the first element (BLAS is doing that transformation itself)
+        if (stride_a < 0) {
+            adt += (ad.shape()[0] - 1) * stride_a; // go back to the start
+        }
+        if (stride_b < 0) {
+            bdt += (ad.shape()[0] - 1) * stride_b; // go back to the start
+        }
+
         cxxblas::dot<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
-            ad.data() + ad.data_offset(),
-            stride_front(ad),
-            bd.data() + bd.data_offset(),
-            stride_front(bd),
+            adt,
+            stride_a,
+            bdt,
+            stride_b,
             result
         );
     }
@@ -108,12 +123,27 @@ namespace blas
         auto&& bd = view_eval<E2::static_layout>(b.derived_cast());
         XTENSOR_ASSERT(ad.dimension() == 1);
 
+        blas_index_t stride_a = stride_front(ad);
+        blas_index_t stride_b = stride_front(bd);
+
+        auto* adt = ad.data() + ad.data_offset();
+        auto* bdt = bd.data() + bd.data_offset();
+
+        // we need to have a pointer that points to the "real" start of the memory
+        // not to the first element (BLAS is doing that transformation itself)
+        if (stride_a < 0) {
+            adt += (ad.shape()[0] - 1) * stride_a; // go back to the start
+        }
+        if (stride_b < 0) {
+            bdt += (ad.shape()[0] - 1) * stride_b; // go back to the start
+        }
+
         cxxblas::dotu<blas_index_t>(
             static_cast<blas_index_t>(ad.shape()[0]),
-            ad.data() + ad.data_offset(),
-            stride_front(ad),
-            bd.data() + bd.data_offset(),
-            stride_front(bd),
+            adt,
+            stride_a,
+            bdt,
+            stride_b,
             result
         );
     }
