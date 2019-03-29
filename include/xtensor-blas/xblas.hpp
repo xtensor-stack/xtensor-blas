@@ -226,9 +226,9 @@ namespace blas
             static_cast<blas_index_t>(dy.shape()[0]),
             alpha,
             dx.data() + dx.data_offset(),
-            static_cast<blas_index_t>(dx.strides().front()),
+            get_leading_stride(dx),
             dy.data() + dy.data_offset(),
-            static_cast<blas_index_t>(dy.strides().front()),
+            get_leading_stride(dy),
             result.data() + result.data_offset(),
             static_cast<blas_index_t>(result.strides().front())
         );

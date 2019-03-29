@@ -10,6 +10,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xrandom.hpp"
 
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlinalg.hpp"
@@ -109,6 +110,23 @@ namespace xt
         EXPECT_TRUE(all(equal(expected, t)));
         EXPECT_TRUE(all(equal(expected, t2)));
         EXPECT_TRUE(all(equal(expected, t3)));
+    }
+
+    TEST(xblas, outer_random)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> expected = xt::random::randn<double>({5});
+        xt::random::seed(123);
+        auto x = xt::random::randn<double>({5});
+        auto weights = xt::xarray<double> ({1});  // should perform identity
+
+        auto result = linalg::outer(x, weights);
+
+        // shapes are different
+        for (std::size_t i = 0; i < 5; ++i)
+        {
+            EXPECT_EQ(result.data()[i], expected.data()[i]);
+        }
     }
 
     TEST(xblas, nan_result)
