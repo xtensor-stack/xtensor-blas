@@ -52,6 +52,9 @@ tpaxpy(StorageOrder order, StorageUpLo, Transpose trans, Diag diag,
     ASSERT(order==ColMajor);
     ASSERT(diag==NonUnit);
 
+    // Dummy operation to avoid compiler warnings
+    (void)(order);
+
     // TODO: Remove copy of diagonal if diag == Unit
 
     if (trans==NoTrans) {
