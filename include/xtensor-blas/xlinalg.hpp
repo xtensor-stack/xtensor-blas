@@ -415,6 +415,57 @@ namespace linalg
     }
 
     /**
+     * Compute the generalized eigenvalues and eigenvectors of a square Hermitian or real symmetric
+     * xexpression.
+     *
+     * @param A,B Matrices for which the generalized eigenvalues and right eigenvectors are computed
+     * @return xtensor containing the eigenvalues.
+     */
+    template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigh(const xexpression<E>& A, const xexpression<E>& B,const char UPLO = 'L')
+    {
+        using value_type = typename E::value_type;
+
+        auto M1 = copy_to_layout<layout_type::column_major>(A.derived_cast());
+        auto M2 = copy_to_layout<layout_type::column_major>(B.derived_cast());
+
+        std::size_t N = M1.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<value_type, 1, layout_type::column_major> w(vN);
+
+        int info = lapack::sygvd(M1, M2, 1, 'V', UPLO, w);
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue computation did not converge.");
+        }
+
+        return std::make_tuple(std::move(w), std::move(M1));
+    }
+
+    #if 0
+    template <class E, std::enable_if_t<xtl::is_complex<typename E::value_type>::value>* = nullptr>
+    auto eigh(const xexpression<E>& A, char UPLO = 'L')
+    {
+        using value_type = typename E::value_type;
+        using underlying_value_type = typename value_type::value_type;
+
+        auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+
+        std::size_t N = M.shape()[0];
+        std::array<std::size_t, 1> vN = {N};
+        xtensor<underlying_value_type, 1, layout_type::column_major> w(vN);
+
+        int info = lapack::heevd(M, 'V', UPLO, w);
+        if (info != 0)
+        {
+            throw std::runtime_error("Eigenvalue computation did not converge.");
+        }
+
+        return std::make_tuple(std::move(w), std::move(M));
+    }
+    #endif
+
+    /**
      * Compute the eigenvalues of a square xexpression.
      *
      * @param A Matrix for which the eigenvalues are computed
