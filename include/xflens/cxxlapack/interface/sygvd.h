@@ -41,6 +41,7 @@ template <typename IndexType>
     IndexType
     sygvd(IndexType             itype,
           char                  jobz,
+          char                  uplo,
           IndexType             n,
           float                 *A,
           IndexType             ldA,
@@ -56,6 +57,7 @@ template <typename IndexType>
     IndexType
     sygvd(IndexType             itype,
           char                  jobz,
+          char                  uplo,
           IndexType             n,
           double                *A,
           IndexType             ldA,
