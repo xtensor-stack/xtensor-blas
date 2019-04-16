@@ -94,7 +94,7 @@ namespace linalg
                 {
                     result += std::abs(std::pow(v(i), ord));
                 }
-                result = std::pow(result, 1./ double(ord));
+                result = std::pow(result, 1./ static_cast<double>(ord));
             }
             return result;
         }
@@ -537,7 +537,7 @@ namespace linalg
 
             inline bool next()
             {
-                size_type dim = m_a.dimension();
+                size_type dim = static_cast<size_type>(m_a.dimension());
                 for (size_type j = dim; j != 0; --j)
                 {
                     size_type i = j - 1;
