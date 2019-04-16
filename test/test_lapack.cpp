@@ -53,6 +53,29 @@ namespace xt
         EXPECT_TRUE(allclose(abs(real(eigvecs)), abs(real(eig_expected_1))));
     }
 
+    TEST(xlapack, generalized_eigenvalues)
+    {
+        xarray<double> eig_arg_0 = {{  0.24,  0.39,  0.42, -0.16},
+                                    {  0.39, -0.11,  0.79,  0.63},
+                                    {  0.42,  0.79, -0.25,  0.48},
+                                    { -0.16,  0.63,  0.48, -0.03}};
+        xarray<double> eig_arg_1 = {{  4.16, -3.12,  0.56, -0.10},
+                                    { -3.12,  5.03, -0.83,  1.09},
+                                    {  0.56, -0.83,  0.76,  0.34},
+                                    { -0.10,  1.09,  0.34,  1.18}};
+        auto eig_res = xt::linalg::eigh(eig_arg_0,eig_arg_1);
+        xtensor<double, 1> eig_expected_0 = { -3.5411, -0.3347, 0.2983, 2.2544 };
+        xtensor<double, 2> eig_expected_1 = {{  1.0,      1.0,     1.0,    1.0},
+                                             {-10.6846,  -4.1593,  1.0517, 1.8547},
+                                             {  8.2568, -15.0567,  0.9577, 2.9680},
+                                             {  8.9384,  10.2472, -1.4993, 2.0218}};
+        xarray<double> eigvals = std::get<0>(eig_res);
+        xarray<double> eigvecs = std::get<1>(eig_res);
+
+        EXPECT_TRUE(allclose(eigvals, eig_expected_0));
+        EXPECT_TRUE(allclose(abs(eigvecs), abs(eig_expected_1)));
+    }
+
     TEST(xlapack, inverse)
     {
         xarray<double> a = {{ 2, 1, 1},
