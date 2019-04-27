@@ -260,7 +260,7 @@ namespace blas
             dy.data() + dy.data_offset(),
             get_leading_stride(dy),
             result.data() + result.data_offset(),
-            static_cast<blas_index_t>(result.strides().front())
+            get_leading_stride(result)
         );
     }
 }
