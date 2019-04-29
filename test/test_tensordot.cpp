@@ -202,9 +202,9 @@ namespace xt
                                       view(b, 0, all(), all(), all()), {0, 2}, {1,2});
 
         EXPECT_EQ(res1, e1);
-        EXPECT_EQ(res1.dimension(), 2);
-        EXPECT_EQ(res1.shape()[0], 3);
-        EXPECT_EQ(res1.shape()[1], 3);
+        EXPECT_EQ(res1.dimension(), 2u);
+        EXPECT_EQ(res1.shape()[0], 3u);
+        EXPECT_EQ(res1.shape()[1], 3u);
     }
 
     TEST(xtensordot, strided_view_range)
@@ -218,9 +218,9 @@ namespace xt
                                       strided_view(b, {range(0, 2), range(0,2), all(), all()}),
                                       {0, 1, 2}, {0, 1, 2});
         EXPECT_EQ(res1, e1);
-        EXPECT_EQ(res1.dimension(), 2);
-        EXPECT_EQ(res1.shape()[0], 2);
-        EXPECT_EQ(res1.shape()[1], 2);
+        EXPECT_EQ(res1.dimension(), 2u);
+        EXPECT_EQ(res1.shape()[0], 2u);
+        EXPECT_EQ(res1.shape()[1], 2u);
 
     }
 

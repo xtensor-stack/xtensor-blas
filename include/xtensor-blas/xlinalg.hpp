@@ -94,7 +94,7 @@ namespace linalg
                 {
                     result += std::abs(std::pow(v(i), ord));
                 }
-                result = std::pow(result, 1./ (double) ord);
+                result = std::pow(result, 1./ double(ord));
             }
             return result;
         }
@@ -537,17 +537,18 @@ namespace linalg
 
             inline bool next()
             {
-                int dim = (int) m_a.dimension();
-                for (int i = dim - 1; i >= 0; --i)
+                size_type dim = m_a.dimension();
+                for (size_type j = dim; j != 0; --j)
                 {
-                    if (i == (int) m_axis)
+                    size_type i = j - 1;
+                    if (i == m_axis)
                     {
                         // skip
                     }
                     else if (m_idx[i] == m_a.shape()[i] - 1)
                     {
-                        m_offset -= m_idx[i] * m_a.strides()[i];
-                        m_idx[i] = 0;
+                        m_offset -= m_idx[i] * static_cast<size_type>(m_a.strides()[i]);
+                        m_idx[i] = size_type(0);
                         if (i == 0 || m_axis == 0 && i == 1)
                         {
                             return false;
@@ -556,7 +557,7 @@ namespace linalg
                     else
                     {
                         ++m_idx[i];
-                        m_offset += m_a.strides()[i];
+                        m_offset += static_cast<size_type>(m_a.strides()[i]);
                         return true;
                     }
                 }
@@ -807,15 +808,15 @@ namespace linalg
                 blas_index_t nd = a_dim + b_dim - 2;
 
                 std::size_t j = 0;
-                std::vector<std::size_t> dimensions((std::size_t) nd);
+                std::vector<std::size_t> dimensions(static_cast<std::size_t>(nd));
 
                 for (blas_index_t i = 0; i < a_dim - 1; ++i)
                 {
-                    dimensions[j++] = t.shape()[i];
+                    dimensions[j++] = t.shape()[static_cast<std::size_t>(i)];
                 }
                 for (blas_index_t i = 0; i < b_dim - 2; ++i)
                 {
-                    dimensions[j++] = o.shape()[i];
+                    dimensions[j++] = o.shape()[static_cast<std::size_t>(i)];
                 }
                 if (b_dim > 1)
                 {
@@ -1116,12 +1117,12 @@ namespace linalg
 
         if (mode == qrmode::complete && M > N)
         {
-            mc = (blas_index_t) M;
+            mc = static_cast<blas_index_t>(M);
             Q.resize({M, M});
         }
         else
         {
-            mc = (blas_index_t) K;
+            mc = static_cast<blas_index_t>(K);
             Q.resize({M, N});
         }
 
@@ -1315,7 +1316,7 @@ namespace linalg
     auto trace(const xexpression<T>& M, int offset = 0, int axis1 = 0, int axis2 = 1)
     {
         const auto& dM = M.derived_cast();
-        auto d = xt::diagonal(dM, offset, axis1, axis2);
+        auto d = xt::diagonal(dM, offset, std::size_t(axis1), std::size_t(axis2));
 
         std::size_t dim = d.dimension();
         if (dim == 1)

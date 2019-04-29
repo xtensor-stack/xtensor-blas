@@ -389,8 +389,8 @@ namespace xt
         EXPECT_TRUE(allclose(nearaf, a));
 
         EXPECT_EQ(std::get<1>(resr), xt::view(rf, xt::range(0, 6), xt::all()));
-        EXPECT_EQ(std::get<0>(resr).size(), 0);
-        EXPECT_EQ(std::get<0>(resr).dimension(), 1);
+        EXPECT_EQ(std::get<0>(resr).size(), 0u);
+        EXPECT_EQ(std::get<0>(resr).dimension(), 1u);
 
         xarray<double, layout_type::column_major> erawR = {{-1.00444014e+01,  0.00000000e+00,  6.74440143e-01, 2.24813381e-01},
                                                            {-9.58743044e+00, -1.25730337e+01, -6.22814365e-03, 3.37562246e-01},

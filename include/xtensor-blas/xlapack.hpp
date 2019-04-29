@@ -104,7 +104,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for orgqr.");
         }
 
-        work.resize((std::size_t) work[0]);
+        work.resize(static_cast<std::size_t>(work[0]));
 
         info = cxxlapack::orgqr<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),
@@ -148,7 +148,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for ungqr.");
         }
 
-        work.resize((std::size_t) std::real(work[0]));
+        work.resize(static_cast<std::size_t>(std::real(work[0])));
 
         info = cxxlapack::ungqr<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),
@@ -189,7 +189,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for geqrf.");
         }
 
-        work.resize((std::size_t) std::real(work[0]));
+        work.resize(static_cast<std::size_t>(std::real(work[0])));
 
         info = cxxlapack::geqrf<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),
@@ -290,7 +290,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for real gesdd.");
         }
 
-        work.resize((std::size_t) work[0]);
+        work.resize(static_cast<std::size_t>(work[0]));
 
         info = cxxlapack::gesdd<blas_index_t>(
             jobz,
@@ -376,7 +376,7 @@ namespace lapack
         {
             throw std::runtime_error("Could not find workspace size for complex gesdd.");
         }
-        work.resize((std::size_t) std::real(work[0]));
+        work.resize(static_cast<std::size_t>(std::real(work[0])));
 
         info = cxxlapack::gesdd<blas_index_t>(
             jobz,
@@ -699,7 +699,7 @@ namespace lapack
         std::size_t m = A.shape()[0];
         std::size_t n = A.shape()[1];
 
-        blas_index_t b_stride = (blas_index_t) std::max(std::max(std::size_t(1), m), n);
+        blas_index_t b_stride = static_cast<blas_index_t>(std::max(std::max(std::size_t(1), m), n));
 
         int info = cxxlapack::gelsd<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),
