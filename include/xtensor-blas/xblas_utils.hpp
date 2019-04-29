@@ -103,28 +103,37 @@ namespace xt
      * Get leading stride
      */
 
-    template <class A, std::enable_if_t<A::static_layout == layout_type::row_major>* = nullptr>
-    inline BLAS_IDX get_leading_stride(const A& a)
+    namespace detail
     {
-        return static_cast<BLAS_IDX>(a.strides().front() == 0 ? a.shape().back() : a.strides().front());
+        template <class T, class U>
+        inline blas_index_t get_leading_stride_impl(const T& str, const U& sh)
+        {
+            return str == T(0) ? static_cast<blas_index_t>(sh) : static_cast<blas_index_t>(str);
+        }
+    }
+
+    template <class A, std::enable_if_t<A::static_layout == layout_type::row_major>* = nullptr>
+    inline blas_index_t get_leading_stride(const A& a)
+    {
+        return detail::get_leading_stride_impl(a.strides().front(), a.shape().back());
     }
 
     template <class A, std::enable_if_t<A::static_layout == layout_type::column_major>* = nullptr>
-    inline BLAS_IDX get_leading_stride(const A& a)
+    inline blas_index_t get_leading_stride(const A& a)
     {
-        return static_cast<BLAS_IDX>(a.strides().back() == 0 ? a.shape().front() : a.strides().back());
+        return detail::get_leading_stride_impl(a.strides().back(), a.shape().front());
     }
 
     template <class A, std::enable_if_t<A::static_layout != layout_type::row_major && A::static_layout != layout_type::column_major>* = nullptr>
-    inline BLAS_IDX get_leading_stride(const A& a)
+    inline blas_index_t get_leading_stride(const A& a)
     {
         if (a.layout() == layout_type::row_major)
         {
-            return static_cast<BLAS_IDX>(a.strides().front() == 0 ? a.shape().back() : a.strides().front());
+            return detail::get_leading_stride_impl(a.strides().front(), a.shape().back());
         }
         else if (a.layout() == layout_type::column_major)
         {
-            return static_cast<BLAS_IDX>(a.strides().back() == 0 ? a.shape().front() : a.strides().back());
+            return detail::get_leading_stride_impl(a.strides().back(), a.shape().front());
         }
         DEFAULT_LEADING_STRIDE_BEHAVIOR;
     }

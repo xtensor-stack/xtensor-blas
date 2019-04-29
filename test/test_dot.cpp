@@ -83,7 +83,7 @@ namespace xt
         EXPECT_EQ(e2, r2);
 
         auto r3 = linalg::dot(b, e1);
-        EXPECT_EQ(b * 3, r3);
+        EXPECT_EQ(b * 3.f, r3);
     }
 
     TEST(xdot, matrix_times_1d)
@@ -174,7 +174,7 @@ namespace xt
         EXPECT_EQ(e2, r2);
 
         auto r3 = linalg::dot(b, e1);
-        EXPECT_EQ(b * 3, r3);
+        EXPECT_EQ(b * 3.f, r3);
     }
 
     TEST(xdot, on_view)
@@ -189,9 +189,9 @@ namespace xt
         EXPECT_EQ(res1(0, 0), 285.);
         EXPECT_EQ(res1(1, 2), 3635.);
 
-        EXPECT_EQ(res1.dimension(), 2);
-        EXPECT_EQ(res1.shape()[0], 3);
-        EXPECT_EQ(res1.shape()[1], 3);
+        EXPECT_EQ(res1.dimension(), 2u);
+        EXPECT_EQ(res1.shape()[0], 3u);
+        EXPECT_EQ(res1.shape()[1], 3u);
 
         auto res2 = xt::linalg::dot(strided_view(a, {0, 0}), strided_view(b, {0, 0}));
         auto res3 = xt::linalg::dot(strided_view(a, {0, range(0, 3)}), transpose(strided_view(b, {0, range(0, 3)})));
@@ -199,9 +199,9 @@ namespace xt
         EXPECT_EQ(res3(0, 0), 285.);
         EXPECT_EQ(res3(1, 2), 3635.);
 
-        EXPECT_EQ(res3.dimension(), 2);
-        EXPECT_EQ(res3.shape()[0], 3);
-        EXPECT_EQ(res3.shape()[1], 3);
+        EXPECT_EQ(res3.dimension(), 2u);
+        EXPECT_EQ(res3.shape()[0], 3u);
+        EXPECT_EQ(res3.shape()[1], 3u);
     }
 
 }

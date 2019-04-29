@@ -92,10 +92,10 @@ namespace blas
         // we need to have a pointer that points to the "real" start of the memory
         // not to the first element (BLAS is doing that transformation itself)
         if (stride_a < 0) {
-            adt += (ad.shape()[0] - 1) * stride_a; // go back to the start
+            adt += (static_cast<blas_index_t>(ad.shape()[0]) - 1) * stride_a; // go back to the start
         }
         if (stride_b < 0) {
-            bdt += (ad.shape()[0] - 1) * stride_b; // go back to the start
+            bdt += (static_cast<blas_index_t>(ad.shape()[0]) - 1) * stride_b; // go back to the start
         }
 
         cxxblas::dot<blas_index_t>(
@@ -132,10 +132,10 @@ namespace blas
         // we need to have a pointer that points to the "real" start of the memory
         // not to the first element (BLAS is doing that transformation itself)
         if (stride_a < 0) {
-            adt += (ad.shape()[0] - 1) * stride_a; // go back to the start
+            adt += (static_cast<blas_index_t>(ad.shape()[0]) - 1) * stride_a; // go back to the start
         }
         if (stride_b < 0) {
-            bdt += (ad.shape()[0] - 1) * stride_b; // go back to the start
+            bdt += (static_cast<blas_index_t>(ad.shape()[0]) - 1) * stride_b; // go back to the start
         }
 
         cxxblas::dotu<blas_index_t>(
