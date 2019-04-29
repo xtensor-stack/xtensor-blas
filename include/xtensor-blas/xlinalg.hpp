@@ -1578,8 +1578,8 @@ namespace linalg
                 result_shape[j++] = b.shape()[i];
             }
             // flatten a/b
-            auto vec_a = xt::ravel<T::static_layout>(a);
-            auto vec_b = xt::ravel<O::static_layout>(b);
+            auto vec_a = xt::ravel<result_type::static_layout>(a);
+            auto vec_b = xt::ravel<result_type::static_layout>(b);
             // take the outer product of the two vectors
             result = outer(vec_a, vec_b);
             // reshape the result
