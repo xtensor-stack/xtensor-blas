@@ -42,7 +42,7 @@ jobs:
                         gtest ^
                         mkl-devel ^
                         ninja ^
-                        xtensor=0.20.4 ^
+                        xtensor=0.20.6 ^
                         python=3.6
           conda list
         displayName: "Install conda packages"
