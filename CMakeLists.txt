@@ -60,8 +60,14 @@ set(XTENSOR_BLAS_HEADERS
 
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
 OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
+# Decide whether to use OpenBLAS or not.
+# The user might have the folder containing OpenBLASConfig.cmake file
+# in the paths inspected by CMake already and just setting this to ON
+# would be enough to detect OpenBLAS.
+# If that is not the case, one can pass OpenBLAS_DIR without the boolean
+# toggle.
 OPTION(USE_OPENBLAS "use OpenBLAS (requires suitable OpenBLASConfig.cmake)" OFF)
-if(OpenBLASConfig_DIR)
+if(OpenBLAS_DIR)
   set(USE_OPENBLAS ON)
 endif()
 
