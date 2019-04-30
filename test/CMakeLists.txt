@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-blas-test)
@@ -24,31 +24,43 @@ include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
+# C++14 is the earliest standard needed to compile
+set(CMAKE_CXX_STANDARD 14)
+if(CPP17)
+  # User requested C++17, but compiler might not oblige.
+  # Thus, we check availability of the flag.
+  CHECK_CXX_COMPILER_FLAG("-std=c++17" nonwin_HAS_CPP17_FLAG)
+  CHECK_CXX_COMPILER_FLAG("/std:c++17" win_HAS_CPP17_FLAG)
+  if(win_HAS_CPP17_FLAG OR nonwin_HAS_CPP17_FLAG)
+    message(STATUS "Building with C++17")
+    set(CMAKE_CXX_STANDARD 17)
+  else()
+    message(STATUS "Building with C++14")
+  endif()
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj /wd4800")
+  set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if(NOT WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
-    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion")
-    CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
-    CHECK_CXX_COMPILER_FLAG("-std=c++17" HAS_CPP17_FLAG)
-
-    if (CPP17 AND HAS_CPP17_FLAG)
-        set(CMAKE_CXX_STANDARD 17)
-        message(STATUS "Building with -std=c++17")
-    elseif (HAS_CPP14_FLAG)
-        set(CMAKE_CXX_STANDARD 14)
-        message(STATUS "Building with -std=c++14")
-    else()
-        message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
-    endif()
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set(CMAKE_CXX_EXTENSIONS OFF)
-endif()
-
-if(MSVC)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  else() # We are using clang-cl
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj /wd4800")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+  endif()
+else()
+  message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
 endif()
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
@@ -90,7 +102,7 @@ include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${XBLAS_INCLUDE_DIR})
 
 find_package(xtensor REQUIRED)
-if (WIN32)
+if(USE_OPENBLAS)
     find_package(OpenBLAS REQUIRED)
     set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
 else()

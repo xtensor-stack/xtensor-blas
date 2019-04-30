@@ -60,6 +60,10 @@ set(XTENSOR_BLAS_HEADERS
 
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
 OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
+OPTION(USE_OPENBLAS "use OpenBLAS (requires suitable OpenBLASConfig.cmake)" OFF)
+if(OpenBLASConfig_DIR)
+  set(USE_OPENBLAS ON)
+endif()
 
 if(XTENSOR_USE_FLENS_BLAS)
   add_definitions(-DXTENSOR_USE_FLENS_BLAS=1)
