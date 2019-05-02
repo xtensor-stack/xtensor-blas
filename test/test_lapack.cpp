@@ -64,13 +64,19 @@ namespace xt
                                     {  0.56, -0.83,  0.76,  0.34},
                                     { -0.10,  1.09,  0.34,  1.18}};
         auto eig_res = xt::linalg::eigh(eig_arg_0,eig_arg_1);
-        xtensor<double, 1> eig_expected_0 = { -3.5411, -0.3347, 0.2983, 2.2544 };
-        xtensor<double, 2> eig_expected_1 = {{  1.0,      1.0,     1.0,    1.0},
-                                             {-10.6846,  -4.1593,  1.0517, 1.8547},
-                                             {  8.2568, -15.0567,  0.9577, 2.9680},
-                                             {  8.9384,  10.2472, -1.4993, 2.0218}};
+        xtensor<double, 1> eig_expected_0 = { -2.225448, -0.454756,  0.100076,  1.127039 };
+        xtensor<double, 2> eig_expected_1 = {{ 0.031913,  0.327020,  0.682699,  0.425628 },
+                                             { 0.265466,  0.565845,  0.056645,  0.520961 },
+                                             { 0.713483, -0.371290, -0.077102,  0.714215 },
+                                             {-0.647650, -0.659561, -0.724409, -0.193227 }};
         xarray<double> eigvals = std::get<0>(eig_res);
         xarray<double> eigvecs = std::get<1>(eig_res);
+        for (unsigned i=0;i<4;++i) {
+            auto v = xt::view(eigvecs, xt::all(), i);
+            v /= xt::linalg::norm(v,2);
+            if (v(0)<0.0)
+                v = -v;
+        }
 
         EXPECT_TRUE(allclose(eigvals, eig_expected_0));
         EXPECT_TRUE(allclose(abs(eigvecs), abs(eig_expected_1)));
