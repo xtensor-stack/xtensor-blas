@@ -571,6 +571,70 @@ namespace lapack
     }
 
     /**
+     * Interface to LAPACK sygvd.
+     * @returns info
+     */
+    template <class E, class W>
+    int sygvd(E& A, E& B, blas_index_t itype, char jobz, char uplo, W& w)
+    {
+        XTENSOR_ASSERT(A.dimension() == 2);
+        XTENSOR_ASSERT(A.layout() == layout_type::column_major);
+        XTENSOR_ASSERT(B.dimension() == 2);
+        XTENSOR_ASSERT(B.layout() == layout_type::column_major);
+
+        using value_type = typename E::value_type;
+        using xtype = xtensor<value_type, 2, layout_type::column_major>;
+
+        auto N = A.shape()[0];
+        XTENSOR_ASSERT(B.shape()[0] ==N);
+
+        uvector<value_type> work(1);
+        uvector<blas_index_t> iwork(1);
+
+        int info = cxxlapack::sygvd<blas_index_t>(
+            itype,
+            jobz,
+            uplo,
+            static_cast<blas_index_t>(N),
+            A.data(),
+            stride_back(A),
+            B.data(),
+            stride_back(B),
+            w.data(),
+            work.data(),
+            static_cast<blas_index_t>(-1),
+            iwork.data(),
+            static_cast<blas_index_t>(-1)
+        );
+
+        if (info != 0)
+        {
+            throw std::runtime_error("Could not find workspace size for sygvd.");
+        }
+
+        work.resize(std::size_t(work[0]));
+        iwork.resize(std::size_t(iwork[0]));
+
+        info = cxxlapack::sygvd<blas_index_t>(
+            itype,
+            jobz,
+            uplo,
+            static_cast<blas_index_t>(N),
+            A.data(),
+            stride_back(A),
+            B.data(),
+            stride_back(B),
+            w.data(),
+            work.data(),
+            static_cast<blas_index_t>(work.size()),
+            iwork.data(),
+            static_cast<blas_index_t>(iwork.size())
+        );
+
+        return info;
+    }
+
+    /**
      * Complex version of geev
      */
     template <class E, class W, class V>

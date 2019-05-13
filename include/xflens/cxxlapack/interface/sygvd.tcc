@@ -43,6 +43,7 @@ template <typename IndexType>
 IndexType
 sygvd(IndexType             itype,
       char                  jobz,
+      char                  uplo,
       IndexType             n,
       float                 *A,
       IndexType             ldA,
@@ -54,11 +55,12 @@ sygvd(IndexType             itype,
       IndexType             *iWork,
       IndexType             liWork)
 {
-    CXXLAPACK_DEBUG_OUT("ssyevd");
+    CXXLAPACK_DEBUG_OUT("ssygvd");
 
     IndexType info;
-    LAPACK_IMPL(ssyevd)(&itype,
+    LAPACK_IMPL(ssygvd)(&itype,
                         &jobz,
+                        &uplo,
                         &n,
                         A,
                         &ldA,
@@ -83,6 +85,7 @@ template <typename IndexType>
 IndexType
 sygvd(IndexType             itype,
       char                  jobz,
+      char                  uplo,
       IndexType             n,
       double                *A,
       IndexType             ldA,
@@ -94,11 +97,12 @@ sygvd(IndexType             itype,
       IndexType             *iWork,
       IndexType             liWork)
 {
-    CXXLAPACK_DEBUG_OUT("dsyevd");
+    CXXLAPACK_DEBUG_OUT("dsygvd");
 
     IndexType info;
-    LAPACK_IMPL(dsyevd)(&itype,
+    LAPACK_IMPL(dsygvd)(&itype,
                         &jobz,
+                        &uplo,
                         &n,
                         A,
                         &ldA,
