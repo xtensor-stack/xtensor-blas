@@ -763,6 +763,7 @@ namespace lapack
         std::size_t m = A.shape()[0];
         std::size_t n = A.shape()[1];
 
+        blas_index_t a_stride = static_cast<blas_index_t>(std::max(std::size_t(1), m));
         blas_index_t b_stride = static_cast<blas_index_t>(std::max(std::max(std::size_t(1), m), n));
 
         int info = cxxlapack::gelsd<blas_index_t>(
@@ -770,7 +771,7 @@ namespace lapack
             static_cast<blas_index_t>(A.shape()[1]),
             b_dim,
             A.data(),
-            stride_back(A),
+            a_stride,
             b.data(),
             b_stride,
             s.data(),
@@ -794,7 +795,7 @@ namespace lapack
             static_cast<blas_index_t>(A.shape()[1]),
             b_dim,
             A.data(),
-            stride_back(A),
+            a_stride,
             b.data(),
             b_stride,
             s.data(),

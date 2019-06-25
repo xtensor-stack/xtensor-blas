@@ -317,5 +317,33 @@ namespace xt
         EXPECT_TRUE(xt::allclose(std::get<3>(xres), py_res3));
     }
 
+    /*py
+    a = np.array([[1.], [1.]])
+    b = np.array([1., 1.])
+    */
+    TEST(xtest_extended, lstsq7)
+    {
+        // cannot use "// py_a" due to ambiguous initializer list conversion below
+        // xarray<double> py_a = {{1.},
+        //                        {1.}};
+        xarray<double> py_a = xt::ones<double>({2, 1});
+        // py_b
+        xarray<double> py_b = {1.,1.};
+        // py_res0 = np.linalg.lstsq(a, b)[0]
+        xarray<double> py_res0 = {0.9999999999999997};
+        // py_res1 = np.linalg.lstsq(a, b)[1]
+        xarray<double> py_res1 = {2.2508083912556065e-33};
+        // py_res2 = np.linalg.lstsq(a, b)[2]
+        int py_res2 = 1;
+        // py_res3 = np.linalg.lstsq(a, b)[3]
+        xarray<double> py_res3 = {1.4142135623730951};
+        
+        auto xres = xt::linalg::lstsq(py_a, py_b);
+        EXPECT_TRUE(xt::allclose(std::get<0>(xres), py_res0));
+        EXPECT_TRUE(xt::allclose(std::get<1>(xres), py_res1));
+        EXPECT_EQ(std::get<2>(xres), py_res2);
+        EXPECT_TRUE(xt::allclose(std::get<3>(xres), py_res3));
+    }
+
 
 }

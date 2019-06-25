@@ -126,6 +126,8 @@ set(XTENSOR_BLAS_TESTS
     test_blas.cpp
     test_lapack.cpp
     test_linalg.cpp
+    test_lstsq.cpp
+    test_qr.cpp
     test_dot.cpp
     test_tensordot.cpp
 )
