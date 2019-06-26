@@ -88,10 +88,10 @@ if (CXXBLAS_DEBUG)
 endif()
 
 OPTION(BUILD_TESTS "xtensor-blas test suite" OFF)
-OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
+OPTION(BUILD_BENCHMARK "xtensor-blas test suite" OFF)
 
-OPTION(BUILD_BENCHMARKS "xtensor-blas test suite" OFF)
-OPTION(DOWNLOAD_GBENCHMARK "build gtest from downloaded sources" OFF)
+OPTION(DOWNLOAD_GTEST "download gtest and build from source" OFF)
+OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" OFF)
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     set(BUILD_TESTS ON)
