@@ -94,7 +94,7 @@ namespace linalg
                 {
                     result += std::abs(std::pow(v(i), ord));
                 }
-                result = std::pow(result, 1./ static_cast<double>(ord));
+                result = std::pow(result, 1. / static_cast<double>(ord));
             }
             return result;
         }
@@ -583,9 +583,11 @@ namespace linalg
                 : m_a(a), m_axis(axis)
             {
                 resize_container(m_idx, a.dimension());
+                std::fill(m_idx.begin(), m_idx.end(), 0);
                 m_offset = 0;
             }
 
+            #define SC(X) static_cast<std::size_t>(X)
             inline bool next()
             {
                 size_type dim = static_cast<size_type>(m_a.dimension());
@@ -596,9 +598,9 @@ namespace linalg
                     {
                         // skip
                     }
-                    else if (m_idx[i] == m_a.shape()[i] - 1)
+                    else if (m_idx[SC(i)] == m_a.shape()[SC(i)] - 1)
                     {
-                        m_offset -= m_idx[i] * static_cast<size_type>(m_a.strides()[i]);
+                        m_offset -= static_cast<std::ptrdiff_t>(m_idx[i]) * m_a.strides()[i];
                         m_idx[i] = size_type(0);
                         if (i == 0 || m_axis == 0 && i == 1)
                         {
@@ -608,14 +610,14 @@ namespace linalg
                     else
                     {
                         ++m_idx[i];
-                        m_offset += static_cast<size_type>(m_a.strides()[i]);
+                        m_offset += m_a.strides()[i];
                         return true;
                     }
                 }
                 return false;
             }
-
-            inline size_type offset() const
+            #undef SC
+            inline std::ptrdiff_t offset() const
             {
                 return m_offset;
             }
@@ -624,7 +626,7 @@ namespace linalg
             const A& m_a;
             index_type m_idx;
             size_type m_axis;
-            size_type m_offset;
+            std::ptrdiff_t m_offset;
         };
     }
 
@@ -656,6 +658,11 @@ namespace linalg
         auto&& t = view_eval<T::static_layout>(xt.derived_cast());
         auto&& o = view_eval<O::static_layout>(xo.derived_cast());
 
+        // is one of each a scalar? just mulyiply
+        if (t.dimension() == 0 || o.dimension() == 0)
+        {
+            return return_type(t * o);
+        }
         if (t.dimension() == 1 && o.dimension() == 1)
         {
             result.resize(std::vector<std::size_t>{1});
