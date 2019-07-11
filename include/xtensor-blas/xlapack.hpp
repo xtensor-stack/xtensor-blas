@@ -260,7 +260,7 @@ namespace lapack
         std::size_t n = A.shape()[1];
 
         xtype1 s;
-        s.resize({ std::max(std::size_t(1), std::min(m, n)) });
+        s.resize({ std::max(static_cast<std::size_t>(1), std::min(m, n)) });
 
         xtype2 u, vt;
 
@@ -348,7 +348,7 @@ namespace lapack
         }
 
         xtype1 s;
-        s.resize({ std::max(std::size_t(1), std::min(m, n)) });
+        s.resize({ std::max(static_cast<std::size_t>(1), std::min(m, n)) });
 
         xtype2 u, vt;
 
@@ -446,7 +446,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for getri.");
         }
 
-        work.resize(std::size_t(std::real(work[0])));
+        work.resize(static_cast<std::size_t>(std::real(work[0])));
 
         info = cxxlapack::getri<blas_index_t>(
             static_cast<blas_index_t>(A.shape()[0]),
@@ -496,7 +496,7 @@ namespace lapack
             throw std::runtime_error("Could not find workspace size for geev.");
         }
 
-        work.resize(std::size_t(work[0]));
+        work.resize(static_cast<std::size_t>(work[0]));
 
         info = cxxlapack::geev<blas_index_t>(
             jobvl,

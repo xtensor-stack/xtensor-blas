@@ -130,6 +130,10 @@ set(XTENSOR_BLAS_TESTS
     test_qr.cpp
     test_dot.cpp
     test_tensordot.cpp
+    test_lstsq.cpp
+    test_dot.cpp
+    test_dot_extended.cpp
+    test_qr.cpp
 )
 
 add_executable(test_xtensor_blas ${XTENSOR_BLAS_TESTS} ${XTENSOR_BLAS_HEADERS} ${XTENSOR_HEADERS})
