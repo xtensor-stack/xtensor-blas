@@ -147,7 +147,7 @@ install:
     # Install xtensor and BLAS
     - conda install xtensor=0.20.6 -c conda-forge
     - if [[ "$BLAS" == "OpenBLAS" ]]; then
-        conda install openblas -c conda-forge;
+        conda install openblas "libblas * *openblas" -c conda-forge;
       elif [[ "$BLAS" == "mkl" ]]; then
         conda install mkl;
       fi
