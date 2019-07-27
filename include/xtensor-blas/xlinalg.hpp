@@ -150,7 +150,7 @@ namespace linalg
         {
             if (ord == normorder::frob)
             {
-                return std::sqrt(sum(pow(abs(v), 2))());
+                return static_cast<value_type>(std::sqrt(sum(pow(abs(v), 2))()));
             }
             if (ord == normorder::nuc)
             {
