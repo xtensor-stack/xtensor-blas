@@ -93,6 +93,18 @@ namespace xt
         EXPECT_NEAR(res, 7.5498344352707498, 1e-6);
     }
 
+    TEST(xblas, normFloat)
+    {
+        auto a = linalg::norm(xt::arange<float>(15), 1);
+        auto b = linalg::norm(xt::arange<float>(15), 2);
+        xarray<float> c = {6, 4, 2, 1};
+        auto res = linalg::norm(c);
+
+        EXPECT_EQ(a, 105.0);
+        EXPECT_NEAR(b, 31.859064644147981, 1e-6);
+        EXPECT_NEAR(res, 7.5498344352707498, 1e-6);
+    }
+
     TEST(xblas, outer)
     {
         xarray<double> a = {1, 1, 1};
