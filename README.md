@@ -4,7 +4,7 @@
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor-blas)
 [![Azure](https://dev.azure.com/robertodr/xtensor-blas/_apis/build/status/robertodr.xtensor-blas?branchName=clang-cl)](https://dev.azure.com/robertodr/xtensor-blas/_build/latest?definitionId=8&branchName=clang-cl)
 [![Documentation](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Introduction
@@ -46,14 +46,15 @@ which are also available on conda-forge.
 
 ## Trying it online
 
-To try out xtensor-blas interactively in your web browser, just click on the binder
-link:
+You can play with `xtensor` interactively in a Jupyter notebook right now! Just click on the binder link below:
 
 [![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 
+The C++ support in Jupyter is powered by the [xeus-cling](https://github.com/QuantStack/xeus-cling) C++ kernel. Together with xeus-cling, xtensor enables a similar workflow to that of NumPy with the IPython Jupyter kernel.
+
 ## Documentation
 
-To get started with using `xtensor-blas`, check out the full documentation
+For more information on using `xtensor`, check out the reference documentation
 
 http://xtensor-blas.readthedocs.io/
 
