@@ -352,7 +352,7 @@ namespace linalg
         std::array<std::size_t, 1> vN = {N};
         xtensor<value_type, 1, layout_type::column_major> w(vN);
 
-        std::array<std::size_t, 2> shp({N, N});
+        std::array<std::size_t, 2> shp = {N, N};
         xtensor<value_type, 2, layout_type::column_major> VL(shp), VR(shp);
 
         // jobvl N: left eigenvectors of A are not computed
@@ -484,7 +484,7 @@ namespace linalg
         xtensor<value_type, 1, layout_type::column_major> wi(vN);
 
         // TODO check if we can remove allocation and pass nullptr as VL / VR
-        std::array<std::size_t, 2> shp({N, N});
+        std::array<std::size_t, 2> shp = {N, N};
         xtensor<value_type, 2, layout_type::column_major> VL(shp);
         xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
@@ -511,7 +511,7 @@ namespace linalg
         xtensor<value_type, 1, layout_type::column_major> w(vN);
 
         // TODO check if we can remove allocation and pass nullptr as VL / VR
-        std::array<std::size_t, 2> shp({N, N});
+        std::array<std::size_t, 2> shp = {N, N};
         xtensor<value_type, 2, layout_type::column_major> VL(shp);
         xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
@@ -1401,7 +1401,7 @@ namespace linalg
         XTENSOR_ASSERT(da.dimension() == 2);
         XTENSOR_ASSERT(db.dimension() == 2);
 
-        std::array<std::size_t, 2> shp = { da.shape()[0] * db.shape()[0], da.shape()[1] * db.shape()[1] };
+        std::array<std::size_t, 2> shp = {da.shape()[0] * db.shape()[0], da.shape()[1] * db.shape()[1]};
         xtensor<value_type, 2> res(shp);
 
         for (std::size_t i = 0; i < da.shape()[0]; ++i)
