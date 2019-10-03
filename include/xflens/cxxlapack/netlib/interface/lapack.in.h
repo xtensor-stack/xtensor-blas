@@ -2,34 +2,34 @@
 
 #ifndef INTEGER
 #    ifndef MKL_ILP64
-#        define INTEGER int
+typedef int INTEGER;
 #    else
-#        define INTEGER long
+typedef long INTEGER;
 #    endif
 #endif
 
 #ifndef FLOAT
-#define FLOAT float
+typedef float FLOAT;
 #endif
 
 #ifndef DOUBLE
-#define DOUBLE double
+typedef double DOUBLE;
 #endif
 
 #ifndef FLOAT_COMPLEX
-#define FLOAT_COMPLEX float
+typedef float FLOAT_COMPLEX;
 #endif
 
 #ifndef DOUBLE_COMPLEX
-#define DOUBLE_COMPLEX double
+typedef double DOUBLE_COMPLEX;
 #endif
 
 #ifndef LOGICAL
-#define LOGICAL int
+typedef int LOGICAL;
 #endif
 
 #ifndef UNKNOWN
-#define UNKNOWN void
+typedef void UNKNOWN;
 #endif
 
 //-- cbbcsd --------------------------------------------------------------------
