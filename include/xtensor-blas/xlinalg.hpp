@@ -658,7 +658,7 @@ namespace linalg
         auto&& t = view_eval<T::static_layout>(xt.derived_cast());
         auto&& o = view_eval<O::static_layout>(xo.derived_cast());
 
-        // is one of each a scalar? just mulyiply
+        // is one of each a scalar? just multiply
         if (t.dimension() == 0 || o.dimension() == 0)
         {
             return return_type(t * o);
@@ -1754,7 +1754,7 @@ namespace linalg
         for (std::size_t i = 0; i < b.dimension(); ++i)
         {
             auto b_ax_it = std::find(ax_b.begin(), ax_b.end(), i);
-            // seccond pass if i is not in ax_b add to newaxes_b
+            // second pass if i is not in ax_b add to newaxes_b
             if (b_ax_it == ax_b.end())
             {
                 newaxes_b.push_back(i);
