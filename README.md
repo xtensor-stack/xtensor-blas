@@ -1,6 +1,6 @@
 # ![xtensor](docs/source/xtensor-blas.svg)
 
-[![Travis](https://travis-ci.org/xtensor-tack/xtensor-blas.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor-blas)
+[![Travis](https://travis-ci.org/xtensor-stack/xtensor-blas.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor-blas)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/i5c8u3q0uksx0m06?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor-blas)
 [![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor-blas?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=5&branchName=master)
 [![Documentation](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
