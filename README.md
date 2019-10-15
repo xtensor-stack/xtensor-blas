@@ -1,10 +1,10 @@
 # ![xtensor](docs/source/xtensor-blas.svg)
 
-[![Travis](https://travis-ci.org/QuantStack/xtensor-blas.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor-blas)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor-blas)
-[![Azure](https://dev.azure.com/robertodr/xtensor-blas/_apis/build/status/robertodr.xtensor-blas?branchName=clang-cl)](https://dev.azure.com/robertodr/xtensor-blas/_build/latest?definitionId=8&branchName=clang-cl)
+[![Travis](https://travis-ci.org/xtensor-tack/xtensor-blas.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor-blas)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/i5c8u3q0uksx0m06?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor-blas)
+[![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor-blas?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=5&branchName=master)
 [![Documentation](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Introduction
@@ -48,7 +48,7 @@ which are also available on conda-forge.
 
 You can play with `xtensor` interactively in a Jupyter notebook right now! Just click on the binder link below:
 
-[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
+[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 
 The C++ support in Jupyter is powered by the [xeus-cling](https://github.com/QuantStack/xeus-cling) C++ kernel. Together with xeus-cling, xtensor enables a similar workflow to that of NumPy with the IPython Jupyter kernel.
 
