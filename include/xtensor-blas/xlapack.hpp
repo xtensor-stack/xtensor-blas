@@ -584,7 +584,6 @@ namespace lapack
         XTENSOR_ASSERT(B.layout() == layout_type::column_major);
 
         using value_type = typename E::value_type;
-        using xtype = xtensor<value_type, 2, layout_type::column_major>;
 
         auto N = A.shape()[0];
         XTENSOR_ASSERT(B.shape()[0] ==N);
