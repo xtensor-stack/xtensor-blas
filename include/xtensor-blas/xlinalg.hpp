@@ -489,7 +489,12 @@ namespace linalg
         xtensor<value_type, 2, layout_type::column_major> VL(shp);
         xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
-        auto geev_res = lapack::geev(M, 'N', 'N', wr, wi, VL, VR);
+        auto info = lapack::geev(M, 'N', 'N', wr, wi, VL, VR);
+        if (info != 0)
+        {
+            throw std::runtime_error("Failed to compute eigenvalue " +
+                std::to_string(std::abs(info)) + ".");
+        }
 
         xtensor<std::complex<value_type>, 1> eig_vals;
         eig_vals.resize({N});
@@ -516,7 +521,12 @@ namespace linalg
         xtensor<value_type, 2, layout_type::column_major> VL(shp);
         xtensor<value_type, 2, layout_type::column_major> VR(shp);
 
-        auto geev_res = lapack::geev(M, 'N', 'N', w, VL, VR);
+        auto info = lapack::geev(M, 'N', 'N', w, VL, VR);
+        if (info != 0)
+        {
+            throw std::runtime_error("Failed to compute eigenvalue " +
+                std::to_string(std::abs(info)) + ".");
+        }
 
         using value_type = typename E::value_type;
 
