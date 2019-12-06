@@ -16,6 +16,14 @@
 
 @PACKAGE_INIT@
 
+if(NOT TARGET @PROJECT_NAME@)
+  include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
+  get_target_property(@PROJECT_NAME@_INCLUDE_DIRS xtensor-blas INTERFACE_INCLUDE_DIRECTORIES)
+  find_dependency(BLAS REQUIRED)
+  find_dependency(LAPACK REQUIRED)
+  target_link_libraries(xtensor-blas INTERFACE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+endif()
+
 set(PN xtensor_blas)
 set_and_check(TEMP_XTENSOR_BLAS_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
 set(${PN}_INCLUDE_DIRS "${TEMP_XTENSOR_BLAS_INCLUDE_DIR}")
