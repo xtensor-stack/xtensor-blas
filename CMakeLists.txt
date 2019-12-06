@@ -59,6 +59,13 @@ set(XTENSOR_BLAS_HEADERS
     ${INCLUDE_DIR}/xtensor-blas/xlinalg.hpp
 )
 
+add_library(xtensor-blas INTERFACE)
+
+target_include_directories(xtensor-blas
+  INTERFACE
+    $<BUILD_INTERFACE:${XTENSOR_BLAS_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
 OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
 # Decide whether to use OpenBLAS or not.
@@ -108,6 +115,13 @@ endif()
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+install(TARGETS xtensor-blas
+        EXPORT ${PROJECT_NAME}-targets)
+
+# Makes the project importable from the build directory
+export(EXPORT ${PROJECT_NAME}-targets
+       FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
+
 install(FILES ${XTENSOR_BLAS_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor-blas)
 
@@ -137,4 +151,8 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Conf
 set(CMAKE_SIZEOF_VOID_P ${_XTENSOR_CMAKE_SIZEOF_VOID_P})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR})
+
+install(EXPORT ${PROJECT_NAME}-targets
+        FILE ${PROJECT_NAME}Targets.cmake
         DESTINATION ${XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR})
