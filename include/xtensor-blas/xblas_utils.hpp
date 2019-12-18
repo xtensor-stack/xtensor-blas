@@ -195,7 +195,7 @@ namespace xt
      ***********************************/
 
     template <class T>
-    constexpr void assert_nd_square(const xexpression<T>& t) {
+    inline void assert_nd_square(const xexpression<T>& t) {
         auto& dt = t.derived_cast();
         if (dt.shape()[dt.dimension() - 1] != dt.shape()[dt.dimension() - 2])
         {
