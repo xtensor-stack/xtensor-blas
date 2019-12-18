@@ -134,6 +134,19 @@ namespace xt
         EXPECT_TRUE(allclose(std::get<2>(res), expected_2));
     }
 
+    TEST(xlinalg, svd_horizontal_vertical)
+    {
+        xarray<double> a = xt::ones<double>({3, 1});
+        xarray<double> b = xt::ones<double>({1, 3});
+        xarray<double> u, s, vt;
+
+        std::tie(u, s, vt) = linalg::svd(a, false);
+        EXPECT_TRUE(allclose(a, xt::linalg::dot(u * s, vt)));
+
+        std::tie(u, s, vt) = linalg::svd(b, false);
+        EXPECT_TRUE(allclose(b, xt::linalg::dot(u * s, vt)));
+    }
+
     TEST(xlinalg, matrix_rank)
     {
         xarray<double> eall = eye<double>(4);
@@ -590,8 +603,29 @@ namespace xt
 
         auto res = xt::linalg::dot(A1, A2);
         EXPECT_EQ(res(), 94);
+    }
 
-        
+    TEST(xlinalg, asserts)
+    {
+        EXPECT_THROW(xt::linalg::eigh(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::eig(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::solve(xt::ones<double>({3, 1}), xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::inv(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::eigvals(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::eigvalsh(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::det(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::slogdet(xt::ones<double>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::cholesky(xt::ones<double>({3, 1})), std::runtime_error);
+
+        EXPECT_THROW(xt::linalg::eigh(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::eig(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::solve(xt::ones<std::complex<double>>({3, 1}), xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::inv(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::eigvals(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::eigvalsh(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::det(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::slogdet(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
+        EXPECT_THROW(xt::linalg::cholesky(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
     }
 
 }

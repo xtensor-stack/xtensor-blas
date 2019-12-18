@@ -185,9 +185,22 @@ namespace xt
         std::false_type is_xfunction_impl(...);
     }
 
-    template<typename T>
+    template<class T>
     constexpr bool is_xfunction(T&& t) {
         return decltype(detail::is_xfunction_impl(t))::value;
+    }
+
+    /***********************************
+     * assert_nd_square implementation *
+     ***********************************/
+
+    template <class T>
+    constexpr void assert_nd_square(const xexpression<T>& t) {
+        auto& dt = t.derived_cast();
+        if (dt.shape()[dt.dimension() - 1] != dt.shape()[dt.dimension() - 2])
+        {
+            throw std::runtime_error("Last 2 dimensions of the array must be square.");
+        }
     }
 }
 #endif

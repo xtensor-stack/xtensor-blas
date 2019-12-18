@@ -226,6 +226,7 @@ namespace linalg
     template <class E1, class E2>
     auto solve(const xexpression<E1>& A, const xexpression<E2>& b)
     {
+        assert_nd_square(A);
         auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
         auto db = copy_to_layout<layout_type::column_major>(b.derived_cast());
 
@@ -248,6 +249,7 @@ namespace linalg
     template <class E1>
     auto inv(const xexpression<E1>& A)
     {
+        assert_nd_square(A);
         auto dA = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         uvector<blas_index_t> piv(std::min(dA.shape()[0], dA.shape()[1]));
@@ -299,6 +301,7 @@ namespace linalg
         using underlying_type = typename E::value_type;
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -348,6 +351,7 @@ namespace linalg
     {
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -380,6 +384,7 @@ namespace linalg
     {
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -401,6 +406,7 @@ namespace linalg
         using value_type = typename E::value_type;
         using underlying_value_type = typename value_type::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -424,10 +430,11 @@ namespace linalg
      * @return xtensor containing the eigenvalues.
      */
     template <class E, std::enable_if_t<!xtl::is_complex<typename E::value_type>::value>* = nullptr>
-    auto eigh(const xexpression<E>& A, const xexpression<E>& B,const char UPLO = 'L')
+    auto eigh(const xexpression<E>& A, const xexpression<E>& B, const char UPLO = 'L')
     {
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M1 = copy_to_layout<layout_type::column_major>(A.derived_cast());
         auto M2 = copy_to_layout<layout_type::column_major>(B.derived_cast());
 
@@ -478,6 +485,7 @@ namespace linalg
     {
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -511,6 +519,7 @@ namespace linalg
     {
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -545,6 +554,7 @@ namespace linalg
     {
         using value_type = typename E::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -566,6 +576,7 @@ namespace linalg
         using value_type = typename E::value_type;
         using underlying_value_type = typename value_type::value_type;
 
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         std::size_t N = M.shape()[0];
@@ -989,8 +1000,9 @@ namespace linalg
     auto det(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
-        xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
+        assert_nd_square(A);
 
+        xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
         uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
         lapack::getrf(LU, piv);
@@ -1025,6 +1037,7 @@ namespace linalg
     auto slogdet(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
+        assert_nd_square(A);
 
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
         uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
@@ -1059,6 +1072,8 @@ namespace linalg
     auto slogdet(const xexpression<T>& A)
     {
         using value_type = typename T::value_type;
+        assert_nd_square(A);
+
         xtensor<value_type, 2, layout_type::column_major> LU = A.derived_cast();
         uvector<blas_index_t> piv(std::min(LU.shape()[0], LU.shape()[1]));
 
@@ -1214,6 +1229,7 @@ namespace linalg
     template <class T>
     auto cholesky(const xexpression<T>& A)
     {
+        assert_nd_square(A);
         auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
 
         int info = lapack::potr(M, 'L');
