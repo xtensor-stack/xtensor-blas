@@ -37,7 +37,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     laesy(std::complex<float >  a,
           std::complex<float >  b,
@@ -48,7 +48,7 @@ template <typename VOID=void>
           std::complex<float >  &cs1,
           std::complex<float >  &sn1);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     laesy(std::complex<double>  a,
           std::complex<double>  b,

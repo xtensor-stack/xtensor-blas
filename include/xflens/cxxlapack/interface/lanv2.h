@@ -37,7 +37,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     lanv2(float    &a,
           float    &b,
@@ -50,7 +50,7 @@ template <typename VOID=void>
           float    &cs,
           float    &sn);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     lanv2(double   &a,
           double   &b,

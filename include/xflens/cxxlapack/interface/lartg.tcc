@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lartg(const float      &f,
       const float      &g,
@@ -57,7 +57,7 @@ lartg(const float      &f,
 }
 
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lartg(const double     &f,
       const double     &g,
@@ -74,7 +74,7 @@ lartg(const double     &f,
                         &r);
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lartg(const std::complex<float >    &f,
       const std::complex<float >    &g,
@@ -91,7 +91,7 @@ lartg(const std::complex<float >    &f,
                         reinterpret_cast<float  *>(&r));
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lartg(const std::complex<double>    &f,
       const std::complex<double>    &g,

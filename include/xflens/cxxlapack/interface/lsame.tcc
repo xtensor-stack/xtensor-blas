@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 bool
 lsame(char                  ca,
       char                  cb)

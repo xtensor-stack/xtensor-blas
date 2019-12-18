@@ -37,12 +37,12 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 bool
     laisnan(float                  sin1,
             float                  sin2);
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 bool
     laisnan(double                 din1,
             double                 din2);

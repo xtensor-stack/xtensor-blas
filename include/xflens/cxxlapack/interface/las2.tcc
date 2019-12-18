@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 las2 (float                 f,
       float                 g,
@@ -56,7 +56,7 @@ las2 (float                 f,
                         &ssmax);
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 las2 (double                f,
       double                g,

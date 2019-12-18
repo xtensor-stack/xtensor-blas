@@ -37,11 +37,11 @@
 
 namespace cxxlapack {
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     float
     lapy2(float x, float y);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     double
     lapy2(double x, double y);
 
