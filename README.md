@@ -50,7 +50,7 @@ You can play with `xtensor` interactively in a Jupyter notebook right now! Just 
 
 [![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 
-The C++ support in Jupyter is powered by the [xeus-cling](https://github.com/QuantStack/xeus-cling) C++ kernel. Together with xeus-cling, xtensor enables a similar workflow to that of NumPy with the IPython Jupyter kernel.
+The C++ support in Jupyter is powered by the [xeus-cling](https://github.com/xtensor-stack/xeus-cling) C++ kernel. Together with xeus-cling, xtensor enables a similar workflow to that of NumPy with the IPython Jupyter kernel.
 
 ## Documentation
 
