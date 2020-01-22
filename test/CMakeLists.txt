@@ -110,7 +110,6 @@ include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${XBLAS_INCLUDE_DIR})
 
-find_package(xtensor REQUIRED)
 if(USE_OPENBLAS)
     find_package(OpenBLAS REQUIRED)
     set(BLAS_LIBRARIES ${CMAKE_INSTALL_PREFIX}${OpenBLAS_LIBRARIES})
