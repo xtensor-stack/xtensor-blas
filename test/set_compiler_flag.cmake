@@ -38,7 +38,9 @@ function(set_compiler_flag _result _lang)
   set(_flag_found FALSE)
   # loop over all flags, try to find the first which works
   foreach(flag IN ITEMS ${_list_of_flags})
-
+    # Note: since cmake-3.17-rc1 its not sufficient to unset _flag_works
+    # from the cache, so this double-unset is relevant:
+    unset(_flag_works)
     unset(_flag_works CACHE)
     if(_lang STREQUAL "C")
       check_c_compiler_flag("${flag}" _flag_works)
@@ -53,9 +55,16 @@ function(set_compiler_flag _result _lang)
     # if the flag works, use it, and exit
     # otherwise try next flag
     if(_flag_works)
+      if(NOT CMAKE_REQUIRED_QUIET)
+        message(STATUS "Found flag ${flag} for language ${_lang} is supported")
+      endif()
       set(${_result} "${flag}" PARENT_SCOPE)
       set(_flag_found TRUE)
       break()
+    else()
+      if(NOT CMAKE_REQUIRED_QUIET)
+        message(STATUS "Found flag ${flag} for language ${_lang} is not supported")
+      endif()
     endif()
   endforeach()
 
