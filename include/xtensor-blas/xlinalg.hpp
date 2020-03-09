@@ -705,7 +705,7 @@ namespace linalg
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
-                result.resize({t.shape()[0]});
+                result.resize({static_cast<std::size_t>(t.shape()[0])});
 
                 blas_index_t shape_x, shape_y;
                 cxxblas::Transpose trans;
@@ -747,7 +747,7 @@ namespace linalg
                     throw std::runtime_error("Dot: shape mismatch.");
                 }
 
-                result.resize({o.shape()[1]});
+                result.resize({static_cast<std::size_t>(o.shape()[1])});
 
                 blas_index_t shape_x, shape_y;
                 cxxblas::Transpose trans;
@@ -812,7 +812,7 @@ namespace linalg
                 {
                     // TODO add check to compare strides & shape
 
-                    result.resize({t.shape()[0], t.shape()[0]});
+                    result.resize({static_cast<std::size_t>(t.shape()[0]), static_cast<std::size_t>(t.shape()[0])});
 
                     cxxblas::syrk<blas_index_t>(
                         get_blas_storage_order(result),
@@ -838,7 +838,7 @@ namespace linalg
                     return result;
                 }
 
-                result.resize({t.shape()[0], o.shape()[1]});
+                result.resize({static_cast<std::size_t>(t.shape()[0]), static_cast<std::size_t>(o.shape()[1])});
 
                 cxxblas::gemm<blas_index_t>(
                     get_blas_storage_order(result),
