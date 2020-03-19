@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lags2(bool                  upper,
       float                 a1,
@@ -75,7 +75,7 @@ lags2(bool                  upper,
 }
 
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lags2(bool                  upper,
       double                a1,
@@ -110,7 +110,7 @@ lags2(bool                  upper,
 
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lags2(bool                  upper,
       float                 a1,
@@ -146,7 +146,7 @@ lags2(bool                  upper,
 
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lags2(bool                  upper,
       double                a1,

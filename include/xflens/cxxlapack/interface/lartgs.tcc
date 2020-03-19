@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lartgs(float                 x,
        float                 y,
@@ -56,7 +56,7 @@ lartgs(float                 x,
                          &sn);
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lartgs(double                x,
        double                y,

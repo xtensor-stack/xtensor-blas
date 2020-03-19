@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 labad(float &small, float &large)
 {
@@ -49,7 +49,7 @@ labad(float &small, float &large)
                         &large);
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 labad(double &small, double &large)
 {

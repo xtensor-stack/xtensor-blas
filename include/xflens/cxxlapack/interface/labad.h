@@ -37,11 +37,11 @@
 
 namespace cxxlapack {
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     labad(float  &small, float  &large);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     labad(double &small, double &large);
 

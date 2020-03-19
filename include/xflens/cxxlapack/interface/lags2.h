@@ -37,7 +37,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     lags2(bool                  upper,
           float                 a1,
@@ -53,7 +53,7 @@ template <typename VOID=void>
           float                 &csq,
           float                 &snq);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     lags2(bool                  upper,
           double                a1,
@@ -69,7 +69,7 @@ template <typename VOID=void>
           double                &csq,
           double                &snq);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     lags2(bool                  upper,
           float                 a1,
@@ -85,7 +85,7 @@ template <typename VOID=void>
           float                 &csq,
           std::complex<float >  &snq);
 
-template <typename VOID=void>
+template <typename XFLENS_VOID=void>
     void
     lags2(bool                  upper,
           double                a1,

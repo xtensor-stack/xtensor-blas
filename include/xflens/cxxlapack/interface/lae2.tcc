@@ -39,7 +39,7 @@
 
 namespace cxxlapack {
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lae2(float                 a,
      float                 b,
@@ -56,7 +56,7 @@ lae2(float                 a,
                        &rt2);
 }
 
-template <typename VOID>
+template <typename XFLENS_VOID>
 void
 lae2(double                a,
      double                b,
