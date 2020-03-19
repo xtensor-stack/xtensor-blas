@@ -89,12 +89,15 @@ namespace lapack
             n = static_cast<blas_index_t>(A.shape()[1]);
         }
 
+        blas_index_t m = static_cast<blas_index_t>(A.shape()[0]);
+        blas_index_t a_stride = std::max(blas_index_t(1), m);
+
         int info = cxxlapack::orgqr<blas_index_t>(
-            static_cast<blas_index_t>(A.shape()[0]),
+            m,
             n,
             static_cast<blas_index_t>(tau.size()),
             A.data(),
-            stride_back(A),
+            a_stride,
             tau.data(),
             work.data(),
             static_cast<blas_index_t>(-1)
@@ -108,11 +111,11 @@ namespace lapack
         work.resize(static_cast<std::size_t>(work[0]));
 
         info = cxxlapack::orgqr<blas_index_t>(
-            static_cast<blas_index_t>(A.shape()[0]),
+            m,
             n,
             static_cast<blas_index_t>(tau.size()),
             A.data(),
-            stride_back(A),
+            a_stride,
             tau.data(),
             work.data(),
             static_cast<blas_index_t>(work.size())
@@ -133,12 +136,15 @@ namespace lapack
             n = static_cast<blas_index_t>(A.shape()[1]);
         }
 
+        blas_index_t m = static_cast<blas_index_t>(A.shape()[0]);
+        blas_index_t a_stride = std::max(blas_index_t(1), m);
+
         int info = cxxlapack::ungqr<blas_index_t>(
-            static_cast<blas_index_t>(A.shape()[0]),
+            m,
             n,
             static_cast<blas_index_t>(tau.size()),
             A.data(),
-            stride_back(A),
+            a_stride,
             tau.data(),
             work.data(),
             static_cast<blas_index_t>(-1)
@@ -152,11 +158,11 @@ namespace lapack
         work.resize(static_cast<std::size_t>(std::real(work[0])));
 
         info = cxxlapack::ungqr<blas_index_t>(
-            static_cast<blas_index_t>(A.shape()[0]),
+            m,
             n,
             static_cast<blas_index_t>(tau.size()),
             A.data(),
-            stride_back(A),
+            a_stride,
             tau.data(),
             work.data(),
             static_cast<blas_index_t>(work.size())
@@ -174,12 +180,14 @@ namespace lapack
         XTENSOR_ASSERT(A.layout() == layout_type::column_major);
 
         uvector<value_type> work(1);
+        blas_index_t m = static_cast<blas_index_t>(A.shape()[0]);
+        blas_index_t a_stride = std::max(blas_index_t(1), m);
 
         int info = cxxlapack::geqrf<blas_index_t>(
-            static_cast<blas_index_t>(A.shape()[0]),
+            m,
             static_cast<blas_index_t>(A.shape()[1]),
             A.data(),
-            stride_back(A),
+            a_stride,
             tau.data(),
             work.data(),
             static_cast<blas_index_t>(-1)
@@ -193,10 +201,10 @@ namespace lapack
         work.resize(static_cast<std::size_t>(std::real(work[0])));
 
         info = cxxlapack::geqrf<blas_index_t>(
-            static_cast<blas_index_t>(A.shape()[0]),
+            m,
             static_cast<blas_index_t>(A.shape()[1]),
             A.data(),
-            stride_back(A),
+            a_stride,
             tau.data(),
             work.data(),
             static_cast<blas_index_t>(work.size())
@@ -241,7 +249,9 @@ namespace lapack
                 return m >= n ? std::make_pair(1, stride_back(vt)) :
                                 std::make_pair(stride_back(u), 1);
             }
-            return std::make_pair(stride_back(u), stride_back(vt));
+
+            return std::make_pair(std::max(blas_index_t(u.shape()[0]), 1),
+                                  std::max(blas_index_t(vt.shape()[0]), 1));
         }
     }
 
@@ -269,13 +279,14 @@ namespace lapack
         std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
 
         uvector<blas_index_t> iwork(8 * std::min(m, n));
+        blas_index_t a_stride = static_cast<blas_index_t>(std::max(std::size_t(1), m));
 
         int info = cxxlapack::gesdd<blas_index_t>(
             jobz,
             static_cast<blas_index_t>(A.shape()[0]),
             static_cast<blas_index_t>(A.shape()[1]),
             A.data(),
-            stride_back(A),
+            a_stride,
             s.data(),
             u.data(),
             u_stride,
@@ -292,13 +303,12 @@ namespace lapack
         }
 
         work.resize(static_cast<std::size_t>(work[0]));
-
         info = cxxlapack::gesdd<blas_index_t>(
             jobz,
             static_cast<blas_index_t>(A.shape()[0]),
             static_cast<blas_index_t>(A.shape()[1]),
             A.data(),
-            stride_back(A),
+            a_stride,
             s.data(),
             u.data(),
             u_stride,
@@ -355,13 +365,14 @@ namespace lapack
 
         blas_index_t u_stride, vt_stride;
         std::tie(u_stride, vt_stride) = detail::init_u_vt(u, vt, jobz, m, n);
+        blas_index_t a_stride = static_cast<blas_index_t>(std::max(std::size_t(1), m));
 
         int info = cxxlapack::gesdd<blas_index_t>(
             jobz,
             static_cast<blas_index_t>(A.shape()[0]),
             static_cast<blas_index_t>(A.shape()[1]),
             A.data(),
-            stride_back(A),
+            a_stride,
             s.data(),
             u.data(),
             u_stride,
@@ -384,7 +395,7 @@ namespace lapack
             static_cast<blas_index_t>(A.shape()[0]),
             static_cast<blas_index_t>(A.shape()[1]),
             A.data(),
-            stride_back(A),
+            a_stride,
             s.data(),
             u.data(),
             u_stride,
