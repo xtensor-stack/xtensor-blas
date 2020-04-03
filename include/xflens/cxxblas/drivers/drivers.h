@@ -38,17 +38,17 @@
 
 // define implementation specific constants, macros, etc.
 #if defined (WITH_ATLAS)
-#   include <cxxblas/drivers/atlas.h>
+#   include "xflens/cxxblas/drivers/atlas.h"
 #elif defined (WITH_GOTOBLAS)
-#   include <cxxblas/drivers/gotoblas.h>
+#   include "xflens/cxxblas/drivers/gotoblas.h"
 #elif defined (WITH_OPENBLAS)
-#   include <cxxblas/drivers/openblas.h>
+#   include "xflens/cxxblas/drivers/openblas.h"
 #elif defined (WITH_VECLIB)
-#   include <cxxblas/drivers/veclib.h>
+#   include "xflens/cxxblas/drivers/veclib.h"
 #elif defined (WITH_MKLBLAS)
-#   include <cxxblas/drivers/mklblas.h>
+#   include "xflens/cxxblas/drivers/mklblas.h"
 #elif defined (WITH_REFBLAS)
-#   include <cxxblas/drivers/refblas.h>
+#   include "xflens/cxxblas/drivers/refblas.h"
 #endif
 
 
