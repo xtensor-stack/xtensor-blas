@@ -628,4 +628,27 @@ namespace xt
         EXPECT_THROW(xt::linalg::cholesky(xt::ones<std::complex<double>>({3, 1})), std::runtime_error);
     }
 
+    TEST(xlinalg, multiply) {
+        xarray<double> arg_0 = {{2, 3}, {5, 7}, {11, 13}}; 
+        xarray<double> arg_1 = {{1, 2}, {3, 4}, {5, 6}}; 
+
+        // scalar and array
+        xt::xarray<double> scalar(3.);
+        auto res0 = linalg::multiply(arg_0, scalar);
+        xarray<double> expect0 = {{6, 9}, {15, 21}, {33, 39}};
+        EXPECT_EQ(res0, expect0);
+
+        // Hadamard product
+        auto res1 = linalg::multiply(arg_0, arg_1);
+        xarray<double> expect1 = {{2, 6}, {15, 28}, {55, 78}}; 
+        EXPECT_EQ(res1, expect1);
+
+        // array and array with broadcasting
+        xtensor<double, 3> arg_2 =
+            xt::arange(4).reshape({2, 1, 2}); 
+        auto res2 = linalg::multiply(arg_0, arg_2);
+        xarray<double> expect2 = {{{0, 3}, {0, 7}, {0, 13}},
+                                    {{4, 9}, {10, 21}, {22, 39}}}; 
+        EXPECT_EQ(res2, expect2);
+    }
 }

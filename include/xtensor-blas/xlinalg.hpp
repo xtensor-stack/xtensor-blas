@@ -1794,6 +1794,74 @@ namespace linalg
         // the integer arg form of tensordot will handle the reshape of output for us
         return tensordot(a_t, b_t, n_ax);
     }
+
+    /**
+     * @brief Compute element-wise multipy.
+     *
+     * Compute the product of \em xt and \em xo, element-wise. The result is a
+     * scalar if both  \em xt and and \em xo are scalars. If one of each is a
+     * scalar, just multipy. Otherwise, \em xt and \em xo must be broadcastable to a
+     * common shape (which becomes the shape of the output).
+     *
+     * @param xt input array
+     * @param xo input array
+     * @return resulting array
+     */
+    template <class T, class O>
+    auto multiply(const xexpression<T> &xt, const xexpression<O> &xo) {
+        using value_type =
+            std::common_type_t<typename T::value_type, typename O::value_type>;
+
+        using return_type =
+            std::conditional_t<(T::static_layout == O::static_layout) &&
+                                  (T::static_layout != layout_type::dynamic &&
+                                    T::static_layout != layout_type::any),
+                              xarray<value_type, T::static_layout>,
+                              xarray<value_type, XTENSOR_DEFAULT_LAYOUT>>;
+
+        return_type result;
+
+        auto &&t = view_eval<T::static_layout>(xt.derived_cast());
+        auto &&o = view_eval<O::static_layout>(xo.derived_cast());
+
+        // is one of each a scalar? just multiply
+        if (t.dimension() == 0 || o.dimension() == 0) {
+          return return_type(t * o);
+        }
+
+        xt::dynamic_shape<std::size_t> result_shape(
+            std::max(t.dimension(), o.dimension()));
+
+        auto ts_itr = t.shape().crbegin();
+        auto os_itr = o.shape().crbegin();
+        auto rs_itr = result_shape.rbegin();
+        for (; rs_itr != result_shape.rend(); ++rs_itr) {
+          if (ts_itr == t.shape().crend()) {
+            *rs_itr = *os_itr;
+            ++os_itr;
+          } else if (os_itr == o.shape().crend()) {
+            *rs_itr = *ts_itr;
+            ++ts_itr;
+          } else if (*ts_itr != *os_itr && *ts_itr != 1 && *os_itr != 1) {
+            throw std::runtime_error("Multipy: shape mismatch. Operands could "
+                                    "not be broadcast.");
+          } else {
+            *rs_itr = std::max(*ts_itr, *os_itr);
+            ++ts_itr;
+            ++os_itr;
+          }
+        }
+        result.resize(result_shape);
+
+        // Hadamard product
+        auto bt = xt::flatten(xt::broadcast(t, result_shape));
+        auto bo = xt::flatten(xt::broadcast(o, result_shape));
+        for (std::size_t i = 0; i < bt.shape()[0]; i++) {
+          result(i) = bt(i) * bo(i);
+      }
+
+      return result;
+    }
 }
 }
 #endif
