@@ -1254,6 +1254,50 @@ namespace linalg
     }
 
     /**
+    * Solves a system of linear equations M*X = B with a symmetric
+    * where M = A*A**T if uplo is L.
+    * Factorization of M can be computed with cholesky.
+    * @return solution X
+    */
+    template <class T, class D>
+    auto solve_cholesky(const xexpression<T>& A, const xexpression<D>& b)
+    {
+      assert_nd_square(A);
+      auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+      auto p = copy_to_layout<layout_type::column_major>(b.derived_cast());
+
+      int info = lapack::potrs(M, p, 'L');
+
+      if (info > 0)
+      {
+        throw std::runtime_error("Cholesky decomposition failed.");
+      }
+
+      return p;
+    }
+
+    /**
+    * Solves Ax = b, where A is a lower triangular matrix
+    * @return solution x
+    */
+    template <class T, class D>
+    auto solve_triangular(const xexpression<T>& A, const xexpression<D>& b)
+    {
+      assert_nd_square(A);
+      auto M = copy_to_layout<layout_type::column_major>(A.derived_cast());
+      auto p = copy_to_layout<layout_type::column_major>(b.derived_cast());
+
+      int info = lapack::trtrs(M, p, 'L', 'N');
+
+      if (info > 0)
+      {
+        throw std::runtime_error("Cholesky decomposition failed.");
+      }
+
+      return p;
+    }
+
+    /**
      * Compute the SVD decomposition of \em A.
      * @return tuple containing S, V, and D
      */
