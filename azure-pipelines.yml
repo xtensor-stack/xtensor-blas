@@ -6,7 +6,7 @@ jobs:
   # Configure, build, install, and test job
   - job: 'build'
     pool:
-      vmImage: 'vs2015-win2012r2'
+      vmImage: 'vs2017-win2016'
     timeoutInMinutes: 360
     steps:
 
@@ -38,8 +38,8 @@ jobs:
       # Create conda enviroment
       # Note: conda activate doesn't work here, because it creates a new shell!
       - script: |
-          conda install cmake ^
-                        gtest ^
+          conda install cmake==3.14.0 ^
+                        gtest==1.10.0 ^
                         mkl-devel ^
                         ninja ^
                         xtensor=0.21.4 ^
