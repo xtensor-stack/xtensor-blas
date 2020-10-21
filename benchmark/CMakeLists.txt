@@ -24,13 +24,6 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder")
-    CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
-
-    if (HAS_CPP14_FLAG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-    else()
-        message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
-    endif()
 
     # Enable link time optimization and set the default symbol
     # visibility to hidden (very important to obtain small binaries)
@@ -124,6 +117,12 @@ set(XTENSOR_BENCHMARK
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GBENCHMARK_LIBRARIES})
+if(CPP17)
+    target_compile_features(${XTENSOR_BENCHMARK_TARGET} PUBLIC cxx_std_17)
+else()
+    target_compile_features(${XTENSOR_BENCHMARK_TARGET} PUBLIC cxx_std_14)
+endif()
+
 
 add_custom_target(xbenchmark
     COMMAND benchmark_xtensor

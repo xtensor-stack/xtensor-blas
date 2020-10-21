@@ -27,34 +27,6 @@ else()
     message(STATUS "Tests build type is ${CMAKE_BUILD_TYPE}")
 endif()
 
-include(CheckCXXCompilerFlag)
-
-string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
-
-include(set_compiler_flag.cmake)
-
-if(CPP17)
-  # User requested C++17, but compiler might not oblige.
-  set_compiler_flag(
-    _cxx_std_flag CXX
-    "-std=c++17"  # this should work with GNU, Intel, PGI
-    "/std:c++17"  # this should work with MSVC
-  )
-  if(_cxx_std_flag)
-    message(STATUS "Building with C++17")
-  endif()
-else()
-  set_compiler_flag(
-    _cxx_std_flag CXX REQUIRED
-    "-std=c++14"  # this should work with GNU, Intel, PGI
-    "/std:c++14"  # this should work with MSVC
-  )
-  message(STATUS "Building with C++14")
-endif()
-
-if(NOT _cxx_std_flag)
-  message(FATAL_ERROR "xtensor-blas needs a C++14-compliant compiler.")
-endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
@@ -153,6 +125,11 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 
 target_link_libraries(test_xtensor_blas ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
+if(CPP17)
+    target_compile_features(test_xtensor_blas PUBLIC cxx_std_17)
+else()
+    target_compile_features(test_xtensor_blas PUBLIC cxx_std_14)
+endif()
 
 add_custom_target(xtest COMMAND test_xtensor_blas DEPENDS test_xtensor_blas)
 add_test(NAME xtest COMMAND test_xtensor_blas)
