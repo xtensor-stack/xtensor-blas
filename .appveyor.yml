@@ -20,7 +20,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda install gtest cmake -c conda-forge
+  - conda install cmake -c conda-forge
   - conda install xtensor=0.21.4 -c conda-forge
   - conda install m2w64-openblas -c msys2
   # Patch OpenBLASConfig.cmake
@@ -28,7 +28,7 @@ install:
   - ps: (Get-Content $Env:MINICONDA\Library\mingw-w64\lib\cmake\openblas\OpenBLASConfig.cmake).replace('mingw32', 'mingw-w64') | Set-Content $Env:MINICONDA\Library\mingw-w64\lib\cmake\openblas\OpenBLASConfig.cmake
   - ps: (Get-Content $Env:MINICONDA\Library\mingw-w64\lib\cmake\openblas\OpenBLASConfig.cmake).replace('bin', 'lib') | Set-Content $Env:MINICONDA\Library\mingw-w64\lib\cmake\openblas\OpenBLASConfig.cmake
   - ps: (Get-Content $Env:MINICONDA\Library\mingw-w64\lib\cmake\openblas\OpenBLASConfig.cmake).replace('dll', 'dll.a') | Set-Content $Env:MINICONDA\Library\mingw-w64\lib\cmake\openblas\OpenBLASConfig.cmake
-  - cmake -G "NMake Makefiles" -DOpenBLAS_DIR=%MINICONDA%\Library\mingw-w64\lib\cmake\openblas -DCMAKE_INSTALL_PREFIX=%MINICONDA%\Library -DBUILD_TESTS=ON .
+  - cmake -G "NMake Makefiles" -DOpenBLAS_DIR=%MINICONDA%\Library\mingw-w64\lib\cmake\openblas -DCMAKE_INSTALL_PREFIX=%MINICONDA%\Library -DBUILD_TESTS=ON -DDOWNLOAD_GTEST=ON .
   - nmake test_xtensor_blas
   - cd test
 
