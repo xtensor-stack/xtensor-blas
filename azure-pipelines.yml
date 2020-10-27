@@ -39,7 +39,6 @@ jobs:
       # Note: conda activate doesn't work here, because it creates a new shell!
       - script: |
           conda install cmake==3.14.0 ^
-                        gtest==1.10.0 ^
                         mkl-devel ^
                         ninja ^
                         xtensor=0.21.4 ^
@@ -66,6 +65,7 @@ jobs:
                 -DCMAKE_C_COMPILER=clang-cl ^
                 -DCMAKE_CXX_COMPILER=clang-cl ^
                 -DBUILD_TESTS=ON ^
+                -DDOWNLOAD_GTEST=ON ^
                 $(Build.SourcesDirectory)
         displayName: "Configure xtensor-blas"
         workingDirectory: $(Build.BinariesDirectory)
