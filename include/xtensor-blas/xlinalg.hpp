@@ -131,7 +131,7 @@ namespace linalg
         }
         std::stringstream ss;
         ss << "Norm " << ord << " not implemented!" << std::endl;
-        throw std::runtime_error(ss.str());
+        XTENSOR_THROW(std::runtime_error, ss.str());
     }
 
     /**
@@ -191,7 +191,7 @@ namespace linalg
         }
         std::stringstream ss;
         ss << "Norm not implemented!" << std::endl;
-        throw std::runtime_error(ss.str());
+        XTENSOR_THROW(std::runtime_error, ss.str());
     }
 
     /**
@@ -234,7 +234,7 @@ namespace linalg
 
         if (info != 0)
         {
-            throw std::runtime_error("The solution could not be computed");
+            XTENSOR_THROW(std::runtime_error, "The solution could not be computed");
         }
 
         return db;
@@ -260,13 +260,13 @@ namespace linalg
         int info = lapack::getrf(dA, piv);
         if (info > 0)
         {
-            throw std::runtime_error("Singular matrix not invertible (getrf).");
+            XTENSOR_THROW(std::runtime_error, "Singular matrix not invertible (getrf).");
         }
 
         info = lapack::getri(dA, piv);
         if (info > 0)
         {
-            throw std::runtime_error("Singular matrix not invertible (getri).");
+            XTENSOR_THROW(std::runtime_error, "Singular matrix not invertible (getri).");
         }
         return dA;
     }
@@ -317,7 +317,7 @@ namespace linalg
 
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue calculation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue calculation did not converge.");
         }
 
         auto eig_vecs = xtensor<std::complex<underlying_type>, 2>::from_shape({ N, N });
@@ -367,7 +367,7 @@ namespace linalg
 
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue calculation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue calculation did not converge.");
         }
 
         return std::make_tuple(std::move(w), std::move(VR));
@@ -394,7 +394,7 @@ namespace linalg
         int info = lapack::syevd(M, 'V', UPLO, w);
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue computation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue computation did not converge.");
         }
 
         return std::make_tuple(std::move(w), std::move(M));
@@ -416,7 +416,7 @@ namespace linalg
         int info = lapack::heevd(M, 'V', UPLO, w);
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue computation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue computation did not converge.");
         }
 
         return std::make_tuple(std::move(w), std::move(M));
@@ -445,7 +445,7 @@ namespace linalg
         int info = lapack::sygvd(M1, M2, 1, 'V', UPLO, w);
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue computation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue computation did not converge.");
         }
 
         return std::make_tuple(std::move(w), std::move(M1));
@@ -467,7 +467,7 @@ namespace linalg
         int info = lapack::heevd(M, 'V', UPLO, w);
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue computation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue computation did not converge.");
         }
 
         return std::make_tuple(std::move(w), std::move(M));
@@ -501,7 +501,7 @@ namespace linalg
         auto info = lapack::geev(M, 'N', 'N', wr, wi, VL, VR);
         if (info != 0)
         {
-            throw std::runtime_error("Failed to compute eigenvalue " +
+            XTENSOR_THROW(std::runtime_error, "Failed to compute eigenvalue " +
                 std::to_string(std::abs(info)) + ".");
         }
 
@@ -534,7 +534,7 @@ namespace linalg
         auto info = lapack::geev(M, 'N', 'N', w, VL, VR);
         if (info != 0)
         {
-            throw std::runtime_error("Failed to compute eigenvalue " +
+            XTENSOR_THROW(std::runtime_error, "Failed to compute eigenvalue " +
                 std::to_string(std::abs(info)) + ".");
         }
 
@@ -564,7 +564,7 @@ namespace linalg
         int info = lapack::syevd(M, 'N', UPLO, w);
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue computation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue computation did not converge.");
         }
 
         return w;
@@ -586,7 +586,7 @@ namespace linalg
         int info = lapack::heevd(M, 'N', UPLO, w);
         if (info != 0)
         {
-            throw std::runtime_error("Eigenvalue computation did not converge.");
+            XTENSOR_THROW(std::runtime_error, "Eigenvalue computation did not converge.");
         }
 
         return w;
@@ -691,7 +691,7 @@ namespace linalg
             result.resize(std::vector<std::size_t>{1});
             if (t.shape()[0] != o.shape()[0])
             {
-                throw std::runtime_error("Dot: shape mismatch.");
+                XTENSOR_THROW(std::runtime_error, "Dot: shape mismatch.");
             }
 
             if (xtl::is_complex<typename T::value_type>::value)
@@ -713,7 +713,7 @@ namespace linalg
 
                 if (t.shape()[1] != o.shape()[0])
                 {
-                    throw std::runtime_error("Dot: shape mismatch.");
+                    XTENSOR_THROW(std::runtime_error, "Dot: shape mismatch.");
                 }
 
                 result.resize({static_cast<std::size_t>(t.shape()[0])});
@@ -755,7 +755,7 @@ namespace linalg
 
                 if (t.shape()[0] != o.shape()[0])
                 {
-                    throw std::runtime_error("Dot: shape mismatch.");
+                    XTENSOR_THROW(std::runtime_error, "Dot: shape mismatch.");
                 }
 
                 result.resize({static_cast<std::size_t>(o.shape()[1])});
@@ -799,7 +799,7 @@ namespace linalg
 
                 if (t.shape()[1] != o.shape()[0])
                 {
-                    throw std::runtime_error("Dot: shape mismatch.");
+                    XTENSOR_THROW(std::runtime_error, "Dot: shape mismatch.");
                 }
 
                 cxxblas::Transpose transpose_A = cxxblas::Transpose::NoTrans,
@@ -880,7 +880,7 @@ namespace linalg
                 }
                 if (o.shape()[match_dim] != l)
                 {
-                    throw std::runtime_error("Dot: shape mismatch.");
+                    XTENSOR_THROW(std::runtime_error, "Dot: shape mismatch.");
                 }
 
                 blas_index_t a_dim = static_cast<blas_index_t>(t.dimension());
@@ -1046,7 +1046,7 @@ namespace linalg
 
         if (info != 0)
         {
-            throw std::runtime_error("LU factorization did not compute.");
+            XTENSOR_THROW(std::runtime_error, "LU factorization did not compute.");
         }
 
         value_type result(0);
@@ -1118,7 +1118,7 @@ namespace linalg
             int info = lapack::orgqr(A, tau, n);
             if (info > 0)
             {
-                throw std::runtime_error("Could not find Q (orgqr).");
+                XTENSOR_THROW(std::runtime_error, "Could not find Q (orgqr).");
             }
         }
 
@@ -1129,7 +1129,7 @@ namespace linalg
             int info = lapack::ungqr(A, tau, n);
             if (info > 0)
             {
-                throw std::runtime_error("Could not find Q (ungqr).");
+                XTENSOR_THROW(std::runtime_error, "Could not find Q (ungqr).");
             }
         }
     }
@@ -1179,7 +1179,7 @@ namespace linalg
 
         if (info != 0)
         {
-            throw std::runtime_error("QR decomposition failed.");
+            XTENSOR_THROW(std::runtime_error, "QR decomposition failed.");
         }
 
         // explicitly set shape/size == 0!
@@ -1236,7 +1236,7 @@ namespace linalg
 
         if (info > 0)
         {
-            throw std::runtime_error("Cholesky decomposition failed.");
+            XTENSOR_THROW(std::runtime_error, "Cholesky decomposition failed.");
         }
 
         // delete upper triangle
@@ -1270,7 +1270,7 @@ namespace linalg
 
       if (info > 0)
       {
-        throw std::runtime_error("Cholesky decomposition failed.");
+        XTENSOR_THROW(std::runtime_error, "Cholesky decomposition failed.");
       }
 
       return p;
@@ -1291,7 +1291,7 @@ namespace linalg
 
       if (info > 0)
       {
-        throw std::runtime_error("Cholesky decomposition failed.");
+        XTENSOR_THROW(std::runtime_error, "Cholesky decomposition failed.");
       }
 
       return p;
@@ -1320,7 +1320,7 @@ namespace linalg
 
         if (std::get<0>(result) > 0)
         {
-            throw std::runtime_error("SVD decomposition failed.");
+            XTENSOR_THROW(std::runtime_error, "SVD decomposition failed.");
         }
 
         return std::make_tuple(std::move(std::get<1>(result)), std::move(std::get<2>(result)), std::move(std::get<3>(result)));
@@ -1559,17 +1559,17 @@ namespace linalg
 
         if (dA.dimension() != 2)
         {
-            throw std::runtime_error("Expected 2D expression for A");
+            XTENSOR_THROW(std::runtime_error, "Expected 2D expression for A");
         }
 
         if (!(b_ref.dimension() <= 2))
         {
-            throw std::runtime_error("Expected 1- or 2D expression for A.");
+            XTENSOR_THROW(std::runtime_error, "Expected 1- or 2D expression for A.");
         }
 
         if (b_ref.shape()[0] != M)
         {
-            throw std::runtime_error("Shape of 'b' for lstsq does not match.");
+            XTENSOR_THROW(std::runtime_error, "Shape of 'b' for lstsq does not match.");
         }
 
         // find number of rhs
@@ -1665,7 +1665,7 @@ namespace linalg
         }
         else
         {
-            throw std::runtime_error("a or b did not have appropriate size 2 or 3.");
+            XTENSOR_THROW(std::runtime_error, "a or b did not have appropriate size 2 or 3.");
         }
         return res;
     }
@@ -1731,7 +1731,7 @@ namespace linalg
                 // check for axes size match
                 if (a_val != b_val)
                 {
-                    throw std::runtime_error("Shape mismatch for sum");
+                    XTENSOR_THROW(std::runtime_error, "Shape mismatch for sum");
                 }
                 else
                 {

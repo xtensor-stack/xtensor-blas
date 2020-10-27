@@ -19,11 +19,11 @@
 #include "xtensor/xutils.hpp"
 
 #ifndef DEFAULT_LEADING_STRIDE_BEHAVIOR
-#define DEFAULT_LEADING_STRIDE_BEHAVIOR throw std::runtime_error("No valid layout chosen.");
+#define DEFAULT_LEADING_STRIDE_BEHAVIOR XTENSOR_THROW(std::runtime_error, "No valid layout chosen.");
 #endif
 
 #ifndef DEFAULT_STORAGE_ORDER_BEHAVIOR
-#define DEFAULT_STORAGE_ORDER_BEHAVIOR throw std::runtime_error("Cannot handle layout_type of e.");
+#define DEFAULT_STORAGE_ORDER_BEHAVIOR XTENSOR_THROW(std::runtime_error, "Cannot handle layout_type of e.");
 #endif
 
 namespace xt
@@ -203,7 +203,7 @@ namespace xt
         auto& dt = t.derived_cast();
         if (dt.shape()[dt.dimension() - 1] != dt.shape()[dt.dimension() - 2])
         {
-            throw std::runtime_error("Last 2 dimensions of the array must be square.");
+            XTENSOR_THROW(std::runtime_error, "Last 2 dimensions of the array must be square.");
         }
     }
 }

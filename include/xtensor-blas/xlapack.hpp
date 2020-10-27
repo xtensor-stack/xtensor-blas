@@ -105,7 +105,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for orgqr.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for orgqr.");
         }
 
         work.resize(static_cast<std::size_t>(work[0]));
@@ -152,7 +152,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for ungqr.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for ungqr.");
         }
 
         work.resize(static_cast<std::size_t>(std::real(work[0])));
@@ -195,7 +195,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for geqrf.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for geqrf.");
         }
 
         work.resize(static_cast<std::size_t>(std::real(work[0])));
@@ -299,7 +299,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for real gesdd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for real gesdd.");
         }
 
         work.resize(static_cast<std::size_t>(work[0]));
@@ -386,7 +386,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for complex gesdd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for complex gesdd.");
         }
         work.resize(static_cast<std::size_t>(std::real(work[0])));
 
@@ -503,7 +503,7 @@ namespace lapack
 
         if (info > 0)
         {
-            throw std::runtime_error("Could not find workspace size for getri.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for getri.");
         }
 
         work.resize(static_cast<std::size_t>(std::real(work[0])));
@@ -553,7 +553,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for geev.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for geev.");
         }
 
         work.resize(static_cast<std::size_t>(work[0]));
@@ -608,7 +608,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for syevd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for syevd.");
         }
 
         work.resize(std::size_t(work[0]));
@@ -668,7 +668,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for sygvd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for sygvd.");
         }
 
         work.resize(std::size_t(work[0]));
@@ -729,7 +729,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for geev.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for geev.");
         }
 
         work.resize(std::size_t(std::real(work[0])));
@@ -784,7 +784,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for heevd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for heevd.");
         }
 
         work.resize(std::size_t(std::real(work[0])));
@@ -843,7 +843,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for gelsd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for gelsd.");
         }
 
         work.resize(std::size_t(work[0]));
@@ -900,7 +900,7 @@ namespace lapack
 
         if (info != 0)
         {
-            throw std::runtime_error("Could not find workspace size for gelsd.");
+            XTENSOR_THROW(std::runtime_error, "Could not find workspace size for gelsd.");
         }
 
         work.resize(std::size_t(std::real(work[0])));
