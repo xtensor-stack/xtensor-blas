@@ -44,7 +44,7 @@ message(STATUS "xtensor-blas v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-find_package(xtensor 0.21 REQUIRED)
+find_package(xtensor 0.23 REQUIRED)
 message(STATUS "Found xtensor: ${xtensor_INCLUDE_DIRS}/xtensor")
 
 # Build
