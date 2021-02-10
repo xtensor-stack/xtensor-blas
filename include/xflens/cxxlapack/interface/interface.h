@@ -182,7 +182,6 @@
 #include "xflens/cxxlapack/interface/ilaver.h"
 #include "xflens/cxxlapack/interface/ilazlc.h"
 #include "xflens/cxxlapack/interface/ilazlr.h"
-#include "xflens/cxxlapack/interface/interface.h"
 #include "xflens/cxxlapack/interface/isnan.h"
 #include "xflens/cxxlapack/interface/izmax1.h"
 #include "xflens/cxxlapack/interface/labad.h"
