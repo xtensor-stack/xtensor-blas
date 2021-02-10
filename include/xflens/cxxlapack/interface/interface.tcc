@@ -180,7 +180,6 @@
 #include "xflens/cxxlapack/interface/ilaver.tcc"
 #include "xflens/cxxlapack/interface/ilazlc.tcc"
 #include "xflens/cxxlapack/interface/ilazlr.tcc"
-#include "xflens/cxxlapack/interface/interface.tcc"
 #include "xflens/cxxlapack/interface/isnan.tcc"
 #include "xflens/cxxlapack/interface/izmax1.tcc"
 #include "xflens/cxxlapack/interface/labad.tcc"
