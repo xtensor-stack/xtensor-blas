@@ -11,6 +11,7 @@
 #define XLINALG_HPP
 
 #include <algorithm>
+#include <functional>
 #include <limits>
 #include <sstream>
 #include <chrono>
@@ -1460,7 +1461,7 @@ namespace linalg
     }
 
     /**
-     * Calculate the Kronecker product between two 2D xexpressions.
+     * Calculate the Kronecker product between two kD xexpressions.
      */
     template <class T, class E>
     auto kron(const xexpression<T>& a, const xexpression<E>& b)
@@ -1470,23 +1471,38 @@ namespace linalg
         const auto& da = a.derived_cast();
         const auto& db = b.derived_cast();
 
-        XTENSOR_ASSERT(da.dimension() == 2);
-        XTENSOR_ASSERT(db.dimension() == 2);
+        XTENSOR_ASSERT(da.dimension() == bd.dimension());
 
-        std::array<std::size_t, 2> shp = {da.shape()[0] * db.shape()[0], da.shape()[1] * db.shape()[1]};
-        xtensor<value_type, 2> res(shp);
+        const auto shapea = da.shape();
+        const auto shapeb = db.shape();
+        const std::vector<std::size_t> shp = [&shapea, &shapeb](){
+            std::vector<std::size_t> r;
+            r.reserve(shapea.size());
+            std::transform(shapea.begin(), shapea.end(), shapeb.begin(),
+                           std::back_inserter(r), std::multiplies<std::size_t>());
+            return r;
+        }();
 
-        for (std::size_t i = 0; i < da.shape()[0]; ++i)
+        xarray<value_type> res(shp);
+
+        std::vector<std::size_t> ia(da.dimension(), 0);
+        xt::xstrided_slice_vector sv(da.dimension(), 0);
+
+        for (auto ii = da.begin(); ii < da.end(); ii++)
         {
-            for (std::size_t j = 0; j < da.shape()[1]; ++j)
+            for (std::size_t i = 0; i < da.dimension(); i++)
             {
-                for (std::size_t k = 0; k < db.shape()[0]; ++k)
-                {
-                    for (std::size_t h = 0; h < db.shape()[1]; ++h)
-                    {
-                        res(i * db.shape()[0] + k, j * db.shape()[1] + h) = da(i, j) * db(k, h);
-                    }
-                }
+                sv[i] = range(ia[i] * shapeb[i], (ia[i] + 1) * shapeb[i]);
+            }
+            strided_view(res, sv) = da[ia] * db;
+
+            size_t j = ia.size() - 1;
+            ia[j]++;
+            while (ia[j] >= shapea[j] && j > 0)
+            {
+                ia[j] = 0;
+                ia[j - 1]++;
+                j--;
             }
         }
 

@@ -366,6 +366,22 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
+    TEST(xlinalg, kron_3d)
+    {
+        xarray<int> arg_0 = {{{1, 2, 3}}};
+
+        xarray<int> arg_1 = xt::ones<int>({2, 2, 1});
+
+        auto res = xt::linalg::kron(arg_0, arg_1);
+
+        xarray<int> expected = {{{1, 2, 3},
+                                 {1, 2, 3}},
+                                {{1, 2, 3},
+                                 {1, 2, 3}}};
+
+        EXPECT_EQ(expected, res);
+    }
+
     TEST(xlinalg, cholesky)
     {
         xarray<double> arg_0 = {{  4, 12,-16},
