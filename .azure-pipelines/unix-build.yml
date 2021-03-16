@@ -8,7 +8,7 @@ steps:
       if [[ $(blas) == 'mkl' ]]; then
         conda install mkl
       else
-        conda install openblas==0.3.7 "blas * openblas" -c conda-forge;
+        conda install openblas==0.3 blas-devel -c conda-forge;
       fi
     displayName: Install dependencies
 
