@@ -33,7 +33,6 @@
 #ifndef CXXBLAS_DRIVERS_MKLBLAS_H
 #define CXXBLAS_DRIVERS_MKLBLAS_H 1
 
-#include <cxxstd/cstdlib.h>
 
 #   define HAVE_CBLAS           1
 #   define HAVE_SPARSEBLAS      1
