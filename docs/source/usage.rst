@@ -35,9 +35,9 @@ For example, calculating a determinant:
     
     int main()
     {
-        xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xt::xarray<double> a = {{3, 2, 1}, {0, 4, 2}, {1, 3, 5}};
         auto d = xt::linalg::det(a);
-        std::cout << d << std::endl;  // 6.661338e-16
+        std::cout << d << std::endl;  // 42.0
     }
 
 We can also try to compute the same determinant using the ``slogdet`` function, which
@@ -47,9 +47,9 @@ returning a ``std::tuple``, which can be unpacked using ``std::get<N>(tuple)``.
 
 .. code-block:: cpp
 
-    xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    xt::xarray<double> a = {{3, 2, 1}, {0, 4, 2}, {1, 3, 5}};
     auto d = xt::linalg::slogdet(a);
-    std::cout << std::get<0>(d) << ", " << std::get<1>(d) << std::endl;  // 1, -34.9450...
+    std::cout << std::get<0>(d) << ", " << std::get<1>(d) << std::endl;  // +1, 3.7376696
 
 Returning tuples is used throughout the xlinalg package.
 
