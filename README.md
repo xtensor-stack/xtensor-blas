@@ -22,10 +22,10 @@ Low-level functions to interface with BLAS or LAPACK with xtensor containers are
 
 ## Installation
 
-xtensor-blas is a header-only library. We provide a package for the conda package manager.
+xtensor-blas is a header-only library. We provide a package for the mamba (or conda) package manager.
 
 ```
-conda install -c conda-forge xtensor-blas
+mamba install -c conda-forge xtensor-blas
 ```
 
 which will also install the core `xtensor` package.
