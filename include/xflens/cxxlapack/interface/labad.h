@@ -39,11 +39,11 @@ namespace cxxlapack {
 
 template <typename XFLENS_VOID=void>
     void
-    labad(float  &small, float  &large);
+    labad(float  &smallv, float  &largev);
 
 template <typename XFLENS_VOID=void>
     void
-    labad(double &small, double &large);
+    labad(double &smallv, double &largev);
 
 } // namespace cxxlapack
 

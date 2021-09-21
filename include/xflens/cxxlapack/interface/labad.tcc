@@ -41,22 +41,22 @@ namespace cxxlapack {
 
 template <typename XFLENS_VOID>
 void
-labad(float &small, float &large)
+labad(float &smallv, float &largev)
 {
     CXXLAPACK_DEBUG_OUT("slabad");
 
-    LAPACK_IMPL(slabad)(&small,
-                        &large);
+    LAPACK_IMPL(slabad)(&smallv,
+                        &largev);
 }
 
 template <typename XFLENS_VOID>
 void
-labad(double &small, double &large)
+labad(double &smallv, double &largev)
 {
     CXXLAPACK_DEBUG_OUT("dlabad");
 
-    LAPACK_IMPL(dlabad)(&small,
-                        &large);
+    LAPACK_IMPL(dlabad)(&smallv,
+                        &largev);
 }
 
 
