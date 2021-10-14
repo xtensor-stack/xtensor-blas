@@ -22,7 +22,7 @@ namespace xt
 {
 
 TEST(xblas, norm_complex_float) {
-  xt::xarray<std::complex<float>> a = {std::complex<float>({1.0f, 2.0f}), std::complex<float>({3.0f, 4.0f})};
+  xt::xarray<std::complex<float>> a = {std::complex<float>(1.0f, 2.0f), std::complex<float>(3.0f, 4.0f)};
   auto res = linalg::norm(a);
 
   EXPECT_NEAR(res.real(), 5.4772f, 1e-3f);
