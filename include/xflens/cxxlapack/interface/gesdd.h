@@ -76,7 +76,7 @@ template <typename IndexType>
           IndexType              n,
           std::complex<float >   *A,
           IndexType              ldA,
-          double                 *s,
+          float                  *s,
           std::complex<float >   *U,
           IndexType              ldU,
           std::complex<float >   *Vt,
