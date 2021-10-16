@@ -163,7 +163,7 @@ namespace xt
                                             -1.3449222878385465 , -1.81183493755905478};
 
         for (int i = 0; i < x_expected.shape()[0]; ++i) {
-          EXPECT_DOUBLE_EQ(x_expected[i], x[i]);
+          EXPECT_NEAR(x_expected[i], x[i], 2e-16);
         }
     }
 
