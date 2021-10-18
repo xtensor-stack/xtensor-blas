@@ -2,14 +2,8 @@ jobs:
   - job: 'Linux_1'
     strategy:
       matrix:
-        gcc_4_OpenBLAS:
-          gcc_version: '4.9'
-          blas: 'OpenBLAS'
-        gcc_5_OpenBLAS:
-          gcc_version: '5'
-          blas: 'OpenBLAS'
         gcc_6_OpenBLAS:
-          gcc_version: '5'
+          gcc_version: '6'
           blas: 'OpenBLAS'
         gcc_6_bound_checks:
           gcc_version: '6'
@@ -24,12 +18,6 @@ jobs:
         gcc_9_OpenBLAS:
           gcc_version: '9'
           blas: 'OpenBLAS'
-        gcc_4_mkl:
-          gcc_version: '4.9'
-          blas: 'mkl'
-        gcc_5_mkl:
-          gcc_version: '5'
-          blas: 'mkl'
         gcc_6_mkl:
           gcc_version: '6'
           blas: 'mkl'
@@ -43,7 +31,7 @@ jobs:
           gcc_version: '9'
           blas: 'mkl'
     pool:
-      vmImage: ubuntu-16.04
+      vmImage: ubuntu-18.04
     variables:
       CC: gcc-$(gcc_version)
       CXX: g++-$(gcc_version)

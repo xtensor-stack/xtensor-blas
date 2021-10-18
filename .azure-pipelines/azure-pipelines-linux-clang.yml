@@ -2,12 +2,6 @@ jobs:
   - job: 'Linux_0'
     strategy:
       matrix:
-        clang_4:
-          llvm_version: '4.0'
-          blas: 'OpenBLAS'
-        clang_5:
-          llvm_version: '5.0'
-          blas: 'OpenBLAS'
         clang_6:
           llvm_version: '6.0'
           blas: 'OpenBLAS'
@@ -24,7 +18,7 @@ jobs:
           llvm_version: '10'
           blas: 'OpenBLAS'
     pool:
-      vmImage: ubuntu-16.04
+      vmImage: ubuntu-18.04
     variables:
       CC: clang-$(llvm_version)
       CXX: clang++-$(llvm_version)

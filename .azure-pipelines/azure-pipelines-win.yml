@@ -1,5 +1,5 @@
 jobs:
-  - job: 'build'
+  - job: 'Windows clang'
     pool:
       vmImage: 'vs2017-win2016'
     timeoutInMinutes: 360
