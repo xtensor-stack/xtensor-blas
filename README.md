@@ -64,7 +64,7 @@ http://xtensor-blas.readthedocs.io/
 
 | `xtensor-blas`  | `xtensor` |
 |-----------------|-----------|
-| master          |  ^0.23.3  |
+| master          |  ^0.24.0  |
 | 0.19.2          |  ^0.23.3  |
 | 0.19.1          |  ^0.23.3  |
 | 0.19.0          |  ^0.23.0  |

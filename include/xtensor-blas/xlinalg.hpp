@@ -1326,6 +1326,35 @@ namespace linalg
         return std::make_tuple(std::move(std::get<1>(result)), std::move(std::get<2>(result)), std::move(std::get<3>(result)));
     }
 
+    namespace detail
+    {
+        template <bool>
+        struct conj_eval_impl
+        {
+            template <class E>
+            static const E& run(const E& e)
+            {
+                return e;
+            }
+        };
+
+        template <>
+        struct conj_eval_impl<true>
+        {
+            template <class E>
+            static auto run(const E& e)
+            {
+                return xt::conj(e);
+            }
+        };
+
+        template <class E>
+        inline decltype(auto) conj_eval(const E& e)
+        {
+            return conj_eval_impl<xtl::is_complex<typename E::value_type>::value>::run(e);
+        }
+    }
+
     /**
      * Calculate Moore-Rose pseudo inverse using LAPACK SVD.
      */
@@ -1335,7 +1364,7 @@ namespace linalg
         using value_type = typename T::value_type;
         const auto& dA = A.derived_cast();
 
-        xtensor<value_type, 2, layout_type::column_major> M = xt::conj(dA);
+        xtensor<value_type, 2, layout_type::column_major> M = detail::conj_eval(dA);
 
         auto gesdd_res = svd(M, false, true);
 
