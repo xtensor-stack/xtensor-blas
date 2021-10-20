@@ -1,5 +1,5 @@
 jobs:
-  - job: 'build'
+  - job: 'Windows clang'
     pool:
       vmImage: 'vs2017-win2016'
     timeoutInMinutes: 360
@@ -36,7 +36,7 @@ jobs:
           conda install cmake==3.14.0 ^
                         mkl-devel ^
                         ninja ^
-                        xtensor=0.23.0 ^
+                        xtensor=0.24.0 ^
                         python=3.6
           conda list
         displayName: "Install conda packages"
