@@ -1474,7 +1474,7 @@ namespace linalg
     template <class T>
     auto trace(const xexpression<T>& M, int offset = 0, int axis1 = 0, int axis2 = 1)
     {
-        const auto& dM = M.derived_cast();
+        auto&& dM = xt::view_eval<T::static_layout>(M.derived_cast());
         auto d = xt::diagonal(dM, offset, std::size_t(axis1), std::size_t(axis2));
 
         std::size_t dim = d.dimension();
