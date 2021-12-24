@@ -498,10 +498,10 @@ namespace xt
         EXPECT_EQ(6,  ar2());
         EXPECT_EQ(10, ar3());
 
-        xarray<std::complex<double>> ar2 = random::rand<double>({ 2, 3, 1, 3 });
-        xarray<std::complex<double>> ar3 = linalg::trace(ar2, 0, 1, 3);
+        xarray<std::complex<double>> ar4 = random::rand<double>({ 2, 3, 1, 3 });
+        xarray<std::complex<double>> ar5 = linalg::trace(ar4, 0, 1, 3);
 
-        EXPECT_EQ(ar3.shape(), { 2, 1 });
+        EXPECT_EQ(ar5.shape(), { 2, 1 });
     }
 
     TEST(xlinalg, dots)
