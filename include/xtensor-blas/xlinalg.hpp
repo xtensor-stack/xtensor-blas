@@ -1474,17 +1474,18 @@ namespace linalg
     template <class T>
     auto trace(const xexpression<T>& M, int offset = 0, int axis1 = 0, int axis2 = 1)
     {
+        using value_type = std::common_type_t<typename T::value_type>;
         auto&& dM = xt::view_eval<T::static_layout>(M.derived_cast());
         auto d = xt::diagonal(dM, offset, std::size_t(axis1), std::size_t(axis2));
 
         std::size_t dim = d.dimension();
         if (dim == 1)
         {
-            return xt::xarray<double>(xt::sum(d)());
+            return xt::xarray<value_type, T::static_layout>(xt::sum(d)());
         }
         else
         {
-            return xt::xarray<double>(xt::sum(d, {dim - 1}));
+            return xt::xarray<value_type, T::static_layout>(xt::sum(d, {dim - 1}));
         }
     }
 
