@@ -192,7 +192,7 @@ namespace xt
         auto cmvecs = std::get<1>(complres);
         EXPECT_TRUE(allclose(complexpected_0, cmvals));
         xarray<std::complex<double>, layout_type::column_major> complexpected_1 = {{-0.92387953+0.i        ,-0.38268343+0.i        },
-                                                                                   { 0.00000000+0.38268343i, 0.00000000-0.92387953i}}; 
+                                                                                   { 0.00000000+0.38268343i, 0.00000000-0.92387953i}};
         EXPECT_TRUE(allclose(imag(complexpected_1), imag(cmvecs)));
         EXPECT_TRUE(allclose(real(complexpected_1), real(cmvecs)));
 
@@ -432,7 +432,7 @@ namespace xt
                                 { 2., 1.},
                                 { 3., 1.}};
 
-        xarray<double> arg_1 = {{-1., 0.2, 0.9, 2.1}, 
+        xarray<double> arg_1 = {{-1., 0.2, 0.9, 2.1},
                                 { 2., 3. , 2. , 1. }};
         arg_1 = transpose(arg_1);
         auto res = xt::linalg::lstsq(arg_0, arg_1);
@@ -443,7 +443,7 @@ namespace xt
         int el_2 = 2;
         xarray<double> el_3 = { 4.10003045, 1.09075677};
 
-    
+
         EXPECT_TRUE(allclose(el_0, std::get<0>(res)));
         EXPECT_TRUE(allclose(el_1, std::get<1>(res)));
         EXPECT_EQ(el_2, std::get<2>(res));
@@ -497,6 +497,11 @@ namespace xt
         EXPECT_EQ(12, ar1());
         EXPECT_EQ(6,  ar2());
         EXPECT_EQ(10, ar3());
+
+        xarray<std::complex<double>> ar4 = random::rand<double>({ 2, 3, 1, 3 });
+        xarray<std::complex<double>> ar5 = linalg::trace(ar4, 0, 1, 3);
+
+        EXPECT_EQ(ar5.shape(), xt::shape({ 2, 1 }));
     }
 
     TEST(xlinalg, dots)
@@ -533,7 +538,7 @@ namespace xt
                                      {{  69,  90, 111},
                                       { 258, 279, 300},
                                       { 447, 468, 489}}},
-                                
+
                                     {{{  96, 126, 156},
                                       { 366, 396, 426},
                                       { 636, 666, 696}},
@@ -541,7 +546,7 @@ namespace xt
                                      {{ 123, 162, 201},
                                       { 474, 513, 552},
                                       { 825, 864, 903}},
-                                
+
                                      {{ 150, 198, 246},
                                       { 582, 630, 678},
                                       {1014,1062,1110}}}};
