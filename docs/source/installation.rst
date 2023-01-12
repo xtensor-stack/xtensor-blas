@@ -23,7 +23,7 @@ Installation
 
 Although ``xtensor-blas`` is a header-only library, we provide standardized means to install it, with package managers or with cmake.
 
-Besides the xtendor headers, all these methods place the `cmake` project configuration file in the right location so that third-party projects can use cmake's find_package to locate xtensor headers.
+Besides the xtensor headers, all these methods place the `cmake` project configuration file in the right location so that third-party projects can use cmake's find_package to locate xtensor headers.
 
 .. seealso:: Read the :ref:`Performance and Linking <perf-and-link>` chapter on how to link against BLAS and improve performance
 
