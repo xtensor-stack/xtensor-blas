@@ -1,7 +1,7 @@
 jobs:
-  - job: 'Windows clang'
+  - job: Windows_clang
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: windows-2019
     timeoutInMinutes: 360
     steps:
 
@@ -36,8 +36,8 @@ jobs:
           conda install cmake==3.14.0 ^
                         mkl-devel ^
                         ninja ^
-                        xtensor=0.24.0 ^
-                        python=3.6
+                        xtensor=0.24.3 ^
+                        python=3.9
           conda list
         displayName: "Install conda packages"
 
