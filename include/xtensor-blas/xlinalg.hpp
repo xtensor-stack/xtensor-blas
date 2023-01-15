@@ -94,9 +94,9 @@ namespace xt
                 {
                     for (std::size_t i = 0; i < v.size(); ++i)
                     {
-                        result += std::abs(std::pow(v(i), ord));
+                        result += static_cast<underlying_value_type>(std::abs(std::pow(v(i), ord)));
                     }
-                    result = std::pow(result, 1. / static_cast<double>(ord));
+                    result = static_cast<underlying_value_type>(std::pow(result, 1. / static_cast<double>(ord)));
                 }
                 return result;
             }
