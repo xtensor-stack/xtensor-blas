@@ -36,4 +36,3 @@
 #include "xflens/cxxlapack/interface/interface.h"
 
 #endif // CXXLAPACK_CXXLAPACK_H 1
-

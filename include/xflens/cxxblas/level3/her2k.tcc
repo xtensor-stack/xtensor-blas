@@ -161,4 +161,3 @@ her2k(StorageOrder order, StorageUpLo upLo,
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL3_HER2K_TCC
-

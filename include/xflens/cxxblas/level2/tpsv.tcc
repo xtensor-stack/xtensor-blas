@@ -298,4 +298,3 @@ tpsv(StorageOrder order, StorageUpLo upLo,
 } // namespace flens
 
 #endif // CXXBLAS_LEVEL2_TPSV_TCC
-

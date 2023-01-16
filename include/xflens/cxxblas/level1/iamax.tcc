@@ -147,4 +147,3 @@ iamax(IndexType n, const ComplexDouble *x, IndexType incX, IndexType &i)
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL1_IAMAX_TCC
-

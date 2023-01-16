@@ -1,37 +1,37 @@
 steps:
-  - script: |
-      conda config --set always_yes yes --set changeps1 no
-      conda update -q conda
-      conda env create --file environment-dev.yml
-      source activate xtensor-blas
-      echo $(blas)
-      if [[ $(blas) == 'mkl' ]]; then
-        conda install mkl
-      else
-        conda install openblas==0.3 blas-devel -c conda-forge;
-      fi
-    displayName: Install dependencies
+- script: |
+    conda config --set always_yes yes --set changeps1 no
+    conda update -q conda
+    conda env create --file environment-dev.yml
+    source activate xtensor-blas
+    echo $(blas)
+    if [[ $(blas) == 'mkl' ]]; then
+      conda install mkl
+    else
+      conda install openblas==0.3 blas-devel -c conda-forge;
+    fi
+  displayName: Install dependencies
 
-  - script: |
-      source activate xtensor-blas
-      mkdir build
-      cd build
-      if [[ $(bound_checks) == 1 ]]; then
-        CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DXTENSOR_ENABLE_ASSERT=ON";
-      fi
-      cmake -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib $CMAKE_EXTRA_ARGS $(Build.SourcesDirectory);
-    displayName: Configure xtensor-blas
-    workingDirectory: $(Build.BinariesDirectory)
+- script: |
+    source activate xtensor-blas
+    mkdir build
+    cd build
+    if [[ $(bound_checks) == 1 ]]; then
+      CMAKE_EXTRA_ARGS="$CMAKE_EXTRA_ARGS -DXTENSOR_ENABLE_ASSERT=ON";
+    fi
+    cmake -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib $CMAKE_EXTRA_ARGS $(Build.SourcesDirectory);
+  displayName: Configure xtensor-blas
+  workingDirectory: $(Build.BinariesDirectory)
 
-  - script: |
-      source activate xtensor-blas
-      make -j2 test_xtensor_blas
-    displayName: Build xtensor-blas
-    workingDirectory: $(Build.BinariesDirectory)/build
-          
-  - script: |
-      source activate xtensor-blas
-      cd test
-      ./test_xtensor_blas
-    displayName: Test xtensor-blas
-    workingDirectory: $(Build.BinariesDirectory)/build/test
+- script: |
+    source activate xtensor-blas
+    make -j2 test_xtensor_blas
+  displayName: Build xtensor-blas
+  workingDirectory: $(Build.BinariesDirectory)/build
+
+- script: |
+    source activate xtensor-blas
+    cd test
+    ./test_xtensor_blas
+  displayName: Test xtensor-blas
+  workingDirectory: $(Build.BinariesDirectory)/build/test

@@ -212,4 +212,3 @@ syr2k(StorageOrder order, StorageUpLo upLo,
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL3_SYR2K_TCC
-

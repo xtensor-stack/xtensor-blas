@@ -186,4 +186,3 @@ trsm(StorageOrder order, Side side, StorageUpLo upLo,
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL3_TRSM_TCC
-

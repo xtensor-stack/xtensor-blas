@@ -87,4 +87,3 @@ imax1(IndexType n, const X *x, IndexType incX)
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL1EXTENSIONS_IMAX1_TCC
-

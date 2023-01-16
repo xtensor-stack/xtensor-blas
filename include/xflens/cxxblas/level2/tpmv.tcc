@@ -291,4 +291,3 @@ tpmv(StorageOrder order, StorageUpLo upLo,
 } // namespace flens
 
 #endif // CXXBLAS_LEVEL2_TPMV_TCC
-
