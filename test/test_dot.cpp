@@ -1,18 +1,18 @@
 /***************************************************************************
-* Copyright (c) Wolf Vollprecht, Johan Mabille and Sylvain Corlay          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Wolf Vollprecht, Johan Mabille and Sylvain Corlay          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
-#include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xstrided_view.hpp"
+#include "xtensor/xview.hpp"
 
+#include "gtest/gtest.h"
 #include "xtensor-blas/xlinalg.hpp"
 
 namespace xt
@@ -157,7 +157,8 @@ namespace xt
         EXPECT_EQ(r1, e1);
 
         auto r2 = linalg::dot(b, xt::transpose(a));
-        xarray<float, layout_type::column_major> e2 = xarray<float, layout_type::column_major>::from_shape({3, 1});
+        xarray<float, layout_type::column_major> e2 = xarray<float, layout_type::column_major>::from_shape({3, 1}
+        );
         e2(0, 0) = 6.f;
         e2(1, 0) = 15.f;
         e2(2, 0) = 24.f;
@@ -173,7 +174,8 @@ namespace xt
 
         auto r1 = linalg::dot(a, b);
 
-        xarray<float, layout_type::column_major> e1 = xarray<float, layout_type::column_major>::from_shape({1, 1});
+        xarray<float, layout_type::column_major> e1 = xarray<float, layout_type::column_major>::from_shape({1, 1}
+        );
         e1(0, 0) = 3;
 
         EXPECT_EQ(e1, r1);
@@ -203,7 +205,10 @@ namespace xt
         EXPECT_EQ(res1.shape()[1], 3u);
 
         auto res2 = xt::linalg::dot(strided_view(a, {0, 0}), strided_view(b, {0, 0}));
-        auto res3 = xt::linalg::dot(strided_view(a, {0, range(0, 3)}), transpose(strided_view(b, {0, range(0, 3)})));
+        auto res3 = xt::linalg::dot(
+            strided_view(a, {0, range(0, 3)}),
+            transpose(strided_view(b, {0, range(0, 3)}))
+        );
         EXPECT_EQ(res2(0), 285.);
         EXPECT_EQ(res3(0, 0), 285.);
         EXPECT_EQ(res3(1, 2), 3635.);
@@ -213,4 +218,4 @@ namespace xt
         EXPECT_EQ(res3.shape()[1], 3u);
     }
 
-}
+}  // namespace xt

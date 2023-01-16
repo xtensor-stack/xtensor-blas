@@ -1,18 +1,18 @@
 /***************************************************************************
-* Copyright (c) Wolf Vollprecht, Johan Mabille and Sylvain Corlay          *
-* Copyright (c) QuantStack                                                 *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) Wolf Vollprecht, Johan Mabille and Sylvain Corlay          *
+ * Copyright (c) QuantStack                                                 *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
-#include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
-#include "xtensor/xview.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xrandom.hpp"
+#include "xtensor/xview.hpp"
 
+#include "gtest/gtest.h"
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlinalg.hpp"
 
@@ -20,8 +20,7 @@ namespace xt
 {
     TEST(xblas, matrix_times_vector)
     {
-        xarray<double> m1 = {{1, 2, 3},
-                             {4, 5, 6}};
+        xarray<double> m1 = {{1, 2, 3}, {4, 5, 6}};
         xarray<double> b = {1, 2, 3};
 
         auto res = linalg::dot(m1, b);
@@ -57,9 +56,7 @@ namespace xt
         b.reshape({3, 5});
 
         auto ab = linalg::dot(a, b);
-        xarray<double> ab_expected ={{ 25,  28,  31,  34,  37},
-                                     { 70,  82,  94, 106, 118},
-                                     {115, 136, 157, 178, 199}};
+        xarray<double> ab_expected = {{25, 28, 31, 34, 37}, {70, 82, 94, 106, 118}, {115, 136, 157, 178, 199}};
         EXPECT_EQ(ab_expected, ab);
     }
 
@@ -72,9 +69,7 @@ namespace xt
         xarray<double> expected = {35};
         EXPECT_EQ(expected, res);
 
-        xarray<double> m1
-          {{1, 2, 3},
-           {4, 5, 6}};
+        xarray<double> m1{{1, 2, 3}, {4, 5, 6}};
 
         xarray<double> c = {1, 2};
         auto res2 = xt::linalg::dot(xt::view(m1, xt::all(), 1), c);
@@ -112,9 +107,7 @@ namespace xt
 
         xarray<double> b = arange(0, 3);
 
-        xarray<double> expected = {{0, 1, 2},
-                                   {0, 1, 2},
-                                   {0, 1, 2}};
+        xarray<double> expected = {{0, 1, 2}, {0, 1, 2}, {0, 1, 2}};
 
         auto t = linalg::outer(a, b);
         auto t2 = linalg::outer(a, xt::arange<double>(0, 3));
@@ -131,7 +124,7 @@ namespace xt
         xt::xarray<double> expected = xt::random::randn<double>({5});
         xt::random::seed(123);
         auto x = xt::random::randn<double>({5});
-        auto weights = xt::xarray<double> ({1});  // should perform identity
+        auto weights = xt::xarray<double>({1});  // should perform identity
 
         auto result = linalg::outer(x, weights);
 
@@ -144,8 +137,7 @@ namespace xt
 
     TEST(xblas, nan_result)
     {
-        xt::xarray<double> X = {{1, 2, 3},
-                                {1, 2, 3}};
+        xt::xarray<double> X = {{1, 2, 3}, {1, 2, 3}};
 
         auto M = xt::xarray<double>::from_shape({3, 3});
         M(0, 0) = std::numeric_limits<double>::quiet_NaN();
@@ -159,8 +151,7 @@ namespace xt
 
     TEST(xblas, gemm_transpose)
     {
-        xt::xarray<double> X = {{1, 2, 3},
-                                {1, 2, 3}};
+        xt::xarray<double> X = {{1, 2, 3}, {1, 2, 3}};
 
         auto M = xt::xarray<double>::from_shape({3, 3});
         auto O = xt::xarray<double>::from_shape({2, 2});
@@ -168,12 +159,9 @@ namespace xt
         xt::blas::gemm(X, X, M, true, false, 1.0, 0.0);
         xt::blas::gemm(X, X, O, false, true, 1.0, 0.0);
 
-        xt::xarray<double> expM = {{ 2,  4,  6},
-                                   { 4,  8, 12},
-                                   { 6, 12, 18}};
+        xt::xarray<double> expM = {{2, 4, 6}, {4, 8, 12}, {6, 12, 18}};
 
-        xt::xarray<double> expO = {{ 14, 14},
-                                   { 14, 14}};
+        xt::xarray<double> expO = {{14, 14}, {14, 14}};
 
         EXPECT_TRUE(all(equal(expM, M)));
         EXPECT_TRUE(all(equal(expO, O)));
@@ -181,8 +169,7 @@ namespace xt
 
     TEST(xblas, gemv_transpose)
     {
-        xt::xarray<double> X = {{1, 2, 3},
-                                {1, 2, 3}};
+        xt::xarray<double> X = {{1, 2, 3}, {1, 2, 3}};
         xt::xarray<double> v = {1, 2};
         auto R = xt::xarray<double>::from_shape({3});
 
@@ -192,4 +179,4 @@ namespace xt
 
         EXPECT_TRUE(all(equal(expR, R)));
     }
-}
+}  // namespace xt
