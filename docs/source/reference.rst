@@ -62,7 +62,7 @@ Matrix eigenvalues
 
 .. doxygenfunction:: xt::linalg::eigh(const xexpression<E>&, char)
     :project: xtensor-blas
- 
+
 .. doxygenfunction:: xt::linalg::eigh(const xexpression<E>&, const xexpression<E>&, const char)
     :project: xtensor-blas
 

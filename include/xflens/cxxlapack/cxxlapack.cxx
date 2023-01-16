@@ -37,4 +37,3 @@
 #include "xflens/cxxlapack/cxxlapack.tcc"
 
 #endif // CXXLAPACK_CXXLAPACK_CXX 1
-

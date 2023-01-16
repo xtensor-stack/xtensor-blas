@@ -1,19 +1,19 @@
 /***************************************************************************
-* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
-*                                                                          *
-* Distributed under the terms of the BSD 3-Clause License.                 *
-*                                                                          *
-* The full license is in the file LICENSE, distributed with this software. *
-****************************************************************************/
+ * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+ *                                                                          *
+ * Distributed under the terms of the BSD 3-Clause License.                 *
+ *                                                                          *
+ * The full license is in the file LICENSE, distributed with this software. *
+ ****************************************************************************/
 
 #ifndef BENCHMARK_BLAS_HPP
 #define BENCHMARK_BLAS_HPP
 
 #include <benchmark/benchmark.h>
 
+#include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xarray.hpp"
 
 #include "xtensor-blas/xlinalg.hpp"
 
@@ -41,11 +41,10 @@ namespace xt
         }
 
         template <class V>
-        inline void init_xtensor_benchmark(V& lhs, V& rhs,
-                                           std::size_t size0, size_t size1)
+        inline void init_xtensor_benchmark(V& lhs, V& rhs, std::size_t size0, size_t size1)
         {
-            lhs.reshape({ size0, size1 });
-            rhs.reshape({ size0, size1 });
+            lhs.reshape({size0, size1});
+            rhs.reshape({size0, size1});
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
@@ -95,10 +94,10 @@ namespace xt
             }
         }
 
-        BENCHMARK_TEMPLATE(benchmark_dot, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(benchmark_transpose_dot, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(benchmark_transpose_with_assign_dot, xt::xtensor<double, 2>)->Range(32, 32<<3);
-    }
-}
+        BENCHMARK_TEMPLATE(benchmark_dot, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(benchmark_transpose_dot, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+        BENCHMARK_TEMPLATE(benchmark_transpose_with_assign_dot, xt::xtensor<double, 2>)->Range(32, 32 << 3);
+    }  // namespace benchmark_dot
+}  // namespace xt
 
 #endif

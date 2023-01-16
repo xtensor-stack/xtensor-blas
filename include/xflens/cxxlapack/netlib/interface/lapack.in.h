@@ -24056,4 +24056,3 @@ LAPACK_IMPL(zupmtr)(const char               *SIDE,
                     const INTEGER            *LDC,
                     DOUBLE_COMPLEX           *WORK,
                     INTEGER                  *INFO);
-

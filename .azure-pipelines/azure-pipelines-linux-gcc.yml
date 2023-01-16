@@ -1,52 +1,52 @@
 jobs:
-  - job: 'Linux_1'
-    strategy:
-      matrix:
-        gcc_6_OpenBLAS:
-          gcc_version: '6'
-          blas: 'OpenBLAS'
-        gcc_6_bound_checks:
-          gcc_version: '6'
-          blas: 'OpenBLAS'
-          bound_checks: 1
-        gcc_7_OpenBLAS:
-          gcc_version: '7'
-          blas: 'OpenBLAS'
-        gcc_8_OpenBLAS:
-          gcc_version: '8'
-          blas: 'OpenBLAS'
-        gcc_9_OpenBLAS:
-          gcc_version: '9'
-          blas: 'OpenBLAS'
-        gcc_6_mkl:
-          gcc_version: '6'
-          blas: 'mkl'
-        gcc_7_mkl:
-          gcc_version: '7'
-          blas: 'mkl'
-        gcc_8_mkl:
-          gcc_version: '8'
-          blas: 'mkl'
-        gcc_9_mkl:
-          gcc_version: '9'
-          blas: 'mkl'
-    pool:
-      vmImage: ubuntu-18.04
-    variables:
-      CC: gcc-$(gcc_version)
-      CXX: g++-$(gcc_version)
-    timeoutInMinutes: 360
-    steps:
+- job: Linux_1
+  strategy:
+    matrix:
+      gcc_6_OpenBLAS:
+        gcc_version: '6'
+        blas: OpenBLAS
+      gcc_6_bound_checks:
+        gcc_version: '6'
+        blas: OpenBLAS
+        bound_checks: 1
+      gcc_7_OpenBLAS:
+        gcc_version: '7'
+        blas: OpenBLAS
+      gcc_8_OpenBLAS:
+        gcc_version: '8'
+        blas: OpenBLAS
+      gcc_9_OpenBLAS:
+        gcc_version: '9'
+        blas: OpenBLAS
+      gcc_6_mkl:
+        gcc_version: '6'
+        blas: mkl
+      gcc_7_mkl:
+        gcc_version: '7'
+        blas: mkl
+      gcc_8_mkl:
+        gcc_version: '8'
+        blas: mkl
+      gcc_9_mkl:
+        gcc_version: '9'
+        blas: mkl
+  pool:
+    vmImage: ubuntu-18.04
+  variables:
+    CC: gcc-$(gcc_version)
+    CXX: g++-$(gcc_version)
+  timeoutInMinutes: 360
+  steps:
 
-      - script: |
-          if [[ $(gcc_version) == '4.9' || $(gcc_version) == '6' || $(gcc_version) == '7' || $(gcc_version) == '8' ]]; then
-            sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-            sudo apt-get update
-            sudo apt-get --no-install-suggests --no-install-recommends install g++-$(gcc_version)
-          fi
-        displayName: Install build toolchain
-          
-      - bash: echo "##vso[task.prependpath]$CONDA/bin"
-        displayName: Add conda to PATH
+  - script: |
+      if [[ $(gcc_version) == '4.9' || $(gcc_version) == '6' || $(gcc_version) == '7' || $(gcc_version) == '8' ]]; then
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get --no-install-suggests --no-install-recommends install g++-$(gcc_version)
+      fi
+    displayName: Install build toolchain
 
-      - template: unix-build.yml
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+    displayName: Add conda to PATH
+
+  - template: unix-build.yml

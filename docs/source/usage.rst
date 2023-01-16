@@ -22,7 +22,7 @@ Usage
 =====
 
 To use xtensor-blas functions, the ``xlinalg.hpp`` header has to be included.
-In the ``xt::linalg`` namespace, many of NumPy's ``np.linalg`` functions are implemented. 
+In the ``xt::linalg`` namespace, many of NumPy's ``np.linalg`` functions are implemented.
 We make an effort to keep the interfaces very similar.
 
 For example, calculating a determinant:
@@ -32,7 +32,7 @@ For example, calculating a determinant:
 .. code-block:: cpp
 
     #include "xtensor-blas/xlinalg.hpp"
-    
+
     int main()
     {
         xt::xarray<double> a = {{3, 2, 1}, {0, 4, 2}, {1, 3, 5}};

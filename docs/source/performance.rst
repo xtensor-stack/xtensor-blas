@@ -45,4 +45,3 @@ If CMake is not used, the flags can be passed manually to e.g. ``g++``:
 .. code:: bash
 
     g++ test.cpp -o test -lblas -llapack -DHAVE_CBLAS=1
-

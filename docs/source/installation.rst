@@ -64,4 +64,3 @@ On Windows platforms, from the source directory:
     cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=/path/to/prefix ..
     nmake
     nmake install
-

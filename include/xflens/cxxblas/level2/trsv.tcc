@@ -309,4 +309,3 @@ trsv(StorageOrder order, StorageUpLo upLo,
 } // namespace cxxblas
 
 #endif // CXXBLAS_LEVEL2_TRSV_TCC
-

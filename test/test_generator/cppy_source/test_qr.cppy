@@ -35,7 +35,7 @@ namespace xt
         // py_a
         // py_resq1_h = res_q1[0]
         // py_resq1_tau = res_q1[1]
-        
+
         auto res1 = linalg::qr(py_a, linalg::qrmode::raw);
         EXPECT_TRUE(allclose(std::get<0>(res1), py_resq1_h));
         EXPECT_TRUE(allclose(std::get<1>(res1), py_resq1_tau));
@@ -72,7 +72,7 @@ namespace xt
         // py_a
         // py_resq1_h = res_q1[0]
         // py_resq1_tau = res_q1[1]
-        
+
         auto res1 = linalg::qr(py_a, linalg::qrmode::raw);
         EXPECT_TRUE(allclose(std::get<0>(res1), py_resq1_h));
         EXPECT_TRUE(allclose(std::get<1>(res1), py_resq1_tau));
