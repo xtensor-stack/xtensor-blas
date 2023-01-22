@@ -78,6 +78,7 @@ target_include_directories(xtensor-blas
     $<INSTALL_INTERFACE:include>)
 
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
+OPTION(CPP17 "enables C++17" OFF)
 OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
 # Decide whether to use OpenBLAS or not.
 # The user might have the folder containing OpenBLASConfig.cmake file
