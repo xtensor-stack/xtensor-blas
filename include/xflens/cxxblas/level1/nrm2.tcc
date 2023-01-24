@@ -104,19 +104,19 @@ nrm2_generic(IndexType n, const std::complex<X> *x, IndexType incX, T &norm)
             if (real(x[iX]) != Zero) {
                 T absXi = abs(real(x[iX]));
                 if (scale<absXi) {
-                    ssq = One + ssq * pow(scale/absXi, 2);
+                    ssq = One + ssq * static_cast<T>(pow(scale/absXi, 2));
                     scale = absXi;
                 } else {
-                    ssq += pow(absXi/scale, 2);
+                    ssq += static_cast<T>(pow(absXi/scale, 2));
                 }
             }
             if (imag(x[iX]) != Zero) {
                 T absXi = abs(imag(x[iX]));
                 if (scale<absXi) {
-                    ssq = One + ssq * pow(scale/absXi, 2);
+                    ssq = One + static_cast<T>(ssq * pow(scale/absXi, 2));
                     scale = absXi;
                 } else {
-                    ssq += pow(absXi/scale, 2);
+                    ssq += static_cast<T>(pow(absXi/scale, 2));
                 }
             }
         }
