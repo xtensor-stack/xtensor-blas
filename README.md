@@ -1,8 +1,8 @@
 # ![xtensor](docs/source/xtensor-blas.svg)
 
-[![Travis](https://travis-ci.org/xtensor-stack/xtensor-blas.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor-blas)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/i5c8u3q0uksx0m06?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor-blas)
-[![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor-blas?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=5&branchName=master)
+[![GHA Linux](https://github.com/xtensor-stack/xtensor-blas/actions/workflows/linux.yml/badge.svg)](https://github.com/xtensor-stack/xtensor-blas/actions/workflows/linux.yml)
+[![GHA OSX](https://github.com/xtensor-stack/xtensor-blas/actions/workflows/osx.yml/badge.svg)](https://github.com/xtensor-stack/xtensor-blas/actions/workflows/osx.yml)
+[![GHA Windows](https://github.com/xtensor-stack/xtensor-blas/actions/workflows/windows.yml/badge.svg)](https://github.com/xtensor-stack/xtensor-blas/actions/workflows/windows.yml)
 [![Documentation](http://readthedocs.org/projects/xtensor-blas/badge/?version=latest)](https://xtensor-blas.readthedocs.io/en/latest/?badge=latest)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
