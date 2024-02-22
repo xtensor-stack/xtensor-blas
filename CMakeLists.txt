@@ -77,6 +77,8 @@ target_include_directories(xtensor-blas
     $<BUILD_INTERFACE:${XTENSOR_BLAS_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>)
 
+target_compile_features(xtensor-blas INTERFACE cxx_std_14)
+
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
 OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
 # Decide whether to use OpenBLAS or not.
