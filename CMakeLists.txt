@@ -145,6 +145,12 @@ install(DIRECTORY ${INCLUDE_DIR}/xflens
         PATTERN filter.pm EXCLUDE
         PATTERN CMakeLists.txt EXCLUDE)
 
+configure_file(${PROJECT_NAME}.pc.in
+               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+                @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig/")
+
 set(XTENSOR_BLAS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
     STRING "install path for xtensor-blasConfig.cmake")
 
