@@ -14,7 +14,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include "xtensor/xutils.hpp"
+#include "xtensor/utils/xutils.hpp"
 
 #include "xflens/cxxblas/typedefs.h"
 #include "xtensor-blas/xblas_config.hpp"
