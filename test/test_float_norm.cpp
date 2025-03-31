@@ -9,10 +9,10 @@
 
 // this test is for https://github.com/xtensor-stack/xtensor-blas/issues/206
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/generators/xbuilder.hpp"
+#include "xtensor/generators/xrandom.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "gtest/gtest.h"
 #include "xtensor-blas/xblas.hpp"
