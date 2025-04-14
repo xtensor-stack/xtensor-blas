@@ -71,7 +71,7 @@ jobs:
 
     - name: Install OpenBLAS
       if: ${{ matrix.sys.blas == 'OpenBLAS' }}
-      run: micromamba install openblas==0.3 blas-devel
+      run: micromamba install 'openblas==0.3.29=pthreads*' blas-devel
 
     - name: Configure using CMake
       run: cmake -Bbuild -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
