@@ -24,7 +24,7 @@ if(NOT TARGET @PROJECT_NAME@)
   find_dependency(LAPACK REQUIRED)
   target_link_libraries(xtensor-blas INTERFACE ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
   if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8)
-    target_compile_features(xtensor-blas INTERFACE cxx_std_14)
+    target_compile_features(xtensor-blas INTERFACE cxx_std_17)
   endif()
 endif()
 
