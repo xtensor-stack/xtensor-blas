@@ -9,8 +9,8 @@
 
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/generators/xbuilder.hpp"
-#include "xtensor/misc/xcomplex.hpp"
 #include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
 #include "xtensor/views/xview.hpp"
 
 #include "gtest/gtest.h"

@@ -16,13 +16,13 @@
 #include <sstream>
 
 #include "xtensor/containers/xarray.hpp"
-#include "xtensor/misc/xcomplex.hpp"
+#include "xtensor/containers/xtensor.hpp"
 #include "xtensor/core/xeval.hpp"
 #include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
 #include "xtensor/misc/xmanipulation.hpp"
-#include "xtensor/views/xstrided_view.hpp"
-#include "xtensor/containers/xtensor.hpp"
 #include "xtensor/utils/xutils.hpp"
+#include "xtensor/views/xstrided_view.hpp"
 #include "xtensor/views/xview.hpp"
 
 #include "xtensor-blas/xblas.hpp"

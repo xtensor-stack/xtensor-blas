@@ -13,10 +13,10 @@
 #include <algorithm>
 
 #include "xtensor/containers/xarray.hpp"
-#include "xtensor/misc/xcomplex.hpp"
-#include "xtensor/io/xio.hpp"
 #include "xtensor/containers/xstorage.hpp"
 #include "xtensor/containers/xtensor.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
 #include "xtensor/utils/xutils.hpp"
 
 #include "xflens/cxxlapack/cxxlapack.cxx"
