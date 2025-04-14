@@ -33,7 +33,9 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 include(set_compiler_flag.cmake)
 
-if(CPP20)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+
+#[[if(CPP20)
   # User requested C++20, but compiler might not oblige.
   set_compiler_flag(
     _cxx_std_flag CXX
@@ -55,6 +57,7 @@ endif()
 if(NOT _cxx_std_flag)
   message(FATAL_ERROR "xtensor-blas needs a C++17-compliant compiler.")
 endif()
+]]
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
   CHECK_CXX_COMPILER_FLAG(-march=native arch_native_supported)
