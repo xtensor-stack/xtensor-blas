@@ -634,7 +634,7 @@ namespace xt
                         {
                             m_offset -= static_cast<std::ptrdiff_t>(m_idx[i]) * m_a.strides()[i];
                             m_idx[i] = size_type(0);
-                            if (i == 0 || m_axis == 0 && i == 1)
+                            if (i == 0 || (m_axis == 0 && i == 1))
                             {
                                 return false;
                             }
