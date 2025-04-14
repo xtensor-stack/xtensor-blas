@@ -12,8 +12,8 @@
 
 #include <algorithm>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
 
 #include "gtest/gtest.h"
 #include "xtensor-blas/xlinalg.hpp"

@@ -15,15 +15,15 @@
 #include <limits>
 #include <sstream>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xcomplex.hpp"
-#include "xtensor/xeval.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xmanipulation.hpp"
-#include "xtensor/xstrided_view.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xutils.hpp"
-#include "xtensor/xview.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/core/xeval.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
+#include "xtensor/misc/xmanipulation.hpp"
+#include "xtensor/utils/xutils.hpp"
+#include "xtensor/views/xstrided_view.hpp"
+#include "xtensor/views/xview.hpp"
 
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xblas_utils.hpp"

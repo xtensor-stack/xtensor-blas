@@ -12,11 +12,11 @@
 
 #include <algorithm>
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xcomplex.hpp"
-#include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xutils.hpp"
+#include "xtensor/containers/xarray.hpp"
+#include "xtensor/containers/xtensor.hpp"
+#include "xtensor/io/xio.hpp"
+#include "xtensor/misc/xcomplex.hpp"
+#include "xtensor/utils/xutils.hpp"
 
 #include "xflens/cxxblas/cxxblas.cxx"
 #include "xtensor-blas/xblas_config.hpp"

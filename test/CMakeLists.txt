@@ -33,27 +33,27 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 include(set_compiler_flag.cmake)
 
-if(CPP17)
-  # User requested C++17, but compiler might not oblige.
+if(CPP20)
+  # User requested C++20, but compiler might not oblige.
   set_compiler_flag(
     _cxx_std_flag CXX
-    "-std=c++17"  # this should work with GNU, Intel, PGI
-    "/std:c++17"  # this should work with MSVC
+    "-std=c++20"  # this should work with GNU, Intel, PGI
+    "/std:c++20"  # this should work with MSVC
   )
   if(_cxx_std_flag)
-    message(STATUS "Building with C++17")
+    message(STATUS "Building with C++20")
   endif()
 else()
   set_compiler_flag(
     _cxx_std_flag CXX REQUIRED
-    "-std=c++14"  # this should work with GNU, Intel, PGI
-    "/std:c++14"  # this should work with MSVC
+    "-std=c++17"  # this should work with GNU, Intel, PGI
+    "/std:c++17"  # this should work with MSVC
   )
-  message(STATUS "Building with C++14")
+  message(STATUS "Building with C++17")
 endif()
 
 if(NOT _cxx_std_flag)
-  message(FATAL_ERROR "xtensor-blas needs a C++14-compliant compiler.")
+  message(FATAL_ERROR "xtensor-blas needs a C++17-compliant compiler.")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
@@ -115,10 +115,7 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
                      ${CMAKE_CURRENT_BINARY_DIR}/googletest-build EXCLUDE_FROM_ALL)
 
     set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-    add_library(GTest::GTest INTERFACE IMPORTED)
-    target_link_libraries(GTest::GTest INTERFACE gtest)
-    add_library(GTest::Main INTERFACE IMPORTED)
-    target_link_libraries(GTest::Main INTERFACE gtest_main)
+    set(GTEST_BOTH_LIBRARIES gtest_main gtest)
 else()
     find_package(GTest REQUIRED)
 endif()
@@ -161,7 +158,7 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_blas gtest_main)
 endif()
 
-target_link_libraries(test_xtensor_blas ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_blas ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor_blas DEPENDS test_xtensor_blas)
 add_test(NAME xtest COMMAND test_xtensor_blas)

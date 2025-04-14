@@ -39,7 +39,7 @@ jobs:
       run: micromamba install 'openblas==0.3.29=openmp*' blas-devel
 
     - name: Configure using CMake
-      run: cmake -Bbuild -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+      run: cmake -Bbuild -DCMAKE_CXX_STANDARD=17 -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
 
     - name: Build
       working-directory: build
