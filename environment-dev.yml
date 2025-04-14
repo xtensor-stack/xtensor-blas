@@ -3,4 +3,4 @@ channels:
 - conda-forge
 dependencies:
 - cmake
-- xtensor>=0.25.0
+- xtensor>=0.25.0,<0.26
