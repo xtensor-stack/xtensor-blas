@@ -2,5 +2,5 @@ name: xtensor-blas
 channels:
 - conda-forge
 dependencies:
-- cmake <4.0
+- cmake
 - xtensor>=0.25.0,<0.26

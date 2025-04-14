@@ -13,7 +13,7 @@ defaults:
 jobs:
   build:
     runs-on: macos-${{ matrix.os }}
-    name: macos-${{ matrix.os }} - mkl
+    name: macos-${{ matrix.os }} - OpenBLAS
     strategy:
       fail-fast: false
       matrix:
@@ -35,8 +35,8 @@ jobs:
         init-shell: bash
         cache-downloads: true
 
-    - name: Install mkl
-      run: micromamba install mkl
+    - name: Install OpenBLAS
+      run: micromamba install openblas==0.3 blas-devel
 
     - name: Configure using CMake
       run: cmake -Bbuild -DDOWNLOAD_GTEST=ON -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
