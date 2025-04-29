@@ -609,6 +609,9 @@ namespace xt
                 XTENSOR_THROW(std::runtime_error, "Could not find workspace size for syevd.");
             }
 
+            int min_size = 1 + 6*N + (2*N)*(2*N);
+            if(work[0]<min_size) work[0] = min_size;
+
             work.resize(std::size_t(work[0]));
             iwork.resize(std::size_t(iwork[0]));
 
