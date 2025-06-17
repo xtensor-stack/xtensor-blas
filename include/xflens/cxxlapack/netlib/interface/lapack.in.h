@@ -579,21 +579,21 @@ LAPACK_IMPL(cgels)(const char           *TRANS,
 
 //-- cgelsd --------------------------------------------------------------------
 void
-LAPACK_IMPL(cgelsd)(const INTEGER    *M,
-                    const INTEGER    *N,
-                    const INTEGER    *NRHS,
-                    FLOAT_COMPLEX    *A,
-                    const INTEGER    *LDA,
-                    FLOAT_COMPLEX    *B,
-                    const INTEGER    *LDB,
-                    FLOAT            *S,
-                    const FLOAT      *RCOND,
-                    INTEGER          *RANK,
-                    FLOAT_COMPLEX    *WORK,
-                    const INTEGER    *LWORK,
-                    FLOAT            *RWORK,
-                    INTEGER          *IWORK,
-                    INTEGER          *INFO);
+LAPACK_IMPL(cgelsd)(const INTEGER        *M,
+                    const INTEGER        *N,
+                    const INTEGER        *NRHS,
+                    const FLOAT_COMPLEX  *A,
+                    const INTEGER        *LDA,
+                    FLOAT_COMPLEX        *B,
+                    const INTEGER        *LDB,
+                    FLOAT                *S,
+                    const FLOAT          *RCOND,
+                    INTEGER              *RANK,
+                    FLOAT_COMPLEX        *WORK,
+                    const INTEGER        *LWORK,
+                    FLOAT                *RWORK,
+                    INTEGER              *IWORK,
+                    INTEGER              *INFO);
 
 //-- cgelss --------------------------------------------------------------------
 void
