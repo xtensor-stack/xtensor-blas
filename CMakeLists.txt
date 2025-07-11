@@ -32,10 +32,6 @@ set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR})
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR_64 "\"${CMAKE_INSTALL_PREFIX}/lib64\"")
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR_32 "\"${CMAKE_INSTALL_PREFIX}/lib32\"")
 set(XTENSOR_BLAS_CLING_LIBRARY_DIR "\"${CMAKE_INSTALL_PREFIX}/lib\"")
-if(EMSCRIPTEN)
-    set(OPENBLAS_CPPINTEROP_LIBRARY_PATH "\"/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}\"")
-    message(STATUS "OPENBLAS_CPPINTEROP_LIBRARY_PATH = ${OPENBLAS_CPPINTEROP_LIBRARY_PATH}")
-endif()
 
 configure_file (
     "${INCLUDE_DIR}/xtensor-blas/xblas_config_cling.hpp.in"
@@ -103,7 +99,7 @@ OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas
 # If that is not the case, one can pass OpenBLAS_DIR without the boolean
 # toggle.
 OPTION(USE_OPENBLAS "use OpenBLAS (requires suitable OpenBLASConfig.cmake)" OFF)
-if(OpenBLAS_DIR OR EMSCRIPTEN)
+if(OpenBLAS_DIR)
   set(USE_OPENBLAS ON)
 endif()
 
