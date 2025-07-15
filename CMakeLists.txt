@@ -101,13 +101,6 @@ endif()
 OPTION(BUILD_TESTS "xtensor-blas test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor-blas test suite" OFF)
 
-OPTION(DOWNLOAD_GTEST "download gtest and build from source" OFF)
-OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" OFF)
-
-if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    set(BUILD_TESTS ON)
-endif()
-
 if(BUILD_TESTS)
     enable_testing()
     include_directories(${XTENSOR_BLAS_INCLUDE_DIR})
