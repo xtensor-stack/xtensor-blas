@@ -491,6 +491,25 @@ namespace xt
             CHECK(allclose(cel_1, std::get<1>(cres)));
             CHECK_EQ(cel_2, std::get<2>(cres));
             CHECK(allclose(cel_3, std::get<3>(cres)));
+
+            xarray<std::complex<float>> cfarg_0 = {{0.f, 1.f}, {1.f - 3if, 1.f}, {2.f, 1.f}, {3.f, 1.f}};
+            xarray<std::complex<float>> cfarg_1 = {{-1.f, 0.2f + 4if, 0.9f, 2.1f - 1if}, {2.f, 3if, 2.f, 1.f}};
+            cfarg_1 = transpose(cfarg_1);
+            auto cfres = xt::linalg::lstsq(cfarg_0, cfarg_1);
+
+            xarray<std::complex<float>, layout_type::column_major> cfel_0 = {
+                {-0.40425532f - 0.38723404if, -0.61702128f - 0.44680851if},
+                {1.44680851f + 1.02765957if, 2.51063830f + 0.95744681if}
+            };
+            xarray<float> cfel_1 = {16.11787234f, 2.68085106f};
+            int cfel_2 = 2;
+            xarray<float> cfel_3 = {5.01295356f, 1.36758789f};
+
+            CHECK(allclose(imag(cfel_0), imag(std::get<0>(cfres))));
+            CHECK(allclose(real(cfel_0), real(std::get<0>(cfres))));
+            CHECK(allclose(cfel_1, std::get<1>(cfres)));
+            CHECK_EQ(cfel_2, std::get<2>(cfres));
+            CHECK(allclose(cfel_3, std::get<3>(cfres)));
         }
 
         TEST_CASE("trace")
