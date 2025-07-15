@@ -505,11 +505,11 @@ namespace xt
             int cfel_2 = 2;
             xarray<float> cfel_3 = {5.01295356f, 1.36758789f};
   
-            EXPECT_TRUE(allclose(imag(cfel_0), imag(std::get<0>(cfres))));
-            EXPECT_TRUE(allclose(real(cfel_0), real(std::get<0>(cfres))));
-            EXPECT_TRUE(allclose(cfel_1, std::get<1>(cfres)));
-            EXPECT_EQ(cfel_2, std::get<2>(cfres));
-            EXPECT_TRUE(allclose(cfel_3, std::get<3>(cfres)));
+            CHECK(allclose(imag(cfel_0), imag(std::get<0>(cfres))));
+            CHECK(allclose(real(cfel_0), real(std::get<0>(cfres))));
+            CHECK(allclose(cfel_1, std::get<1>(cfres)));
+            CHECK_EQ(cfel_2, std::get<2>(cfres));
+            CHECK(allclose(cfel_3, std::get<3>(cfres)));
         }
 
         TEST_CASE("trace")
