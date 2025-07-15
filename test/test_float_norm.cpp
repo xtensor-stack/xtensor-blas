@@ -14,25 +14,27 @@
 #include "xtensor/generators/xrandom.hpp"
 #include "xtensor/views/xview.hpp"
 
-#include "gtest/gtest.h"
+#include "doctest/doctest.h"
 #include "xtensor-blas/xblas.hpp"
 #include "xtensor-blas/xlinalg.hpp"
 
 namespace xt
 {
 
-    TEST(xblas, norm_complex_float)
+    TEST_SUITE("xblas")
     {
-        xt::xarray<std::complex<float>> a = {std::complex<float>(1.0f, 2.0f), std::complex<float>(3.0f, 4.0f)};
-        auto res = linalg::norm(a);
+        TEST_CASE("norm_complex_float")
+        {
+            xt::xarray<std::complex<float>> a = {std::complex<float>(1.0f, 2.0f), std::complex<float>(3.0f, 4.0f)};
+            auto res = linalg::norm(a);
 
-        EXPECT_NEAR(res.real(), 5.4772f, 1e-3f);
-        EXPECT_NEAR(res.imag(), 0.0f, 1e-3f);
+            CHECK(res.real() == doctest::Approx(5.4772f).epsilon(1e-3f));
+            CHECK(res.imag() == doctest::Approx(0.0f).epsilon(1e-3f));
+        }
+
+        TEST_CASE("norm_float_arange")
+        {
+            xt::linalg::norm(xt::arange<float>(15), 1);
+        }
     }
-
-    TEST(xblas, norm_float_arange)
-    {
-        xt::linalg::norm(xt::arange<float>(15), 1);
-    }
-
 }  // namespace xt

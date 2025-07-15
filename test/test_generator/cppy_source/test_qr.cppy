@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-#include "gtest/gtest.h"
+#include "doctest/doctest.h"
 #include "xtensor/containers/xarray.hpp"
 #include "xtensor/containers/xfixed.hpp"
 #include "xtensor/core/xnoalias.hpp"
@@ -23,77 +23,80 @@ namespace xt
 {
     using namespace xt::placeholders;
 
-    /*py
-    a = np.random.random((6, 3))
-    res_q1 = np.linalg.qr(a, 'raw')
-    res_q2 = np.linalg.qr(a, 'complete')
-    res_q3 = np.linalg.qr(a, 'reduced')
-    res_q4 = np.linalg.qr(a, 'r')
-    */
-    TEST(xtest_extended, qr1)
+    TEST_SUITE("xqr_extended")
     {
-        // py_a
-        // py_resq1_h = res_q1[0]
-        // py_resq1_tau = res_q1[1]
+        /*py
+        a = np.random.random((6, 3))
+        res_q1 = np.linalg.qr(a, 'raw')
+        res_q2 = np.linalg.qr(a, 'complete')
+        res_q3 = np.linalg.qr(a, 'reduced')
+        res_q4 = np.linalg.qr(a, 'r')
+        */
+        TEST_CASE("qr1")
+        {
+            // py_a
+            // py_resq1_h = res_q1[0]
+            // py_resq1_tau = res_q1[1]
 
-        auto res1 = linalg::qr(py_a, linalg::qrmode::raw);
-        EXPECT_TRUE(allclose(std::get<0>(res1), py_resq1_h));
-        EXPECT_TRUE(allclose(std::get<1>(res1), py_resq1_tau));
+            auto res1 = linalg::qr(py_a, linalg::qrmode::raw);
+            CHECK(allclose(std::get<0>(res1), py_resq1_h));
+            CHECK(allclose(std::get<1>(res1), py_resq1_tau));
 
-        // py_resq2_q_cmpl = res_q2[0]
-        // py_resq2_r_cmpl = res_q2[1]
+            // py_resq2_q_cmpl = res_q2[0]
+            // py_resq2_r_cmpl = res_q2[1]
 
-        auto res2 = linalg::qr(py_a, linalg::qrmode::complete);
-        EXPECT_TRUE(allclose(std::get<0>(res2), py_resq2_q_cmpl));
-        EXPECT_TRUE(allclose(std::get<1>(res2), py_resq2_r_cmpl));
+            auto res2 = linalg::qr(py_a, linalg::qrmode::complete);
+            CHECK(allclose(std::get<0>(res2), py_resq2_q_cmpl));
+            CHECK(allclose(std::get<1>(res2), py_resq2_r_cmpl));
 
-        // py_resq3_q_cmpl = res_q3[0]
-        // py_resq3_r_cmpl = res_q3[1]
+            // py_resq3_q_cmpl = res_q3[0]
+            // py_resq3_r_cmpl = res_q3[1]
 
-        auto res3 = linalg::qr(py_a, linalg::qrmode::reduced);
-        EXPECT_TRUE(allclose(std::get<0>(res3), py_resq3_q_cmpl));
-        EXPECT_TRUE(allclose(std::get<1>(res3), py_resq3_r_cmpl));
+            auto res3 = linalg::qr(py_a, linalg::qrmode::reduced);
+            CHECK(allclose(std::get<0>(res3), py_resq3_q_cmpl));
+            CHECK(allclose(std::get<1>(res3), py_resq3_r_cmpl));
 
-        // py_resq4_r_r = res_q4
+            // py_resq4_r_r = res_q4
 
-        auto res4 = linalg::qr(py_a, linalg::qrmode::r);
-        EXPECT_TRUE(allclose(std::get<1>(res4), py_resq4_r_r));
-    }
+            auto res4 = linalg::qr(py_a, linalg::qrmode::r);
+            CHECK(allclose(std::get<1>(res4), py_resq4_r_r));
+        }
 
-    /*py
-    a = np.random.random((5, 10))
-    res_q1 = np.linalg.qr(a, 'raw')
-    res_q2 = np.linalg.qr(a, 'complete')
-    res_q3 = np.linalg.qr(a, 'reduced')
-    res_q4 = np.linalg.qr(a, 'r')
-    */
-    TEST(xtest_extended, qr2)
-    {
-        // py_a
-        // py_resq1_h = res_q1[0]
-        // py_resq1_tau = res_q1[1]
+        /*py
+        a = np.random.random((5, 10))
+        res_q1 = np.linalg.qr(a, 'raw')
+        res_q2 = np.linalg.qr(a, 'complete')
+        res_q3 = np.linalg.qr(a, 'reduced')
+        res_q4 = np.linalg.qr(a, 'r')
+        */
+        TEST_CASE("qr2")
+        {
+            // py_a
+            // py_resq1_h = res_q1[0]
+            // py_resq1_tau = res_q1[1]
 
-        auto res1 = linalg::qr(py_a, linalg::qrmode::raw);
-        EXPECT_TRUE(allclose(std::get<0>(res1), py_resq1_h));
-        EXPECT_TRUE(allclose(std::get<1>(res1), py_resq1_tau));
-        // py_resq2_q_cmpl = res_q2[0]
-        // py_resq2_r_cmpl = res_q2[1]
+            auto res1 = linalg::qr(py_a, linalg::qrmode::raw);
+            CHECK(allclose(std::get<0>(res1), py_resq1_h));
+            CHECK(allclose(std::get<1>(res1), py_resq1_tau));
+            // py_resq2_q_cmpl = res_q2[0]
+            // py_resq2_r_cmpl = res_q2[1]
 
-        auto res2 = linalg::qr(py_a, linalg::qrmode::complete);
-        EXPECT_TRUE(allclose(std::get<0>(res2), py_resq2_q_cmpl));
-        EXPECT_TRUE(allclose(std::get<1>(res2), py_resq2_r_cmpl));
+            auto res2 = linalg::qr(py_a, linalg::qrmode::complete);
+            CHECK(allclose(std::get<0>(res2), py_resq2_q_cmpl));
+            CHECK(allclose(std::get<1>(res2), py_resq2_r_cmpl));
 
-        // py_resq3_q_cmpl = res_q3[0]
-        // py_resq3_r_cmpl = res_q3[1]
+            // py_resq3_q_cmpl = res_q3[0]
+            // py_resq3_r_cmpl = res_q3[1]
 
-        auto res3 = linalg::qr(py_a, linalg::qrmode::reduced);
-        EXPECT_TRUE(allclose(std::get<0>(res3), py_resq3_q_cmpl));
-        EXPECT_TRUE(allclose(std::get<1>(res3), py_resq3_r_cmpl));
+            auto res3 = linalg::qr(py_a, linalg::qrmode::reduced);
+            CHECK(allclose(std::get<0>(res3), py_resq3_q_cmpl));
+            CHECK(allclose(std::get<1>(res3), py_resq3_r_cmpl));
 
-        // py_resq4_r_r = res_q4
+            // py_resq4_r_r = res_q4
 
-        auto res4 = linalg::qr(py_a, linalg::qrmode::r);
-        EXPECT_TRUE(allclose(std::get<1>(res4), py_resq4_r_r));
+            auto res4 = linalg::qr(py_a, linalg::qrmode::r);
+            CHECK(allclose(std::get<1>(res4), py_resq4_r_r));
 
+        }
     }
 }
