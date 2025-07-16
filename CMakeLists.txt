@@ -8,7 +8,18 @@
 ############################################################################
 
 cmake_minimum_required(VERSION 3.29)
+
+# Otherwise adds std=gnu++17 on OSX ...
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 project(xtensor-blas)
+
+# Otherwise adds flags for C++11 standard on OSX ...
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+endif()
+message(STATUS "🔧 C++ standard: ${CMAKE_CXX_STANDARD}")
+
 
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR})
@@ -44,7 +55,7 @@ message(STATUS "xtensor-blas v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtensor_REQUIRED_VERSION 0.26.0)
+set(xtensor_REQUIRED_VERSION 0.27.0)
 if(TARGET xtensor)
     set(xtensor_VERSION ${XTENSOR_VERSION_MAJOR}.${XTENSOR_VERSION_MINOR}.${XTENSOR_VERSION_PATCH})
     # Note: This is not SEMVER compatible comparison
@@ -77,6 +88,8 @@ target_include_directories(xtensor-blas
     $<BUILD_INTERFACE:${XTENSOR_BLAS_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:include>)
 
+target_compile_features(xtensor-blas INTERFACE cxx_std_20)
+
 OPTION(CXXBLAS_DEBUG "print cxxblas debug information" OFF)
 OPTION(XTENSOR_USE_FLENS_BLAS "use FLENS generic implementation instead of cblas" OFF)
 # Decide whether to use OpenBLAS or not.
@@ -100,6 +113,8 @@ endif()
 
 OPTION(BUILD_TESTS "xtensor-blas test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor-blas test suite" OFF)
+
+OPTION(CPP23 "enables C++23 (experimental)" OFF)
 
 if(BUILD_TESTS)
     enable_testing()
