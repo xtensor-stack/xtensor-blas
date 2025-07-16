@@ -8,7 +8,18 @@
 ############################################################################
 
 cmake_minimum_required(VERSION 3.29)
+
+# Otherwise adds std=gnu++17 on OSX ...
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 project(xtensor-blas)
+
+# Otherwise adds flags for C++11 standard on OSX ...
+if(NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+endif()
+message(STATUS "🔧 C++ standard: ${CMAKE_CXX_STANDARD}")
+
 
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(XTENSOR_BLAS_INCLUDE_DIR ${INCLUDE_DIR})
