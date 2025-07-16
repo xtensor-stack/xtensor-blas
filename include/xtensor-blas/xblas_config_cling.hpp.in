@@ -26,7 +26,7 @@
 
 #include <clang/Interpreter/CppInterOp.h>
 static bool _openblas_loaded = []() {
-    Cpp::LoadLibrary(@OPENBLAS_CPPINTEROP_LIBRARY_PATH@, false);
+    Cpp::LoadLibrary("/lib/@CMAKE_SHARED_LIBRARY_PREFIX@openblas@CMAKE_SHARED_LIBRARY_SUFFIX@", false);
     return true;
 }();
 
