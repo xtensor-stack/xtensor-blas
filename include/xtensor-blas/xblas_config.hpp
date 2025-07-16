@@ -30,6 +30,10 @@
 #include "xtensor-blas/xblas_config_cling.hpp"
 #endif
 
+#if defined(__CLANG_REPL__) && defined(__EMSCRIPTEN__)
+#include "xtensor-blas/xblas_config_cling.hpp"
+#endif
+
 namespace xt
 {
     using blas_index_t = BLAS_IDX;

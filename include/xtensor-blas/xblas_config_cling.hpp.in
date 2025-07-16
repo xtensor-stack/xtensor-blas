@@ -10,17 +10,28 @@
 #ifndef XBLAS_CONFIG_CLING_HPP
 #define XBLAS_CONFIG_CLING_HPP
 
-#pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_64@)
-#pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_32@)
-#pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR@)
-
 #ifndef XTENSOR_USE_FLENS_BLAS
 
 #define HAVE_CBLAS 1
 
+#if defined(__CLING__)
+
+#pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_64@)
+#pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR_32@)
+#pragma cling add_library_path(@XTENSOR_BLAS_CLING_LIBRARY_DIR@)
 #pragma cling load("libblas")
 #pragma cling load("liblapack")
 
-#endif
+#elif defined(__EMSCRIPTEN__) && defined(__CLANG_REPL__)
+
+#include <clang/Interpreter/CppInterOp.h>
+static bool _openblas_loaded = []() {
+    Cpp::LoadLibrary(@OPENBLAS_CPPINTEROP_LIBRARY_PATH@, false);
+    return true;
+}();
 
 #endif
+
+#endif // XTENSOR_USE_FLENS_BLAS
+
+#endif // XBLAS_CONFIG_CLING_HPP
